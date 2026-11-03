@@ -4,7 +4,9 @@ using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Cartesia;
+using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Neuphonic;
+using AIHappey.Core.Providers.ResembleAI;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -150,6 +152,118 @@ public sealed class ProviderStreamingSpeechTests
         Assert.Contains("only raw PCM", error.Message);
     }
 
+    [Fact]
+    public async Task ResembleAI_streams_native_WAV_chunks_and_preserves_provider_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://f.cluster.resemble.ai/stream", request.RequestUri!.ToString());
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Contains("audio/wav", request.Headers.Accept.Select(value => value.MediaType));
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            var content = new ByteArrayContent([1, 2, 3, 4]);
+            content.Headers.ContentType = new("audio/wav");
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+        });
+        var metadata = ParseElement("""
+            {
+              "project_uuid":"project-1",
+              "precision":"PCM_16",
+              "sample_rate":24000,
+              "future":{"enabled":true}
+            }
+            """);
+        var request = new StreamingSpeechRequest
+        {
+            Model = "resembleai/chatterbox/voice-1",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            Voice = "ignored-voice",
+            OutputFormat = new() { Type = "wav" },
+            ProviderOptions = new() { ["resembleai"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalMetadata = request.ProviderOptions["resembleai"].Clone();
+
+        var parts = await CollectAsync(CreateResembleAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("data").GetString());
+        Assert.Equal("voice-1", payload.GetProperty("voice_uuid").GetString());
+        Assert.Equal("project-1", payload.GetProperty("project_uuid").GetString());
+        Assert.Equal("PCM_16", payload.GetProperty("precision").GetString());
+        Assert.Equal(24000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.False(payload.TryGetProperty("output_format", out _));
+        Assert.True(JsonElement.DeepEquals(originalMetadata, request.ProviderOptions["resembleai"]));
+        var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal(Convert.ToBase64String(new byte[] { 1, 2, 3, 4 }), audio.Audio);
+        Assert.Equal("audio/wav", audio.AudioFormat.Type);
+        Assert.Equal(24000, audio.AudioFormat.Rate);
+        Assert.Single(parts.OfType<SpeechRawPart>());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task MurfAI_streams_Falcon_audio_and_maps_provider_options_and_output_format()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://global.api.murf.ai/v1/speech/stream", request.RequestUri!.ToString());
+            Assert.Equal("test-key", request.Headers.GetValues("api-key").Single());
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            var content = new ByteArrayContent([5, 6, 7]);
+            content.Headers.ContentType = new("audio/wav");
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = content };
+        });
+        var metadata = ParseElement("""
+            {
+              "locale":"en-US",
+              "sampleRate":24000,
+              "pronunciationDictionary":{"API":{"type":"SAY_AS","pronunciation":"A P I"}},
+              "future":{"enabled":true}
+            }
+            """);
+        var request = new StreamingSpeechRequest
+        {
+            Model = "murfai/falcon-2.1/voice-1",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            Speed = 1.2f,
+            OutputFormat = new() { Type = "wav" },
+            ProviderOptions = new() { ["murfai"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalMetadata = request.ProviderOptions["murfai"].Clone();
+
+        var parts = await CollectAsync(CreateMurfAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("text").GetString());
+        Assert.Equal("falcon-2.1", payload.GetProperty("model").GetString());
+        Assert.Equal("voice-1", payload.GetProperty("voiceId").GetString());
+        Assert.Equal("WAV", payload.GetProperty("format").GetString());
+        Assert.Equal("en-US", payload.GetProperty("locale").GetString());
+        Assert.Equal(10, payload.GetProperty("rate").GetInt32());
+        Assert.Equal(24000, payload.GetProperty("sampleRate").GetInt32());
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("pronunciationDictionary"),
+            payload.GetProperty("pronunciationDictionary")));
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalMetadata, request.ProviderOptions["murfai"]));
+        var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal(Convert.ToBase64String(new byte[] { 5, 6, 7 }), audio.Audio);
+        Assert.Equal("audio/wav", audio.AudioFormat.Type);
+        Assert.Equal(24000, audio.AudioFormat.Rate);
+        Assert.Single(parts.OfType<SpeechRawPart>());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.False(client.DefaultRequestHeaders.Contains("api-key"));
+    }
+
     private static async Task<List<StreamingSpeechPart>> CollectAsync(
         IAsyncEnumerable<StreamingSpeechPart> stream)
     {
@@ -166,6 +280,16 @@ public sealed class ProviderStreamingSpeechTests
 
     private static NeuphonicProvider CreateNeuphonicProvider(HttpClient client)
         => new(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
+
+    private static ResembleAIProvider CreateResembleAIProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
+            new StaticHttpClientFactory(client));
+
+    private static MurfAIProvider CreateMurfAIProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
+            new StaticHttpClientFactory(client));
 
     private static JsonElement ParseElement(string json)
         => JsonDocument.Parse(json).RootElement.Clone();
