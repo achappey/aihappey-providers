@@ -4,12 +4,14 @@ using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Cartesia;
+using AIHappey.Core.Providers.AssemblyAI;
 using AIHappey.Core.Providers.ElevenLabs;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Neuphonic;
 using AIHappey.Core.Providers.ResembleAI;
 using AIHappey.Core.Providers.Speechify;
 using AIHappey.Core.Providers.Speechmatics;
+using AIHappey.Core.Providers.Together;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -112,6 +114,174 @@ public sealed class ProviderStreamingSpeechTests
         Assert.Single(parts.OfType<SpeechStreamStartPart>());
         Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
         Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Together_streams_documented_SSE_audio_deltas_and_preserves_provider_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://api.together.ai/v1/audio/speech", request.RequestUri!.ToString());
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-key", request.Headers.Authorization?.Parameter);
+            Assert.Contains("text/event-stream", request.Headers.Accept.Select(value => value.MediaType));
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"type\":\"conversation.item.audio_output.delta\",\"item_id\":\"tts_1\",\"delta\":\"AQI=\"}\n\n" +
+                    "data: {\"type\":\"conversation.item.word_timestamps\",\"words\":[\"Hello\"],\"start_seconds\":[0.0],\"end_seconds\":[0.4]}\n\n" +
+                    "data: {\"type\":\"conversation.item.audio_output.delta\",\"item_id\":\"tts_1\",\"delta\":\"AwQ=\"}\n\n" +
+                    "data: [DONE]\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+        });
+        var metadata = ParseElement("""
+            {
+              "canopylabs":{"voice":"tara"},
+              "response_encoding":"pcm_s16le",
+              "sample_rate":24000,
+              "future":{"enabled":true}
+            }
+            """);
+        var request = new StreamingSpeechRequest
+        {
+            Model = "together/canopylabs/orpheus-3b-0.1-ft",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            OutputFormat = new() { Type = "raw", Rate = 24000 },
+            ProviderOptions = new() { ["together"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalOptions = request.ProviderOptions["together"].Clone();
+
+        var parts = await CollectAsync(CreateTogetherProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("canopylabs/orpheus-3b-0.1-ft", payload.GetProperty("model").GetString());
+        Assert.Equal("Hello world!", payload.GetProperty("input").GetString());
+        Assert.Equal("tara", payload.GetProperty("voice").GetString());
+        Assert.True(payload.GetProperty("stream").GetBoolean());
+        Assert.Equal("raw", payload.GetProperty("response_format").GetString());
+        Assert.Equal("pcm_s16le", payload.GetProperty("response_encoding").GetString());
+        Assert.Equal(24000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["together"]));
+        Assert.Equal(2, parts.OfType<SpeechAudioPart>().Count());
+        Assert.All(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.Equal("audio/pcm", part.AudioFormat.Type);
+            Assert.Equal(24000, part.AudioFormat.Rate);
+        });
+        Assert.Equal(3, parts.OfType<SpeechRawPart>().Count());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task AssemblyAI_streams_SSE_TTS_audio_and_preserves_event_metadata()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://tts.us.assemblyai.com/v1/speech/events", request.RequestUri!.ToString());
+            Assert.Equal("test-key", request.Headers.GetValues("Authorization").Single());
+            Assert.Contains("text/event-stream", request.Headers.Accept.Select(value => value.MediaType));
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"type\":\"Begin\",\"configuration\":{\"model\":\"assemblyai-tts-1\",\"sample_rate\":24000}}\n\n" +
+                    "data: {\"type\":\"Audio\",\"audio\":\"AQI=\",\"flush_id\":0}\n\n" +
+                    "data: {\"type\":\"Audio\",\"audio\":\"AwQ=\",\"flush_id\":0}\n\n" +
+                    "data: {\"type\":\"FlushDone\",\"flush_id\":0,\"audio_duration_ms\":120}\n\n" +
+                    "data: {\"type\":\"WordBoundaries\",\"flush_id\":0,\"words\":[\"Hello\"]}\n\n" +
+                    "data: {\"type\":\"Termination\",\"summary\":{\"audio_duration_seconds\":0.12}}\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+            response.Headers.Add("X-TTS-Model", "assemblyai-tts-1");
+            return response;
+        });
+        var metadata = ParseElement("""{"future":{"preserve":true},"word_boundaries":true}""");
+        var request = new StreamingSpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            Voice = "aai-jane",
+            Language = "english",
+            OutputFormat = new() { Type = "pcm", Rate = 24000 },
+            ProviderOptions = new() { ["assemblyai"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalOptions = request.ProviderOptions["assemblyai"].Clone();
+
+        var parts = await CollectAsync(CreateAssemblyAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("text").GetString());
+        Assert.Equal("assemblyai-tts-1", payload.GetProperty("model").GetString());
+        Assert.Equal("aai-jane", payload.GetProperty("voice_id").GetString());
+        Assert.Equal("english", payload.GetProperty("language").GetString());
+        Assert.Equal("pcm_s16le", payload.GetProperty("encoding").GetString());
+        Assert.Equal(24000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.True(payload.GetProperty("word_boundaries").GetBoolean());
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["assemblyai"]));
+        Assert.Equal(2, parts.OfType<SpeechAudioPart>().Count());
+        Assert.All(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.Equal("audio/pcm", part.AudioFormat.Type);
+            Assert.Equal(24000, part.AudioFormat.Rate);
+        });
+        Assert.Equal(6, parts.OfType<SpeechRawPart>().Count());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Equal(6, finish.ProviderMetadata["assemblyai"].GetProperty("events").GetArrayLength());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task AssemblyAI_generates_speech_from_its_native_audio_endpoint()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://tts.us.assemblyai.com/v1/speech", request.RequestUri!.ToString());
+            Assert.Equal("test-key", request.Headers.GetValues("Authorization").Single());
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+            response.Content.Headers.ContentType = new("audio/wav");
+            response.Headers.Add("X-TTS-Model", "assemblyai-tts-1");
+            return response;
+        });
+        var request = new SpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = "Hello world!",
+            Voice = "aai-jane",
+            OutputFormat = "wav"
+        };
+
+        var response = await CreateAssemblyAIProvider(client).SpeechRequest(request);
+
+        Assert.Equal("Hello world!", payload.GetProperty("text").GetString());
+        Assert.Equal("assemblyai-tts-1", payload.GetProperty("model").GetString());
+        Assert.Equal("aai-jane", payload.GetProperty("voice_id").GetString());
+        Assert.Equal("wav", payload.GetProperty("container").GetString());
+        Assert.False(payload.GetProperty("stream").GetBoolean());
+        Assert.Equal(Convert.ToBase64String([1, 2, 3]), response.Audio.Base64);
+        Assert.Equal("audio/wav", response.Audio.MimeType);
+        Assert.Equal("wav", response.Audio.Format);
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
@@ -461,6 +631,14 @@ public sealed class ProviderStreamingSpeechTests
 
     private static SpeechmaticsProvider CreateSpeechmaticsProvider(HttpClient client)
         => new(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
+
+    private static TogetherProvider CreateTogetherProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
+
+    private static AssemblyAIProvider CreateAssemblyAIProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
+            new StaticHttpClientFactory(client));
 
     private static JsonElement ParseElement(string json)
         => JsonDocument.Parse(json).RootElement.Clone();
