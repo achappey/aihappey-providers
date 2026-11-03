@@ -1,6 +1,7 @@
 using System.Net.ServerSentEvents;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
@@ -61,7 +62,7 @@ public sealed partial class NeuphonicProvider
         yield return new AudioSpeechStreamDone();
     }
 
-    private async IAsyncEnumerable<(byte[] Audio, JsonElement Metadata)> ReadSpeechAsync(
+    private async IAsyncEnumerable<NeuphonicSpeechFrame> ReadSpeechAsync(
         JsonElement payload, string language, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, $"sse/speak/{Uri.EscapeDataString(language)}")
@@ -75,6 +76,7 @@ public sealed partial class NeuphonicProvider
             throw new HttpRequestException(
                 $"Neuphonic speech failed ({(int)response.StatusCode}): {await response.Content.ReadAsStringAsync(cancellationToken)}",
                 null, response.StatusCode);
+        var headers = response.GetHeaders();
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         await foreach (var item in SseParser.Create(stream).EnumerateAsync(cancellationToken))
         {
@@ -111,10 +113,161 @@ public sealed partial class NeuphonicProvider
                 metadata["data"] = JsonSerializer.SerializeToElement(data.EnumerateObject()
                     .Where(p => p.Name != "audio").ToDictionary(p => p.Name, p => p.Value.Clone()));
             }
-            yield return (audio, JsonSerializer.SerializeToElement(metadata));
+            yield return new(audio, JsonSerializer.SerializeToElement(metadata), headers);
         }
         cancellationToken.ThrowIfCancellationRequested();
     }
+
+    public async IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(
+        StreamingSpeechRequest request,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Text is not { Length: > 0 })
+            throw new ArgumentException("At least one Neuphonic speech text part is required.", nameof(request));
+        if (request.OutputFormat?.Rate is <= 0)
+            throw new ArgumentException("Speech output sample rate must be positive.", nameof(request));
+
+        var text = new System.Text.StringBuilder();
+        JsonElement? configuration = null;
+        JsonElement payload = default;
+        string language = string.Empty;
+        string voice = string.Empty;
+        foreach (var part in request.Text)
+        {
+            if (part is null || part.Type != "text" || part.Text is null)
+                throw new ArgumentException("Neuphonic speech parts must be text with non-null content.", nameof(request));
+
+            var options = MergeNeuphonicOptions(request.ProviderOptions, part.ProviderOptions);
+            var current = BuildPayload(new SpeechRequest
+            {
+                Model = request.Model,
+                Text = "validation",
+                Voice = part.Voice ?? request.Voice,
+                Speed = request.Speed,
+                Language = request.Language,
+                OutputFormat = request.OutputFormat?.Type,
+                ProviderOptions = new() { [GetIdentifier()] = JsonSerializer.SerializeToElement(options) }
+            });
+            if (request.OutputFormat?.Rate is { } rate)
+                current.Payload = SetSampleRate(current.Payload, rate);
+
+            if (configuration is not null && !JsonElement.DeepEquals(configuration.Value, current.Payload))
+                throw new NotSupportedException("Neuphonic SSE speech requires one effective voice and provider-options configuration across text parts.");
+            configuration = current.Payload;
+            payload = current.Payload;
+            language = current.Language;
+            voice = current.Voice;
+            text.Append(part.Text);
+        }
+
+        if (string.IsNullOrWhiteSpace(text.ToString()))
+            throw new ArgumentException("Neuphonic speech text cannot be empty.", nameof(request));
+        payload = SetText(payload, text.ToString());
+        var encoding = GetString(payload, "encoding");
+        var audioType = encoding == "pcm_mulaw" ? "application/octet-stream" : "audio/pcm";
+        var fallbackRate = ReadSampleRate(payload);
+
+        await using var frames = ReadSpeechAsync(payload, language, cancellationToken).GetAsyncEnumerator(cancellationToken);
+        if (!await frames.MoveNextAsync())
+            throw new InvalidOperationException("Neuphonic returned no speech audio.");
+
+        yield return new SpeechStreamStartPart();
+        yield return new SpeechResponseMetadataPart
+        {
+            Timestamp = DateTime.UtcNow,
+            ModelId = $"{GetIdentifier()}/{language}/{voice}",
+            Headers = frames.Current.Headers
+        };
+
+        var receivedAudio = false;
+        var events = new List<JsonElement>();
+        do
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var frame = frames.Current;
+            events.Add(frame.Metadata);
+            if (request.IncludeRawChunks == true)
+                yield return new SpeechRawPart { RawValue = frame.Metadata };
+            if (frame.Audio.Length > 0)
+            {
+                receivedAudio = true;
+                yield return new SpeechAudioPart
+                {
+                    Audio = Convert.ToBase64String(frame.Audio),
+                    AudioFormat = new AudioFormat
+                    {
+                        Type = audioType,
+                        Rate = ReadSampleRate(frame.Metadata) ?? fallbackRate
+                    },
+                    ProviderMetadata = new() { [GetIdentifier()] = frame.Metadata }
+                };
+            }
+        } while (await frames.MoveNextAsync());
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!receivedAudio)
+            throw new InvalidOperationException("Neuphonic returned no speech audio.");
+        yield return new SpeechFinishPart
+        {
+            ProviderMetadata = new() { [GetIdentifier()] = JsonSerializer.SerializeToElement(new { events }) }
+        };
+    }
+
+    private static Dictionary<string, JsonElement> MergeNeuphonicOptions(
+        Dictionary<string, JsonElement>? defaults,
+        Dictionary<string, JsonElement>? overrides)
+    {
+        var values = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        foreach (var options in new[] { defaults, overrides })
+        {
+            if (options?.TryGetValue("neuphonic", out var native) != true)
+                continue;
+            if (native.ValueKind != JsonValueKind.Object)
+                throw new ArgumentException("providerOptions.neuphonic must be an object.");
+            foreach (var property in native.EnumerateObject())
+                values[property.Name] = property.Value.Clone();
+        }
+        return values;
+    }
+
+    private static JsonElement SetSampleRate(JsonElement payload, int rate)
+    {
+        var values = payload.EnumerateObject().ToDictionary(
+            property => property.Name,
+            property => property.Value.Clone(),
+            StringComparer.Ordinal);
+        values["sampling_rate"] = JsonSerializer.SerializeToElement(rate);
+        return JsonSerializer.SerializeToElement(values);
+    }
+
+    private static JsonElement SetText(JsonElement payload, string text)
+    {
+        var values = payload.EnumerateObject().ToDictionary(
+            property => property.Name,
+            property => property.Value.Clone(),
+            StringComparer.Ordinal);
+        values["text"] = JsonSerializer.SerializeToElement(text);
+        return JsonSerializer.SerializeToElement(values);
+    }
+
+    private static int? ReadSampleRate(JsonElement value)
+    {
+        if (value.ValueKind == JsonValueKind.Object &&
+            value.TryGetProperty("data", out var data) && data.ValueKind == JsonValueKind.Object)
+            value = data;
+        return value.ValueKind == JsonValueKind.Object &&
+               value.TryGetProperty("sampling_rate", out var rate) &&
+               rate.ValueKind == JsonValueKind.Number && rate.TryGetInt32(out var sampleRate)
+            ? sampleRate
+            : null;
+    }
+
+    private sealed record NeuphonicSpeechFrame(
+        byte[] Audio,
+        JsonElement Metadata,
+        Dictionary<string, string> Headers);
 
     private (JsonElement Payload, string Language, string Voice) BuildPayload(SpeechRequest request)
     {
