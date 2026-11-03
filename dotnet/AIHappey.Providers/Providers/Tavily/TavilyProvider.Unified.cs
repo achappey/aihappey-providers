@@ -10,7 +10,6 @@ public partial class TavilyProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         var model = ResolveModel(request.Model);
-        ApplyAuthHeader();
         return model is "crawl" or "extract"
             ? await ExecuteWebAsync(request, model, cancellationToken)
             : await ExecuteResearchAsync(request, model, cancellationToken);
@@ -21,7 +20,6 @@ public partial class TavilyProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         var model = ResolveModel(request.Model);
-        ApplyAuthHeader();
         if (model is "crawl" or "extract")
         {
             await foreach (var evt in StreamWebAsync(request, model, cancellationToken))

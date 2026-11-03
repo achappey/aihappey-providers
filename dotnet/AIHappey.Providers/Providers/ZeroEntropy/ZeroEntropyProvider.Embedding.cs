@@ -18,7 +18,6 @@ public partial class ZeroEntropyProvider
         OpenAIEmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ModelProviderEmbeddingCompatibilityExtensions.ValidateOpenAIEmbeddingRequest(request);
 
         var result = await SendZeroEntropyEmbeddingAsync(request, cancellationToken);
@@ -29,8 +28,6 @@ public partial class ZeroEntropyProvider
         EmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var openAIRequest = request.ToOpenAIEmbeddingRequest(GetIdentifier());
         var result = await SendZeroEntropyEmbeddingAsync(openAIRequest, cancellationToken);
         var response = ToZeroEntropyOpenAIResponse(result.Root, openAIRequest.Model);
@@ -67,6 +64,7 @@ public partial class ZeroEntropyProvider
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(message);
         using var response = await _client.SendAsync(
             message,
             HttpCompletionOption.ResponseHeadersRead,
