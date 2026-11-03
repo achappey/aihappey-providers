@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.KlingAI;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
@@ -31,7 +30,11 @@ public partial class KlingAIProvider
 
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
-        var metadata = imageRequest.GetProviderMetadata<KlingAIImageProviderMetadata>(GetIdentifier());
+        var metadata = imageRequest.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+        {
+            throw new JsonException("KlingAI provider metadata must be a JSON object.");
+        }
 
         if (imageRequest.Mask is not null)
         {
@@ -57,17 +60,25 @@ public partial class KlingAIProvider
         {
             ["prompt"] = imageRequest.Prompt,
             ["model_name"] = modelName,
-            ["negative_prompt"] = metadata?.NegativePrompt,
+            ["negative_prompt"] = GetProviderOption<string?>(metadata, "negative_prompt"),
             ["n"] = imageRequest.N,
             ["aspect_ratio"] = imageRequest.AspectRatio,
-            ["resolution"] = metadata?.Resolution,
-            ["image_reference"] = metadata?.ImageReference,
-            ["image_fidelity"] = metadata?.ImageFidelity,
-            ["human_fidelity"] = metadata?.HumanFidelity,
-            ["watermark_info"] = metadata?.WatermarkInfo,
-            ["callback_url"] = metadata?.CallbackUrl,
-            ["external_task_id"] = metadata?.ExternalTaskId
+            ["resolution"] = GetProviderOption<string?>(metadata, "resolution"),
+            ["image_reference"] = GetProviderOption<string?>(metadata, "image_reference"),
+            ["image_fidelity"] = GetProviderOption<float?>(metadata, "image_fidelity"),
+            ["human_fidelity"] = GetProviderOption<float?>(metadata, "human_fidelity"),
+            ["watermark_info"] = GetProviderOptionElement(metadata, "watermark_info"),
+            ["callback_url"] = GetProviderOption<string?>(metadata, "callback_url"),
+            ["external_task_id"] = GetProviderOption<string?>(metadata, "external_task_id")
         };
+
+        if (metadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                payload.TryAdd(property.Name, property.Value.Clone());
+            }
+        }
 
         if (isOmniModel)
         {
@@ -75,9 +86,15 @@ public partial class KlingAIProvider
             payload.Remove("image_reference");
             payload.Remove("image_fidelity");
             payload.Remove("human_fidelity");
-            payload["result_type"] = metadata?.ResultType;
-            payload["series_amount"] = metadata?.SeriesAmount;
-            payload["element_list"] = metadata?.ElementList;
+            payload["result_type"] = GetProviderOption<string>(metadata, "result_type");
+            payload["series_amount"] = GetProviderOptionElement(metadata, "series_amount");
+            payload["element_list"] = GetProviderOptionElement(metadata, "element_list");
+        }
+        else
+        {
+            payload.Remove("result_type");
+            payload.Remove("series_amount");
+            payload.Remove("element_list");
         }
 
         if (imageRequest.Seed is not null)
@@ -121,7 +138,7 @@ public partial class KlingAIProvider
         {
             payload["image"] = NormalizeKlingInputImage(firstFile.GetDataOrUrl());
 
-            if (!string.IsNullOrWhiteSpace(metadata?.NegativePrompt))
+            if (!string.IsNullOrWhiteSpace(GetProviderOption<string?>(metadata, "negative_prompt")))
             {
                 warnings.Add(new
                 {
@@ -298,6 +315,36 @@ public partial class KlingAIProvider
         => image.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
             ? image.RemoveDataUrlPrefix()
             : image;
+
+    private static T? GetProviderOption<T>(JsonElement metadata, string name)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return default;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                return property.Value.Deserialize<T>(JsonSerializerOptions.Web);
+        }
+
+        return default;
+    }
+
+    private static JsonElement? GetProviderOptionElement(JsonElement metadata, string name)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return default;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                return property.Value.ValueKind == JsonValueKind.Null
+                    ? default
+                    : property.Value.Clone();
+        }
+
+        return default;
+    }
 
     private static string FindClosestAspectRatio(double ratio)
     {
