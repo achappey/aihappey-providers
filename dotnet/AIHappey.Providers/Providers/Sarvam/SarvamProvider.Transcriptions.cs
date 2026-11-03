@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.Sarvam;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.MCP.Media;
@@ -24,23 +23,30 @@ public partial class SarvamProvider
         ApplyAuthHeader();
 
         var now = DateTime.UtcNow;
-        var metadata = request.GetProviderMetadata<SarvamTranscriptionProviderMetadata>(GetIdentifier());
-        var bytes = DecodeAudio(request.Audio);
-        var fileName = GetAudioFileName(request.MediaType, metadata?.InputAudioCodec);
-        var model = NormalizeModelId(metadata?.Model ?? request.Model);
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            throw new JsonException("Sarvam provider options must be a JSON object.");
 
-        var jobParameters = new Dictionary<string, object?>
-        {
-            ["model"] = string.IsNullOrWhiteSpace(model) ? "saaras:v4" : model,
-            ["language_code"] = metadata?.LanguageCode ?? "unknown",
-            ["mode"] = metadata?.Mode ?? "transcribe",
-            ["with_timestamps"] = metadata?.WithTimestamps ?? true,
-            ["with_diarization"] = metadata?.WithDiarization ?? false
-        };
-        if (metadata?.NumberOfSpeakers is not null)
-            jobParameters["num_speakers"] = metadata.NumberOfSpeakers;
-        if (!string.IsNullOrWhiteSpace(metadata?.InputAudioCodec))
-            jobParameters["input_audio_codec"] = metadata.InputAudioCodec;
+        var metadataModel = ReadMetadataValue<string?>(metadata, "model");
+        var languageCode = ReadMetadataValue<string?>(metadata, "language_code");
+        var inputAudioCodec = ReadMetadataValue<string?>(metadata, "input_audio_codec");
+        var withTimestamps = ReadMetadataValue<bool?>(metadata, "with_timestamps");
+        var mode = ReadMetadataValue<string?>(metadata, "mode");
+        var withDiarization = ReadMetadataValue<bool?>(metadata, "with_diarization");
+        var numberOfSpeakers = ReadMetadataValue<int?>(metadata, "num_speakers");
+
+        var bytes = DecodeAudio(request.Audio);
+        var fileName = GetAudioFileName(request.MediaType, inputAudioCodec);
+        var model = NormalizeModelId(metadataModel ?? request.Model);
+        var jobParameters = CreateJobParameters(
+            metadata,
+            model,
+            inputAudioCodec,
+            languageCode,
+            mode,
+            withTimestamps,
+            withDiarization,
+            numberOfSpeakers);
 
         using var initiated = await SendJobJsonAsync(HttpMethod.Post, SpeechToTextJobPath,
             new Dictionary<string, object?> { ["job_parameters"] = jobParameters }, cancellationToken);
@@ -82,6 +88,69 @@ public partial class SarvamProvider
             now,
             null);
     }
+
+    private static Dictionary<string, object?> CreateJobParameters(
+        JsonElement metadata,
+        string model,
+        string? inputAudioCodec,
+        string? languageCode,
+        string? mode,
+        bool? withTimestamps,
+        bool? withDiarization,
+        int? numberOfSpeakers)
+    {
+        var jobParameters = new Dictionary<string, object?>();
+        if (metadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (!IsMappedMetadataProperty(property.Name))
+                    jobParameters[property.Name] = property.Value.Clone();
+            }
+        }
+
+        jobParameters["model"] = string.IsNullOrWhiteSpace(model) ? "saaras:v4" : model;
+        jobParameters["language_code"] = languageCode ?? "unknown";
+        jobParameters["mode"] = mode ?? "transcribe";
+        jobParameters["with_timestamps"] = withTimestamps ?? true;
+        jobParameters["with_diarization"] = withDiarization ?? false;
+
+        if (numberOfSpeakers is null)
+            jobParameters.Remove("num_speakers");
+        else
+            jobParameters["num_speakers"] = numberOfSpeakers.Value;
+
+        if (string.IsNullOrWhiteSpace(inputAudioCodec))
+            jobParameters.Remove("input_audio_codec");
+        else
+            jobParameters["input_audio_codec"] = inputAudioCodec;
+
+        return jobParameters;
+    }
+
+    private static T? ReadMetadataValue<T>(JsonElement metadata, string propertyName)
+    {
+        JsonElement? matchedProperty = null;
+        if (metadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                    matchedProperty = property.Value;
+            }
+        }
+
+        return matchedProperty?.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static bool IsMappedMetadataProperty(string propertyName)
+        => propertyName.Equals("model", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("language_code", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("input_audio_codec", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("with_timestamps", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("mode", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("with_diarization", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("num_speakers", StringComparison.OrdinalIgnoreCase);
 
     private static byte[] DecodeAudio(object? audio)
     {
