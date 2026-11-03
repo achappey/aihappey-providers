@@ -8,6 +8,8 @@ using AIHappey.Core.Providers.ElevenLabs;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Neuphonic;
 using AIHappey.Core.Providers.ResembleAI;
+using AIHappey.Core.Providers.Speechify;
+using AIHappey.Core.Providers.Speechmatics;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -15,6 +17,104 @@ namespace AIHappey.Tests;
 
 public sealed class ProviderStreamingSpeechTests
 {
+    [Fact]
+    public async Task Speechify_streams_raw_audio_chunks_with_documented_format_and_provider_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("https://api.speechify.ai/v1/audio/stream", request.RequestUri!.ToString());
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-key", request.Headers.Authorization?.Parameter);
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(new ChunkedReadStream([1, 2, 3, 4], 2))
+            };
+        });
+        var metadata = ParseElement("""
+            {
+              "language":"en-US",
+              "options":{"loudness_normalization":true},
+              "future":{"enabled":true}
+            }
+            """);
+        var request = new StreamingSpeechRequest
+        {
+            Model = "speechify/simba-3.5/voice-1",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            OutputFormat = new() { Type = "mp3", Rate = 24000 },
+            ProviderOptions = new() { ["speechify"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalOptions = request.ProviderOptions["speechify"].Clone();
+
+        var parts = await CollectAsync(CreateSpeechifyProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("input").GetString());
+        Assert.Equal("simba-3.5", payload.GetProperty("model").GetString());
+        Assert.Equal("voice-1", payload.GetProperty("voice_id").GetString());
+        Assert.Equal("mp3_24000_128", payload.GetProperty("output_format").GetString());
+        Assert.Equal("en-US", payload.GetProperty("language").GetString());
+        Assert.True(payload.GetProperty("options").GetProperty("loudness_normalization").GetBoolean());
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["speechify"]));
+        Assert.Equal(2, parts.OfType<SpeechAudioPart>().Count());
+        Assert.All(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.Equal("audio/mpeg", part.AudioFormat.Type);
+            Assert.Equal(24000, part.AudioFormat.Rate);
+        });
+        Assert.Equal(2, parts.OfType<SpeechRawPart>().Count());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Speechmatics_streams_PCM_chunks_from_the_documented_TTS_endpoint()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal(
+                "https://preview.tts.speechmatics.com/generate/sarah?output_format=pcm_16000",
+                request.RequestUri!.ToString());
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-key", request.Headers.Authorization?.Parameter);
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(new ChunkedReadStream([5, 6, 7, 8], 2))
+            };
+        });
+        var request = new StreamingSpeechRequest
+        {
+            Model = "speechmatics/tts/voice/sarah",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            OutputFormat = new() { Type = "pcm", Rate = 16000 },
+            IncludeRawChunks = true
+        };
+
+        var parts = await CollectAsync(CreateSpeechmaticsProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("text").GetString());
+        Assert.Equal(2, parts.OfType<SpeechAudioPart>().Count());
+        Assert.All(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.Equal("audio/pcm", part.AudioFormat.Type);
+            Assert.Equal(16000, part.AudioFormat.Rate);
+        });
+        Assert.Equal(2, parts.OfType<SpeechRawPart>().Count());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
     [Fact]
     public async Task Neuphonic_streams_SSE_audio_and_preserves_provider_options_and_event_metadata()
     {
@@ -353,6 +453,14 @@ public sealed class ProviderStreamingSpeechTests
         => new(new StaticApiKeyResolver(),
             new StaticHttpClientFactory(client),
             new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())));
+
+    private static SpeechifyProvider CreateSpeechifyProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
+            new StaticHttpClientFactory(client));
+
+    private static SpeechmaticsProvider CreateSpeechmaticsProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
 
     private static JsonElement ParseElement(string json)
         => JsonDocument.Parse(json).RootElement.Clone();
