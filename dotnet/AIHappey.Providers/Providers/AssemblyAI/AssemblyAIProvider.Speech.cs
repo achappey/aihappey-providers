@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Models;
+using AIHappey.Vercel.Extensions;
 
 namespace AIHappey.Core.Providers.AssemblyAI;
 
@@ -28,7 +29,7 @@ public partial class AssemblyAIProvider
             request.Language,
             request.OutputFormat,
             null,
-            request.Speed,
+            (float?)request.Speed,
             metadata,
             streaming: false);
         SetAssemblyAIOption(plan.Payload, "stream", false);
@@ -91,7 +92,7 @@ public partial class AssemblyAIProvider
                 request.Language,
                 request.OutputFormat?.Type,
                 request.OutputFormat?.Rate,
-                request.Speed,
+                (float?)request.Speed,
                 options,
                 streaming: true);
             if (plan is not null && !JsonElement.DeepEquals(
