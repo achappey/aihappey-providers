@@ -266,13 +266,6 @@ public partial class GradiumProvider
         return values;
     }
 
-    private static bool IsMappedMetadataProperty(string propertyName)
-        => propertyName.Equals("voice_id", StringComparison.OrdinalIgnoreCase)
-            || propertyName.Equals("model_name", StringComparison.OrdinalIgnoreCase)
-            || propertyName.Equals("output_format", StringComparison.OrdinalIgnoreCase)
-            || propertyName.Equals("json_config", StringComparison.OrdinalIgnoreCase)
-            || propertyName.Equals("only_audio", StringComparison.OrdinalIgnoreCase);
-
     private static JsonElement? GetOptionalValue(JsonElement metadata, string propertyName)
     {
         if (!TryGetPropertyIgnoreCase(metadata, propertyName, out var value) || value.ValueKind == JsonValueKind.Null)
