@@ -151,7 +151,11 @@ public partial class KlingAIProvider
         }
 
         var endpoint = isOmniModel ? "v1/images/omni-image" : "v1/images/generations";
-        var json = JsonSerializer.Serialize(payload, ImageJson);
+        // Omit CLR nulls for known options, but preserve JsonElement nulls from raw metadata.
+        var requestPayload = payload
+            .Where(entry => entry.Value is not null)
+            .ToDictionary(entry => entry.Key, entry => entry.Value);
+        var json = JsonSerializer.Serialize(requestPayload, ImageJson);
         using var req = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
@@ -339,7 +343,7 @@ public partial class KlingAIProvider
         {
             if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 return property.Value.ValueKind == JsonValueKind.Null
-                    ? default
+                    ? null
                     : property.Value.Clone();
         }
 

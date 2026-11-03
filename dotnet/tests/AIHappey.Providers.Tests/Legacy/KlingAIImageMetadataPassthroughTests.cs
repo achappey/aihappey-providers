@@ -9,6 +9,26 @@ namespace AIHappey.Tests;
 
 public sealed class KlingAIImageMetadataPassthroughTests
 {
+    private const string MetadataWithNullOptions = """
+        {
+          "negative_prompt": null,
+          "resolution": null,
+          "image_reference": null,
+          "image_fidelity": null,
+          "human_fidelity": null,
+          "watermark_info": null,
+          "callback_url": null,
+          "external_task_id": null,
+          "result_type": null,
+          "series_amount": null,
+          "element_list": null,
+          "n": 99,
+          "aspect_ratio": "9:16",
+          "future_null": null,
+          "future_object": {"nested": [null, {"value": null}]}
+        }
+        """;
+
     [Fact]
     public async Task KlingAI_image_options_keep_known_mapping_and_forward_unknown_json_at_root()
     {
@@ -156,6 +176,73 @@ public sealed class KlingAIImageMetadataPassthroughTests
         await Assert.ThrowsAsync<JsonException>(() => CreateProvider(invalidClient).ImageRequest(invalidKnownValue));
     }
 
+    [Theory]
+    [InlineData("kling-v2", null)]
+    [InlineData("kling-v2", "{}")]
+    [InlineData("kling-v2", MetadataWithNullOptions)]
+    [InlineData("kling-v3-omni", null)]
+    [InlineData("kling-v3-omni", "{}")]
+    [InlineData("kling-v3-omni", MetadataWithNullOptions)]
+    public async Task KlingAI_omits_null_known_options_but_preserves_unknown_json_nulls(
+        string model, string? metadataJson)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            if (request.Method == HttpMethod.Post)
+            {
+                var expectedPath = model == "kling-v3-omni"
+                    ? "/v1/images/omni-image"
+                    : "/v1/images/generations";
+                Assert.Equal(expectedPath, request.RequestUri!.AbsolutePath);
+                payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+                return JsonResponse("""{"code":0,"data":{"task_id":"task-1"}}""");
+            }
+
+            if (request.RequestUri!.AbsolutePath.EndsWith("/task-1", StringComparison.Ordinal))
+            {
+                return JsonResponse(
+                    """{"code":0,"data":{"task_status":"succeed","task_result":{"images":[{"url":"https://kling.test/image"}]}}}""");
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1]) };
+        });
+        var imageRequest = new ImageRequest
+        {
+            Model = $"klingai/{model}",
+            Prompt = "A landscape",
+            N = 1,
+            ProviderOptions = metadataJson is null
+                ? null
+                : new() { ["klingai"] = ParseElement(metadataJson) }
+        };
+        var serializedRequest = JsonSerializer.Serialize(imageRequest);
+
+        await CreateProvider(client).ImageRequest(imageRequest);
+
+        Assert.Equal(model, payload.GetProperty("model_name").GetString());
+        Assert.Equal("A landscape", payload.GetProperty("prompt").GetString());
+        Assert.Equal(1, payload.GetProperty("n").GetInt32());
+        foreach (var name in new[]
+                 {
+                     "negative_prompt", "resolution", "image_reference", "image_fidelity", "human_fidelity",
+                     "watermark_info", "callback_url", "external_task_id", "result_type", "series_amount",
+                     "element_list", "aspect_ratio"
+                 })
+        {
+            Assert.False(payload.TryGetProperty(name, out _), name);
+        }
+
+        if (metadataJson == MetadataWithNullOptions)
+        {
+            Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+            Assert.True(JsonElement.DeepEquals(
+                ParseElement(metadataJson).GetProperty("future_object"), payload.GetProperty("future_object")));
+        }
+
+        Assert.Equal(serializedRequest, JsonSerializer.Serialize(imageRequest));
+    }
+
     [Fact]
     public async Task KlingAI_upstream_errors_keep_the_existing_exception_message()
     {
@@ -190,7 +277,7 @@ public sealed class KlingAIImageMetadataPassthroughTests
 
     private sealed class StaticApiKeyResolver : IApiKeyResolver
     {
-        public string? Resolve(string provider) => "test-ak:test-sk";
+        public string? Resolve(string provider) => "test-ak:0123456789abcdef0123456789abcdef";
     }
 
     private sealed class StaticHttpClientFactory(HttpClient client) : IHttpClientFactory
