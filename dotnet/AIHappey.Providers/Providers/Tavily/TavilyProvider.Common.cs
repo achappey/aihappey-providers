@@ -122,11 +122,15 @@ public partial class TavilyProvider
     }
 
     private HttpRequestMessage CreateJsonRequest(string endpoint, object payload)
-        => new(HttpMethod.Post, endpoint)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
             Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions.Web),
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(request);
+        return request;
+    }
 
     private async Task<JsonElement> SendJsonAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {

@@ -39,6 +39,7 @@ public partial class TavilyProvider
         {
             cancellationToken.ThrowIfCancellationRequested();
             using var poll = new HttpRequestMessage(HttpMethod.Get, path);
+            ApplyAuthHeader(poll);
             var root = await SendJsonAsync(poll, cancellationToken);
             var status = GetString(root, "status");
             if (status == "completed")

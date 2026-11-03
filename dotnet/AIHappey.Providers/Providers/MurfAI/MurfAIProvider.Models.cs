@@ -8,7 +8,7 @@ namespace AIHappey.Core.Providers.MurfAI;
 
 public sealed partial class MurfAIProvider
 {
-    private static readonly string[] MurfSpeechModelVersions = ["gen2", "falcon-2"];
+    private static readonly string[] MurfSpeechModelVersions = ["gen2", "falcon-2.1"];
 
     public async Task<IEnumerable<Model>> ListModels(
         CancellationToken cancellationToken = default)
@@ -260,4 +260,3 @@ new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     ["el-GR"] = "Greek (Greece)"
 };
 }
-

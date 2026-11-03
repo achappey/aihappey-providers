@@ -12,8 +12,6 @@ public partial class ZeroEntropyProvider
 {
     public async Task<RerankingResponse> RerankingRequest(RerankingRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -62,6 +60,7 @@ public partial class ZeroEntropyProvider
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var raw = await resp.Content.ReadAsStringAsync(cancellationToken);

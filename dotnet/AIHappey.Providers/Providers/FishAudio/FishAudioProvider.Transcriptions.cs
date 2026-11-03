@@ -95,7 +95,11 @@ public partial class FishAudioProvider
         if (ignoreTimestamps is not null)
             form.Add(new StringContent(ignoreTimestamps.Value.ToString().ToLowerInvariant(), Encoding.UTF8), "ignore_timestamps");
 
-        using var resp = await _client.PostAsync("v1/asr", form, cancellationToken);
+        var model = NormalizeTranscriptionModel(request.Model);
+        using var message = FishRequest(HttpMethod.Post, "v1/asr");
+        message.Headers.Add("model", model);
+        message.Content = form;
+        using var resp = await _client.SendAsync(message, cancellationToken);
         var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)
@@ -183,5 +187,16 @@ public partial class FishAudioProvider
 
         return null;
     }
-}
 
+    private static string NormalizeTranscriptionModel(string model)
+    {
+        var normalized = model.Trim();
+        const string prefix = "fishaudio/";
+        if (normalized.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            normalized = normalized[prefix.Length..];
+
+        return normalized.Equals("asr", StringComparison.OrdinalIgnoreCase)
+            ? "transcribe-1-pro"
+            : normalized;
+    }
+}
