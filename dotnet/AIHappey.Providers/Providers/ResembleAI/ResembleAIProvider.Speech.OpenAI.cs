@@ -49,7 +49,6 @@ public partial class ResembleAIProvider
                 $"ResembleAI native streaming supports only wav response_format; received '{options.ResponseFormat}'.");
         }
 
-        ApplyAuthHeader();
         var (_, modelVoiceUuid) = ParseSpeechModelAndVoice(options.Model);
         var voiceUuid = (modelVoiceUuid ?? options.Voice)?.Trim();
         if (string.IsNullOrWhiteSpace(voiceUuid))
@@ -82,6 +81,7 @@ public partial class ResembleAIProvider
                 MediaTypeNames.Application.Json)
         };
         httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("audio/wav"));
+        ApplyAuthHeader(httpRequest);
 
         using var response = await _client.SendAsync(
             httpRequest,
@@ -124,4 +124,3 @@ public partial class ResembleAIProvider
             throw new ArgumentException("'input' is a required field.", nameof(options));
     }
 }
-

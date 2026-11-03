@@ -18,6 +18,7 @@ public sealed class ResembleAITranscriptionMetadataPassthroughTests
         string? audioFileName = null;
         using var client = CreateClient(request =>
         {
+            Assert.Equal("Bearer test-key", request.Headers.Authorization?.ToString());
             if (request.Method == HttpMethod.Post)
             {
                 var form = Assert.IsType<MultipartFormDataContent>(request.Content);
@@ -76,6 +77,7 @@ public sealed class ResembleAITranscriptionMetadataPassthroughTests
         Assert.DoesNotContain("secret", fields.Keys);
         Assert.Equal("audio", Assert.Single(fields["file"]));
         Assert.Equal("audio.wav", audioFileName);
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
     [Fact]
@@ -84,6 +86,7 @@ public sealed class ResembleAITranscriptionMetadataPassthroughTests
         var fields = new List<string>();
         using var client = CreateClient(request =>
         {
+            Assert.Equal("Bearer test-key", request.Headers.Authorization?.ToString());
             if (request.Method == HttpMethod.Post)
             {
                 fields.AddRange(Assert.IsType<MultipartFormDataContent>(request.Content)
@@ -102,6 +105,7 @@ public sealed class ResembleAITranscriptionMetadataPassthroughTests
         }, CancellationToken.None);
 
         Assert.Equal(new[] { "file" }, fields);
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
 
         using var unusedClient = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
         await Assert.ThrowsAsync<JsonException>(() => CreateProvider(unusedClient).TranscriptionRequest(
