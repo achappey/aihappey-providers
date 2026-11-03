@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="dotnet/AIHappey.Providers/AIHappey.Providers.csproj" />
+  <Project Path="dotnet/tests/AIHappey.Providers.Tests/AIHappey.Providers.Tests.csproj" />
+</Solution>

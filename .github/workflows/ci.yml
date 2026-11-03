@@ -1,0 +1,53 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build-test-pack:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: aihappey-providers
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: aihappey-providers
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-responses
+          path: aihappey-responses
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-chatcompletions
+          path: aihappey-chatcompletions
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-messages
+          path: aihappey-messages
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-interactions
+          path: aihappey-interactions
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-openai
+          path: aihappey-openai
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-vercel
+          path: aihappey-vercel
+      - uses: actions/checkout@v4
+        with:
+          repository: achappey/aihappey-unified
+          path: aihappey-unified
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '11.0.x'
+          dotnet-quality: preview
+      - name: Provider, transport, isolation, and registration parity tests
+        run: dotnet test dotnet/tests/AIHappey.Providers.Tests/AIHappey.Providers.Tests.csproj -c Release
+      - name: Verify isolated package-only consumption
+        shell: pwsh
+        run: ./dotnet/tests/Verify-PackageConsumption.ps1

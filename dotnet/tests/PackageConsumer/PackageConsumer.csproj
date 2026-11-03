@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ProvidersPackageVersion Condition="'$(ProvidersPackageVersion)' == ''">1.0.0</ProvidersPackageVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AIHappey.Providers" Version="$(ProvidersPackageVersion)" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>

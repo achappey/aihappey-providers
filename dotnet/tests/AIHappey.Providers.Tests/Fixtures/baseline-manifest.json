@@ -1,0 +1,7561 @@
+{
+  "ModelProviderIds": [
+    "openai",
+    "abacusai",
+    "machinefi",
+    "bespokelabs",
+    "echo",
+    "cloudrift",
+    "cloudflareworkersai",
+    "tinfoil",
+    "deepinfra",
+    "deepseek",
+    "deepgram",
+    "inworld",
+    "nvidia",
+    "canopywave",
+    "inferencenet",
+    "infermatic",
+    "inferexai",
+    "gwdg",
+    "alibaba",
+    "cohere",
+    "coze",
+    "gigachat",
+    "mistral",
+    "copilot",
+    "anthropic",
+    "respan",
+    "keln",
+    "google",
+    "jina",
+    "groq",
+    "perplexity",
+    "together",
+    "pollinations",
+    "spacexai",
+    "runway",
+    "runware",
+    "aiml",
+    "nscale",
+    "stabilityai",
+    "novita",
+    "scaleway",
+    "sambanova",
+    "cerebras",
+    "fireworks",
+    "hyperbolic",
+    "zai",
+    "elevenlabs",
+    "telnyx",
+    "nebius",
+    "replicate",
+    "baseten",
+    "azure",
+    "async",
+    "voyageai",
+    "sarvam",
+    "minimax",
+    "assemblyai",
+    "resembleai",
+    "speechify",
+    "ttsreader",
+    "speechmatics",
+    "hyperstack",
+    "gladia",
+    "verda",
+    "audixa",
+    "ai21",
+    "freepik",
+    "murfai",
+    "lingvanex",
+    "googletranslate",
+    "lectoai",
+    "bria",
+    "friendli",
+    "publicai",
+    "primeintellect",
+    "ovhcloud",
+    "gtranslate",
+    "gmicloud",
+    "byteplus",
+    "ltx",
+    "nlpcloud",
+    "moonshot",
+    "upstage",
+    "siliconflow",
+    "cirrascale",
+    "klingai",
+    "euqai",
+    "vidu",
+    "volink",
+    "decisionmodels",
+    "meragpt",
+    "mindshub",
+    "reve",
+    "decart",
+    "json2video",
+    "greenpt",
+    "relaxai",
+    "regoloai",
+    "arklabs",
+    "ionos",
+    "bergetai",
+    "opperai",
+    "cortecs",
+    "eurouter",
+    "requesty",
+    "portkey",
+    "deepl",
+    "cometapi",
+    "nextbit",
+    "deepbricks",
+    "segmind",
+    "rekaai",
+    "openrouter",
+    "ai302",
+    "matterai",
+    "bytez",
+    "sunoapi",
+    "horayai",
+    "synexa",
+    "recraft",
+    "atlascloud",
+    "bineric",
+    "digitalocean",
+    "gooseai",
+    "supa",
+    "runpod",
+    "meganova",
+    "llmgateway",
+    "abliteration",
+    "amazonbedrock",
+    "parasail",
+    "mancerai",
+    "kilo",
+    "helicone",
+    "nousresearch",
+    "paraloncloud",
+    "asione",
+    "apipie",
+    "stepfun",
+    "sealion",
+    "tencenthunyuan",
+    "deapi",
+    "infomaniak",
+    "tavily",
+    "opencodego",
+    "opencodezen",
+    "celeris",
+    "levantolabs",
+    "strikeai",
+    "openhands",
+    "haimaker",
+    "monica",
+    "cambai",
+    "morpheus",
+    "arceeai",
+    "exa",
+    "featherless",
+    "blackbox",
+    "ohmygpt",
+    "ideogram",
+    "pinecone",
+    "picsart",
+    "zyphra",
+    "azerion",
+    "blackforestlabs",
+    "aionlabs",
+    "lumaai",
+    "truefoundry",
+    "databricks",
+    "browseruse",
+    "crazyrouter",
+    "infraxa",
+    "inceptionlabs",
+    "daglo",
+    "opeai",
+    "aicc",
+    "yourvoic",
+    "xvoice",
+    "fishaudio",
+    "napster",
+    "heygen",
+    "cartesia",
+    "lovo",
+    "verbatik",
+    "smallestai",
+    "orqagentruntime",
+    "orqrouter",
+    "typecast",
+    "unrealspeech",
+    "vapi",
+    "uvoiceai",
+    "astica",
+    "ionet",
+    "avian",
+    "llmapi",
+    "llmlayer",
+    "simplismart",
+    "routeway",
+    "chaingpt",
+    "tetrate",
+    "clod",
+    "wai",
+    "venice",
+    "vercel",
+    "quiverai",
+    "kissapi",
+    "zenmux",
+    "netmind",
+    "apiyi",
+    "thaura",
+    "modal",
+    "modelslab",
+    "hicap",
+    "megallm",
+    "infron",
+    "longcat",
+    "aisa",
+    "evolinkai",
+    "zenlayer",
+    "aihubmix",
+    "uniapi",
+    "apekey",
+    "apertis",
+    "smooth",
+    "speechactors",
+    "gptproto",
+    "neosantara",
+    "redpill",
+    "aether",
+    "regraph",
+    "electronhub",
+    "dandolo",
+    "glio",
+    "navyai",
+    "nearai",
+    "parallel",
+    "nanogpt",
+    "aibramha",
+    "routmy",
+    "poe",
+    "askarc",
+    "synthetic",
+    "renderful",
+    "tigercity",
+    "edenai",
+    "websearchapi",
+    "nimbleway",
+    "eachlabs",
+    "valyu",
+    "laozhang",
+    "jiekouai",
+    "literouter",
+    "lovelyrouter",
+    "arwriter",
+    "qiniu",
+    "lunos",
+    "maritacaai",
+    "cloudferro",
+    "arliai",
+    "dataforseo",
+    "jigsawstack",
+    "ishi",
+    "payperq",
+    "swarms",
+    "docsrouter",
+    "ocrskill",
+    "zoom",
+    "serenityedge",
+    "agentsky",
+    "nexusify",
+    "litai",
+    "onlypixai",
+    "fullai",
+    "apipod",
+    "tokenflux",
+    "tokenlab",
+    "assisters",
+    "llmwise",
+    "casedev",
+    "modelrouter",
+    "apiairforce",
+    "smartaipi",
+    "noiz",
+    "gradium",
+    "voiceai",
+    "rime",
+    "kalpalabs",
+    "edgespeak",
+    "ionrouter",
+    "freedomgpt",
+    "kirha",
+    "sufy",
+    "logicosllmhub",
+    "alphaneural",
+    "shuttleai",
+    "claudible",
+    "surfercloud",
+    "hanzo",
+    "routstr",
+    "setapp",
+    "sference",
+    "writer",
+    "brainiall",
+    "airouter",
+    "agentics",
+    "ainvented",
+    "plori",
+    "nrpnautilus",
+    "eagm",
+    "edgee",
+    "viablelab",
+    "llm7",
+    "kimrel",
+    "keyplex",
+    "llmkiwi",
+    "cheapgrok",
+    "lexico",
+    "eliza",
+    "openlimits",
+    "arkroute",
+    "ainative",
+    "aibadgr",
+    "unbound",
+    "shakespeare",
+    "cline",
+    "bazaarlink",
+    "puter",
+    "routeplex",
+    "novai",
+    "lumenfall",
+    "mia21",
+    "jkaihub",
+    "fal",
+    "textsynth",
+    "modelsync",
+    "huggingface",
+    "askcodi",
+    "martian",
+    "gonkagate",
+    "fastrouter",
+    "agentaigateway",
+    "aicredits",
+    "lazu",
+    "andyapi",
+    "aki",
+    "getgoapi",
+    "blockrun",
+    "neuralwatt",
+    "toapis",
+    "onekey",
+    "nagaai",
+    "sargalay",
+    "zeabur",
+    "inferlink",
+    "chainhub",
+    "ultrasafe",
+    "railwail",
+    "knoxchat",
+    "vlmrun",
+    "vogent",
+    "tikhubai",
+    "preapi",
+    "vultr",
+    "ofoxai",
+    "dedaluslabs",
+    "routerlink",
+    "modelmax",
+    "yollomi",
+    "infercom",
+    "raxai",
+    "piapi",
+    "youcom",
+    "iapp",
+    "oodaai",
+    "stealthgpt",
+    "messari",
+    "jassieai",
+    "memoryrouter",
+    "imagerouter",
+    "cailos",
+    "runapi",
+    "baseapi",
+    "gaterouter",
+    "teamday",
+    "chutes",
+    "xiaomimimo",
+    "ollama",
+    "vivgrid",
+    "ambient",
+    "relace",
+    "baidu",
+    "morph",
+    "streamlake",
+    "akashml",
+    "embyai",
+    "cortex",
+    "perceptron",
+    "mulerun",
+    "sudorouter",
+    "clauddy",
+    "selinaai",
+    "lmrouter",
+    "nonkycai",
+    "simplellm",
+    "tensorx",
+    "schatziai",
+    "nodebyt",
+    "gptsapi",
+    "embercloud",
+    "fortytwo",
+    "oraicle",
+    "foureverland",
+    "fivedock",
+    "magisterium",
+    "mumeai",
+    "munito",
+    "naceai",
+    "subq",
+    "uncensoredchat",
+    "opengateway",
+    "orbigpu",
+    "omniakey",
+    "nouswise",
+    "shengsuanyun",
+    "occludra",
+    "citadelis",
+    "finora",
+    "geekai",
+    "aimagicx",
+    "octagon",
+    "nataris",
+    "therouterai",
+    "lxg2it",
+    "aichixia",
+    "eugpt",
+    "teai",
+    "paul",
+    "radient",
+    "aihorde",
+    "wiserouter",
+    "commonstack",
+    "llama",
+    "ninjachat",
+    "mimicxai",
+    "runtimo",
+    "opuscode",
+    "concentrate",
+    "lumecoder",
+    "clankie",
+    "moleapi",
+    "aiapiworld",
+    "tensorblock",
+    "blink",
+    "shannonai",
+    "holysheepai",
+    "zyloapi",
+    "augure",
+    "sapiom",
+    "theoldapi",
+    "uncloseai",
+    "radiance",
+    "oneinfer",
+    "tapas",
+    "igpt",
+    "botverse",
+    "vibekit",
+    "brave",
+    "linkup",
+    "yutori",
+    "merge",
+    "bastiongpt",
+    "shareai",
+    "token360",
+    "webcrawlerapi",
+    "agentphone",
+    "tembo",
+    "agnesai",
+    "hedra",
+    "creora",
+    "xpectrum",
+    "herma",
+    "bytespace",
+    "runcrate",
+    "mulerouter",
+    "mixlayer",
+    "alltoken",
+    "helyxai",
+    "anyrouter",
+    "surplusintelligence",
+    "fred",
+    "pioneer",
+    "llmbase",
+    "luminoai",
+    "skypooltoken",
+    "tokenhub",
+    "myrouter",
+    "osiris",
+    "sovrgpt",
+    "doubleword",
+    "poolside",
+    "antbase",
+    "nodion",
+    "generalcompute",
+    "libertai",
+    "aigateway",
+    "miapi",
+    "rodiumai",
+    "miromind",
+    "thalam",
+    "ourtoken",
+    "hyperrouter",
+    "clawlite",
+    "callmissed",
+    "picklyone",
+    "opengate",
+    "mycoai",
+    "scalixworld",
+    "apipass",
+    "scrapellm",
+    "freeinference",
+    "llmtr",
+    "llmstats",
+    "wafer",
+    "routera",
+    "routerplus",
+    "orcarouter",
+    "mara",
+    "inceptron",
+    "commandcode",
+    "lilac",
+    "openadapter",
+    "router9",
+    "auriko",
+    "hyperbrowser",
+    "langbasepipe",
+    "langbaseagent",
+    "rewindai",
+    "pixserp",
+    "humeai",
+    "melious",
+    "lucidquery",
+    "hostyourai",
+    "rebytetasks",
+    "rebytemodels",
+    "wayscloud",
+    "tierup",
+    "evidencemd",
+    "docketrouter",
+    "agen",
+    "chatqt",
+    "zeroentropy",
+    "nomic",
+    "twelvelabs",
+    "isaacus",
+    "neuphonic",
+    "mammouth",
+    "plamo",
+    "yandex",
+    "krutrim",
+    "narakeet",
+    "tilde",
+    "respeecher",
+    "wellsaid",
+    "predictionguard",
+    "sutra",
+    "wavespeed",
+    "beastlabai",
+    "lelapaai",
+    "sailresearch",
+    "darkbloom",
+    "crusoe",
+    "ilmu",
+    "lyceum",
+    "depaza",
+    "samtal",
+    "fikra",
+    "cencori",
+    "aivara",
+    "condensechat",
+    "ecoia",
+    "tinyfish",
+    "trustedrouter",
+    "secrypt",
+    "monstergaming",
+    "mljunction",
+    "sunbirdai",
+    "addisai",
+    "akumi",
+    "impossibl",
+    "sluis",
+    "neuralring",
+    "cognitivessai",
+    "summa",
+    "meshapi",
+    "lara",
+    "foundry",
+    "zebracat",
+    "prunaai",
+    "sovereigneg",
+    "soniox",
+    "nexosai",
+    "hetzner",
+    "mixedbread",
+    "sovinfra",
+    "xpersona",
+    "entrim",
+    "paxalabs",
+    "interfaze",
+    "agent37",
+    "m8tes",
+    "agentcontainer",
+    "dust",
+    "agentdiscuss",
+    "baguettebot",
+    "jenova",
+    "researchagent",
+    "amnt",
+    "antimatter",
+    "waslo",
+    "founden",
+    "devicai",
+    "runtype",
+    "camelai",
+    "connect0",
+    "roxy",
+    "select",
+    "pawaai",
+    "empiriolabsai",
+    "standardcompute",
+    "tiarina",
+    "logfare",
+    "ramprouter",
+    "sennoric",
+    "cheaperinference",
+    "maxlayer",
+    "hinow",
+    "vikasit",
+    "circuitnotion",
+    "quantanova",
+    "flatseek",
+    "omneity",
+    "epho",
+    "shadowos",
+    "harnessrouter",
+    "manyfold",
+    "humanbrowser",
+    "appnz",
+    "bananapeel",
+    "softref",
+    "vanceai",
+    "ellipsis",
+    "mireye",
+    "carouter",
+    "tokenspend",
+    "mintrouter",
+    "canrouter",
+    "hush",
+    "openference",
+    "sandbase",
+    "hcompany",
+    "mangoboost",
+    "modelscope",
+    "codebase",
+    "cursor",
+    "manus",
+    "getimg",
+    "astria",
+    "lighton",
+    "lightcone",
+    "leonardo",
+    "clarifai",
+    "sensenova",
+    "watsonx",
+    "skyvern",
+    "agdev",
+    "notte"
+  ],
+  "SkillProviderIds": [
+    "openai",
+    "groovedev",
+    "azure",
+    "casedev",
+    "vlmrun",
+    "terminalskills",
+    "clawhub"
+  ],
+  "Methods": [
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.ChatCompletions.Models.ChatCompletionUpdate] CompleteChatStreamingAsync(AIHappey.ChatCompletions.Models.ChatCompletionOptions, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Core.Models.IAudioSpeechStreamEvent] OpenAISpeechStreamingAsync(AIHappey.Core.Models.AudioSpeechRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Core.Models.IOpenAIImageStreamEvent] OpenAIImageEditStreamingAsync(AIHappey.Core.Models.OpenAIImageEditRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Core.Models.IOpenAIImageStreamEvent] OpenAIImageGenerationStreamingAsync(AIHappey.Core.Models.OpenAIImageGenerationRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Core.Models.IOpenAITranscriptionStreamEvent] OpenAITranscriptionStreamingAsync(AIHappey.Core.Models.OpenAITranscriptionRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Messages.MessageStreamPart] MessagesStreamingAsync(AIHappey.Messages.MessagesRequest, System.Collections.Generic.Dictionary\u00602[System.String,System.String], System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Responses.Streaming.ResponseStreamPart] ResponsesStreamingAsync(AIHappey.Responses.ResponseRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Vercel.Models.StreamingSpeechPart] SpeechStreamingAsync(AIHappey.Vercel.Models.StreamingSpeechRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Vercel.Models.StreamingTranscriptionPart] TranscriptionStreamingAsync(AIHappey.Vercel.Models.StreamingTranscriptionRequest, System.Threading.CancellationToken)",
+    "System.Collections.Generic.IAsyncEnumerable\u00601[AIHappey.Vercel.Models.UIMessagePart] StreamAsync(AIHappey.Vercel.Models.ChatRequest, System.Threading.CancellationToken)",
+    "System.String GetIdentifier()",
+    "System.Threading.Tasks.Task\u00601[AIHappey.ChatCompletions.Models.ChatCompletion] CompleteChatAsync(AIHappey.ChatCompletions.Models.ChatCompletionOptions, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Common.Model.Providers.OpenAI.Live.LiveSessionResponse] CreateLiveSessionAsync(AIHappey.Common.Model.Providers.OpenAI.Live.LiveSessionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Common.Model.RealtimeResponse] GetRealtimeToken(AIHappey.Common.Model.RealtimeRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Core.Models.IOpenAITranscriptionResponse] OpenAITranscriptionRequestAsync(AIHappey.Core.Models.OpenAITranscriptionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Core.Models.OpenAIEmbeddingResponse] OpenAIEmbeddingRequestAsync(AIHappey.Core.Models.OpenAIEmbeddingRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Core.Models.OpenAIImagesResponse] OpenAIImageEditRequestAsync(AIHappey.Core.Models.OpenAIImageEditRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Core.Models.OpenAIImagesResponse] OpenAIImageGenerationRequestAsync(AIHappey.Core.Models.OpenAIImageGenerationRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Decisions.OpenAIDecisionResponse] OpenAIDecisionRequestAsync(AIHappey.Decisions.OpenAIDecisionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Messages.MessagesResponse] MessagesAsync(AIHappey.Messages.MessagesRequest, System.Collections.Generic.Dictionary\u00602[System.String,System.String], System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Responses.ResponseResult] ResponsesAsync(AIHappey.Responses.ResponseRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.DecisionResponse] DecisionRequestAsync(AIHappey.Vercel.Models.DecisionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.EmbeddingResponse] EmbeddingRequestAsync(AIHappey.Vercel.Models.EmbeddingRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.ImageResponse] ImageRequest(AIHappey.Vercel.Models.ImageRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.RealtimeSessionResponse] CreateRealtimeSessionAsync(System.String, AIHappey.Vercel.Models.RealtimeSessionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.RealtimeTokenResponse] CreateRealtimeTokenAsync(System.String, AIHappey.Vercel.Models.RealtimeTokenRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.RerankingResponse] RerankingRequest(AIHappey.Vercel.Models.RerankingRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.SpeechResponse] SpeechRequest(AIHappey.Vercel.Models.SpeechRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.TranscriptionResponse] TranscriptionRequest(AIHappey.Vercel.Models.TranscriptionRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.VideoOperationStartResult] StartVideoOperation(AIHappey.Vercel.Models.VideoRequest, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[AIHappey.Vercel.Models.VideoOperationStatusResult] GetVideoOperationStatus(System.String, System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[System.Collections.Generic.IEnumerable\u00601[AIHappey.Core.Models.Model]] ListModels(System.Threading.CancellationToken)",
+    "System.Threading.Tasks.Task\u00601[System.ValueTuple\u00602[System.Byte[],System.String]] OpenAISpeechRequestAsync(AIHappey.Core.Models.AudioSpeechRequest, System.Threading.CancellationToken)"
+  ],
+  "Registrations": [
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Singleton"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": null,
+      "Lifetime": "Singleton"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": null,
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "openai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "abacusai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "machinefi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bespokelabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "groovedev",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "echo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cloudrift",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cloudflareworkersai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tinfoil",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deepinfra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deepseek",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deepgram",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inworld",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nvidia",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "canopywave",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inferencenet",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "infermatic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inferexai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gwdg",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "alibaba",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cohere",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "coze",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gigachat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mistral",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "copilot",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "anthropic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "respan",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "keln",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "google",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jina",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "groq",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "perplexity",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "together",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "pollinations",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "spacexai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runware",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aiml",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nscale",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "stabilityai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "novita",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "scaleway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sambanova",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cerebras",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fireworks",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hyperbolic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "elevenlabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "telnyx",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nebius",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "replicate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "baseten",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "azure",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "azure",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "async",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "voyageai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sarvam",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "minimax",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "assemblyai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "resembleai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "speechify",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ttsreader",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "speechmatics",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hyperstack",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gladia",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "verda",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "audixa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ai21",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "freepik",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "murfai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lingvanex",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "googletranslate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lectoai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bria",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "friendli",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "publicai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "primeintellect",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ovhcloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gtranslate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gmicloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "byteplus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ltx",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nlpcloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "moonshot",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "upstage",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "siliconflow",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cirrascale",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "klingai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "euqai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vidu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "volink",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "decisionmodels",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "meragpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mindshub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "reve",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "decart",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "json2video",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "greenpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "relaxai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "regoloai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "arklabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ionos",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bergetai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opperai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cortecs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "eurouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "requesty",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "portkey",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deepl",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cometapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nextbit",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deepbricks",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "segmind",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rekaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ai302",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "matterai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bytez",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sunoapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "horayai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "synexa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "recraft",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "atlascloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bineric",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "digitalocean",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gooseai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "supa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runpod",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "meganova",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmgateway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "abliteration",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "amazonbedrock",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "parasail",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mancerai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "kilo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "helicone",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nousresearch",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "paraloncloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "asione",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apipie",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "stepfun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sealion",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tencenthunyuan",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "deapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "infomaniak",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tavily",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opencodego",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opencodezen",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "celeris",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "levantolabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "strikeai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openhands",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "haimaker",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "monica",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cambai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "morpheus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "arceeai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "exa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "featherless",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "blackbox",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ohmygpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ideogram",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "pinecone",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "picsart",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zyphra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "azerion",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "blackforestlabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aionlabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lumaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "truefoundry",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "databricks",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "browseruse",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "crazyrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "infraxa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inceptionlabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "daglo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opeai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aicc",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "yourvoic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "xvoice",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fishaudio",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "napster",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "heygen",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cartesia",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lovo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "verbatik",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "smallestai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "orqagentruntime",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "orqrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "typecast",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "unrealspeech",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "uvoiceai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "astica",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ionet",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "avian",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmlayer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "simplismart",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routeway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "chaingpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tetrate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "clod",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "venice",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vercel",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "quiverai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "kissapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zenmux",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "netmind",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apiyi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "thaura",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modal",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modelslab",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hicap",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "megallm",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "infron",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "longcat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aisa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "evolinkai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zenlayer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aihubmix",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "uniapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apekey",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apertis",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "smooth",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "speechactors",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gptproto",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "neosantara",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "redpill",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aether",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "regraph",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "electronhub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "dandolo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "glio",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "navyai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nearai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "parallel",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nanogpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aibramha",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routmy",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "poe",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "askarc",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "synthetic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "renderful",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tigercity",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "edenai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "websearchapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nimbleway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "eachlabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "valyu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "laozhang",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jiekouai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "literouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lovelyrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "arwriter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "qiniu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lunos",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "maritacaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cloudferro",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "arliai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "dataforseo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jigsawstack",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ishi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "payperq",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "swarms",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "docsrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ocrskill",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zoom",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "serenityedge",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentsky",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nexusify",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "litai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "onlypixai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fullai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apipod",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tokenflux",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tokenlab",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "assisters",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmwise",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "casedev",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "casedev",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modelrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apiairforce",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "smartaipi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "noiz",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gradium",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "voiceai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rime",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "kalpalabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "edgespeak",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ionrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "freedomgpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "kirha",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sufy",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "logicosllmhub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "alphaneural",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shuttleai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "claudible",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "surfercloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hanzo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routstr",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "setapp",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sference",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "writer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "brainiall",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "airouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentics",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ainvented",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "plori",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nrpnautilus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "eagm",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "edgee",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "viablelab",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llm7",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "kimrel",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "keyplex",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmkiwi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cheapgrok",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lexico",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "eliza",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openlimits",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "arkroute",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ainative",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aibadgr",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "unbound",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shakespeare",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cline",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bazaarlink",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "puter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routeplex",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "novai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lumenfall",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mia21",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jkaihub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fal",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "textsynth",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modelsync",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "huggingface",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "askcodi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "martian",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gonkagate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fastrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentaigateway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aicredits",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lazu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "andyapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aki",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "getgoapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "blockrun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "neuralwatt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "toapis",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "onekey",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nagaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sargalay",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zeabur",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inferlink",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "chainhub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ultrasafe",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "railwail",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "knoxchat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "vlmrun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vlmrun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vogent",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tikhubai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "preapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vultr",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ofoxai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "dedaluslabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routerlink",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modelmax",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "yollomi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "infercom",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "raxai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "piapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "youcom",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "iapp",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "oodaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "stealthgpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "messari",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jassieai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "memoryrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "imagerouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cailos",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "baseapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gaterouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "teamday",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "chutes",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "xiaomimimo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ollama",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vivgrid",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ambient",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "relace",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "baidu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "morph",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "streamlake",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "akashml",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "embyai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cortex",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "perceptron",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mulerun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sudorouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "clauddy",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "selinaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lmrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nonkycai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "simplellm",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tensorx",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "schatziai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nodebyt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "gptsapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "embercloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fortytwo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "oraicle",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "foureverland",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fivedock",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "magisterium",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mumeai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "munito",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "naceai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "subq",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "uncensoredchat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opengateway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "orbigpu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "omniakey",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nouswise",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shengsuanyun",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "occludra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "citadelis",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "finora",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "geekai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aimagicx",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "octagon",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nataris",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "therouterai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lxg2it",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aichixia",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "eugpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "teai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "paul",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "radient",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aihorde",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wiserouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "commonstack",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llama",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ninjachat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mimicxai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runtimo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opuscode",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "concentrate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lumecoder",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "clankie",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "moleapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aiapiworld",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tensorblock",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "blink",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shannonai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "holysheepai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zyloapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "augure",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sapiom",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "theoldapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "uncloseai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "radiance",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "oneinfer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tapas",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "igpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "botverse",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vibekit",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "brave",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "terminalskills",
+      "Lifetime": "Singleton"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.ISkillProvider",
+      "Key": "clawhub",
+      "Lifetime": "Singleton"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "linkup",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "yutori",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "merge",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bastiongpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shareai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "token360",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "webcrawlerapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentphone",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tembo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agnesai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hedra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "creora",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "xpectrum",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "herma",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bytespace",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runcrate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mulerouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mixlayer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "alltoken",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "helyxai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "anyrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "surplusintelligence",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fred",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "pioneer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmbase",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "luminoai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "skypooltoken",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tokenhub",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "myrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "osiris",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sovrgpt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "doubleword",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "poolside",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "antbase",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nodion",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "generalcompute",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "libertai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aigateway",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "miapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rodiumai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "miromind",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "thalam",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ourtoken",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hyperrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "clawlite",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "callmissed",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "picklyone",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "opengate",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mycoai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "scalixworld",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "apipass",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "scrapellm",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "freeinference",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmtr",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "llmstats",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wafer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routera",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "routerplus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "orcarouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mara",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "inceptron",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "commandcode",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lilac",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openadapter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "router9",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "auriko",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hyperbrowser",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "langbasepipe",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "langbaseagent",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rewindai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "pixserp",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "humeai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "melious",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lucidquery",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hostyourai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rebytetasks",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "rebytemodels",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wayscloud",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tierup",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "evidencemd",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "docketrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agen",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "chatqt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zeroentropy",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nomic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "twelvelabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "isaacus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "neuphonic",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mammouth",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "plamo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "yandex",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "krutrim",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "narakeet",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tilde",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "respeecher",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wellsaid",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "predictionguard",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sutra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "wavespeed",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "beastlabai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lelapaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sailresearch",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "darkbloom",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "crusoe",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ilmu",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lyceum",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "depaza",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "samtal",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "fikra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cencori",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "aivara",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "condensechat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ecoia",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tinyfish",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "trustedrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "secrypt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "monstergaming",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mljunction",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sunbirdai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "addisai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "akumi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "impossibl",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sluis",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "neuralring",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cognitivessai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "summa",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "meshapi",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lara",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "foundry",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "zebracat",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "prunaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sovereigneg",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "soniox",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "nexosai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hetzner",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mixedbread",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sovinfra",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "xpersona",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "entrim",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "paxalabs",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "interfaze",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agent37",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "m8tes",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentcontainer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "dust",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agentdiscuss",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "baguettebot",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "jenova",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "researchagent",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "amnt",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "antimatter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "waslo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "founden",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "devicai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "runtype",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "camelai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "connect0",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "roxy",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "select",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "pawaai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "empiriolabsai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "standardcompute",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tiarina",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "logfare",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ramprouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sennoric",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cheaperinference",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "maxlayer",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hinow",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vikasit",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "circuitnotion",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "quantanova",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "flatseek",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "omneity",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "epho",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "shadowos",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "harnessrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "manyfold",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "humanbrowser",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "appnz",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "bananapeel",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "softref",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "vanceai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "ellipsis",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mireye",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "carouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "tokenspend",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mintrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "canrouter",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hush",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "openference",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sandbase",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "hcompany",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "mangoboost",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "modelscope",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "codebase",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "cursor",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "manus",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "getimg",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "astria",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lighton",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "lightcone",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "leonardo",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "clarifai",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "sensenova",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "watsonx",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "skyvern",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "agdev",
+      "Lifetime": "Scoped"
+    },
+    {
+      "Contract": "AIHappey.Core.Contracts.IModelProvider",
+      "Key": "notte",
+      "Lifetime": "Scoped"
+    }
+  ]
+}
