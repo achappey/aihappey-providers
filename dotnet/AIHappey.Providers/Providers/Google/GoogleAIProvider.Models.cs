@@ -3,6 +3,7 @@ using AIHappey.Core.AI;
 using System.Globalization;
 using System.Text.Json;
 using AIHappey.Core.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace AIHappey.Core.Providers.Google;
 
@@ -82,7 +83,15 @@ public partial class GoogleAIProvider
                     });
                 }
 
-                rawModels.AddRange(await ListGoogleCustomAgents(ct));
+                try
+                {
+                    rawModels.AddRange(await ListGoogleCustomAgents(ct));
+                }
+                catch (HttpRequestException exception)
+                {
+                    _logger.LogWarning(exception,
+                        "Failed to list Google custom agents; continuing standard model discovery.");
+                }
 
                 return rawModels
                     .WithPricing(GetIdentifier());
