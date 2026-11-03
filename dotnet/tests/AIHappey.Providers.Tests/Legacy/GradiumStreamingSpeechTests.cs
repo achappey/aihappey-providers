@@ -19,7 +19,9 @@ public sealed class GradiumStreamingSpeechTests
             Text("""{"type":"end_of_stream"}"""));
         Uri? connectedUri = null;
         string? connectedKey = null;
-        var provider = new GradiumProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory());
+        var provider = new GradiumProvider(new StaticApiKeyResolver(), 
+            new Core.AI.AsyncCacheHelper(),
+            new StaticHttpClientFactory());
         provider.SpeechSocketFactory = (uri, key, _) =>
         {
             connectedUri = uri;
@@ -69,12 +71,125 @@ public sealed class GradiumStreamingSpeechTests
         Assert.Equal(24000, audio.AudioFormat.Rate);
         Assert.Equal(4, parts.OfType<SpeechRawPart>().Count());
         Assert.Single(parts.OfType<SpeechStreamStartPart>());
-        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Collection(parts.OfType<SpeechResponseMetadataPart>(),
+            ready => AssertResponseMetadata(ready, request.Model, """{"type":"ready"}"""),
+            text => AssertResponseMetadata(text, request.Model, """{"type":"text","text":"Hello world."}"""));
         var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.NotNull(finish.ProviderMetadata);
         Assert.Equal(4, finish.ProviderMetadata["gradium"].GetProperty("events").GetArrayLength());
         Assert.Equal(WebSocketMessageType.Text, socket.SentTypes[0]);
         Assert.Equal(WebSocketMessageType.Text, socket.SentTypes[1]);
         Assert.Equal(WebSocketMessageType.Text, socket.SentTypes[2]);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Gradium_emits_only_ready_metadata_without_text_or_flush_events(bool includeRawChunks)
+    {
+        string[] sourceEvents =
+        [
+            """{"type":"ready","request_id":"request-1"}""",
+            """{"type":"audio","audio":"AQI="}""",
+            """{"type":"end_of_stream"}"""
+        ];
+        var socket = new ScriptedWebSocket(sourceEvents.Select(Text).ToArray());
+        var provider = new GradiumProvider(new StaticApiKeyResolver(),
+            new Core.AI.AsyncCacheHelper(),
+            new StaticHttpClientFactory())
+        {
+            SpeechSocketFactory = (_, _, _) => Task.FromResult<WebSocket>(socket)
+        };
+        var request = new StreamingSpeechRequest
+        {
+            Model = "gradium/default/voice-1",
+            Text = [new() { Text = "Hello world." }],
+            IncludeRawChunks = includeRawChunks
+        };
+
+        var parts = await CollectAsync(provider.SpeechStreamingAsync(request));
+
+        var metadata = Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        AssertResponseMetadata(metadata, request.Model, sourceEvents[0]);
+        Assert.Single(parts.OfType<SpeechAudioPart>());
+        AssertStreamEvents(parts, sourceEvents, includeRawChunks);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Gradium_preserves_repeated_text_and_flush_metadata_in_order(bool includeRawChunks)
+    {
+        string[] sourceEvents =
+        [
+            """{"type":"ready","request_id":"request-1"}""",
+            """{"type":"audio","audio":"AQI="}""",
+            """{"type":"text","text":"Hello ","start":0,"stop":0.1}""",
+            """{"type":"text","text":"world.","start":0.1,"stop":0.3}""",
+            """{"type":"flushed","flush_id":1}""",
+            """{"type":"end_of_stream"}"""
+        ];
+        var socket = new ScriptedWebSocket(sourceEvents.Select(Text).ToArray());
+        var provider = new GradiumProvider(new StaticApiKeyResolver(),
+            new Core.AI.AsyncCacheHelper(),
+            new StaticHttpClientFactory())
+        {
+            SpeechSocketFactory = (_, _, _) => Task.FromResult<WebSocket>(socket)
+        };
+        var request = new StreamingSpeechRequest
+        {
+            Model = "gradium/default/voice-1",
+            Text = [new() { Text = "Hello world." }],
+            IncludeRawChunks = includeRawChunks
+        };
+
+        var parts = await CollectAsync(provider.SpeechStreamingAsync(request));
+
+        Assert.Collection(parts.OfType<SpeechResponseMetadataPart>(),
+            ready => AssertResponseMetadata(ready, request.Model, sourceEvents[0]),
+            firstText => AssertResponseMetadata(firstText, request.Model, sourceEvents[2]),
+            secondText => AssertResponseMetadata(secondText, request.Model, sourceEvents[3]),
+            flushed => AssertResponseMetadata(flushed, request.Model, sourceEvents[4]));
+        Assert.Single(parts.OfType<SpeechAudioPart>());
+        AssertStreamEvents(parts, sourceEvents, includeRawChunks);
+    }
+
+    private static void AssertResponseMetadata(
+        SpeechResponseMetadataPart metadata,
+        string model,
+        string expectedBody)
+    {
+        Assert.Equal(model, metadata.ModelId);
+        Assert.NotNull(metadata.Timestamp);
+        var body = Assert.IsType<JsonElement>(metadata.Body);
+        using var expected = JsonDocument.Parse(expectedBody);
+        Assert.True(JsonElement.DeepEquals(expected.RootElement, body));
+    }
+
+    private static void AssertStreamEvents(
+        List<StreamingSpeechPart> parts,
+        string[] sourceEvents,
+        bool includeRawChunks)
+    {
+        var start = Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Same(start, parts[0]);
+        var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Same(finish, parts[^1]);
+        Assert.NotNull(finish.ProviderMetadata);
+        var events = finish.ProviderMetadata["gradium"].GetProperty("events");
+        Assert.Equal(sourceEvents.Length, events.GetArrayLength());
+        var rawParts = parts.OfType<SpeechRawPart>().ToArray();
+        Assert.Equal(includeRawChunks ? sourceEvents.Length : 0, rawParts.Length);
+        for (var i = 0; i < sourceEvents.Length; i++)
+        {
+            using var expected = JsonDocument.Parse(sourceEvents[i]);
+            Assert.True(JsonElement.DeepEquals(expected.RootElement, events[i]));
+            if (includeRawChunks)
+            {
+                var raw = Assert.IsType<JsonElement>(rawParts[i].RawValue);
+                Assert.True(JsonElement.DeepEquals(expected.RootElement, raw));
+            }
+        }
     }
 
     private static async Task<List<StreamingSpeechPart>> CollectAsync(
