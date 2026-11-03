@@ -190,7 +190,6 @@ public sealed partial class MurfAIProvider : IModelProvider, IUnifiedModelProvid
 
     public IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(StreamingSpeechRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return StreamMurfSpeechAsync(request, cancellationToken);
     }
 }
-
