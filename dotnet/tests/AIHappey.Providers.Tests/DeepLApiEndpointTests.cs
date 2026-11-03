@@ -33,7 +33,7 @@ public sealed class DeepLApiEndpointTests
                 };
             }));
 
-        var models = await provider.ListModels();
+        var models = await provider.ListModels(CancellationToken.None);
 
         Assert.Equal(expectedHost, requestUri?.Host);
         Assert.Equal("/v2/languages", requestUri?.AbsolutePath);
