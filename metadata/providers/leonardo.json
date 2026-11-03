@@ -1,0 +1,16 @@
+{
+  "name": "Leonardo",
+  "description": "Scale campaigns and content production with Leonardo for Teams. AI creative tools for marketing and design leaders to deliver more, faster.",
+  "urls": {
+    "homepage": "https://leonardo.ai",
+    "docs": "https://docs.leonardo.ai",
+    "pricing": "https://leonardo.ai/pricing",
+    "termsOfService": "https://leonardo.ai/terms-of-service",
+    "privacyPolicy": "https://leonardo.ai/privacy-policy"
+  },
+  "category": "app_tools",
+  "providerCountry": "AU",
+  "inferenceRegions": [
+    "World"
+  ]
+}

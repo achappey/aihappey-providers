@@ -1,0 +1,13 @@
+<Project>
+  <!-- Same output contract as a project reference. Transitive hosts and publish
+       receive the package's data without any source checkout or download. -->
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)../catalog/**/*.json">
+      <Link>Catalog/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Pack>false</Pack>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+</Project>

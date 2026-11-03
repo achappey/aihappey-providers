@@ -68,6 +68,17 @@ Check(models.Single().Id == "replicate/owner/model", "Caller-supplied catalog wa
 var empty = await client.ExecuteAsync("replicate", keys, (p, ct) => p.ListModels(ct));
 Check(!empty.Any(), "Catalog data leaked to the next operation.");
 
+var packagedCatalog = new FileProviderCatalogSource(Path.Combine(AppContext.BaseDirectory, "Catalog"));
+Check(packagedCatalog.ReadModels("zai").Any(), "Packaged model catalog was not copied to output/publish.");
+Check(packagedCatalog.ReadPricing("anthropic") is { Length: > 0 }, "Packaged base pricing is missing.");
+Check(packagedCatalog.ReadPricingVariants("google").Any(), "Packaged nested pricing variants are missing.");
+using (ProviderCatalogScope.Begin(packagedCatalog))
+{
+    Check("zai".GetModels().Any(m => m.Id.StartsWith("zai/")), "Packaged model catalog is not consumable.");
+    Check("anthropic".GetPricing()!.Count > 0, "Packaged pricing is not consumable.");
+}
+Check("zai".GetModels().Count > 0, "Existing default catalog output path is not supported.");
+
 Console.WriteLine("Verified package-only compatible/native requests, raw options, streaming, cancellation, disposal, media, and explicit catalog input without a gateway.");
 
 static T Read<T>(string json) => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Web)!;

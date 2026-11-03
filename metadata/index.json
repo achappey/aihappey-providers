@@ -1,0 +1,3929 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "file": "models/providers/abacusai.json",
+      "sha256": "314b322a833fbefbd278f24556e6c38397f03b5d940856b73a71836452fa2031"
+    },
+    {
+      "file": "models/providers/addisai.json",
+      "sha256": "2c6cbe69fc3fb4428832a87e9cb5635eefacd4869777be6d372bd8c07e100366"
+    },
+    {
+      "file": "models/providers/agen.json",
+      "sha256": "1ccd3a747135ca56cd6356adf55928ef7186f7952baca366a370d0e85d15f10f"
+    },
+    {
+      "file": "models/providers/agentics.json",
+      "sha256": "a477bbf9742f1fa1c746bce26f6ff0fa97063d101a796c67988f2506e564d70e"
+    },
+    {
+      "file": "models/providers/ai21.json",
+      "sha256": "bafc9e0c0870f2ef8971ebfced0ceb17cb8829cc3bc2418d95a0c8f9017ed6d8"
+    },
+    {
+      "file": "models/providers/aibadgr.json",
+      "sha256": "c3b1972bcdc8e43f4d7de948e186ddeecad1ac937bf98ccb4dc13ed9fa31e1bf"
+    },
+    {
+      "file": "models/providers/aihorde.json",
+      "sha256": "a98fb481eeea9b74a9fff5178c34d5d71558a8f469ec7294a8c4f1b302b6869e"
+    },
+    {
+      "file": "models/providers/airouter.json",
+      "sha256": "abc00ab31b7a61399b2744e1cbc3fcaef49255dc0e92f0dd48c365b69b0164f8"
+    },
+    {
+      "file": "models/providers/aivara.json",
+      "sha256": "6a36eee3d3e26064e8a234d67571e0ecb7ca4e523a34377f59962d48f6dc4546"
+    },
+    {
+      "file": "models/providers/akashml.json",
+      "sha256": "39824582da95db3cd9e983b0d64c669538b23b0743fd249fb9ce4696c1c6af93"
+    },
+    {
+      "file": "models/providers/aki.json",
+      "sha256": "61fc0f61d382a9e2f9a5ce1e7cf476bb0e581cefb7521b9770491d38b55f96b5"
+    },
+    {
+      "file": "models/providers/antimatter.json",
+      "sha256": "8d0ed132c418883571718fa567417ba05971c55172ccad28ecd91bcd24631d06"
+    },
+    {
+      "file": "models/providers/anyrouter.json",
+      "sha256": "2f8ee235bea73736faf97f7c5609bebe5b3988471ed2455bfc4dd02d822cf224"
+    },
+    {
+      "file": "models/providers/apekey.json",
+      "sha256": "51a678cee16e55dff1561841b2b40e9441d7592fa4fda1c9df377f5e8179adfb"
+    },
+    {
+      "file": "models/providers/apertis.json",
+      "sha256": "ec48499dfb4e2b13b02bce2c824a87f3ca5a5a93e4e4d9893f71e1f7d0401f3d"
+    },
+    {
+      "file": "models/providers/arklabs.json",
+      "sha256": "8b0d0cbf0294cd782b4ba13a5e8389f256068fcc8b9e1dc6724194e98cab3b35"
+    },
+    {
+      "file": "models/providers/asione.json",
+      "sha256": "30d417d0ff66a6852b49a184c3952fc66daebd495e1d12e6a225390cd3d22fba"
+    },
+    {
+      "file": "models/providers/assemblyai.json",
+      "sha256": "93e0f10d72b901fb044187005ebbf579df88035d776e139fce63510d5b598cb5"
+    },
+    {
+      "file": "models/providers/astica.json",
+      "sha256": "ee45f7d74242f16e6357615f0b516aef80bb03d947d01e2d1789e4d916c2f64f"
+    },
+    {
+      "file": "models/providers/async.json",
+      "sha256": "4e652384d2af56df7e4dd662a18a405aafdaccfe8e397a1db5f469faf7889727"
+    },
+    {
+      "file": "models/providers/audixa.json",
+      "sha256": "dcee69ddca4189cb7fd213cb03ea9c37247e48bd208a165e731a147e57c8078f"
+    },
+    {
+      "file": "models/providers/avian.json",
+      "sha256": "d3ac7352f33392914c549ce87057cf1d1435f6203a55bf7dc3616fd764b5ba95"
+    },
+    {
+      "file": "models/providers/azure.json",
+      "sha256": "452eeb498d436f1e144cdb77a507493b59009453b6dbdcab3d99cb8de8217fe0"
+    },
+    {
+      "file": "models/providers/bananapeel.json",
+      "sha256": "23afc89cc773b6700d9adc86b9ddf152f02114e334db9f1dd54d10bb25488d1c"
+    },
+    {
+      "file": "models/providers/bastiongpt.json",
+      "sha256": "6a15205b567e1ae9eca850180925999efeaf3ceb9907c5b1c5389018f5422075"
+    },
+    {
+      "file": "models/providers/bespokelabs.json",
+      "sha256": "565d50036280ebc2c887e24d58aa6aac82b8c2b56827d676182ddd9053dd06f0"
+    },
+    {
+      "file": "models/providers/blackbox.json",
+      "sha256": "468d23892ff14b40c81efae0768770d74142d99c73e6aec9f9ce084c3f3b55fc"
+    },
+    {
+      "file": "models/providers/blackforestlabs.json",
+      "sha256": "dfb9df0b5a354c45eaf7cc8b5cba9e275098655c431a1a1b65a5193239e2de5c"
+    },
+    {
+      "file": "models/providers/blink.json",
+      "sha256": "2145f6e96f1814dd222a69dab054c1621a6bb9a84acc298cefbb57d757cabe89"
+    },
+    {
+      "file": "models/providers/botverse.json",
+      "sha256": "2e419f93a3233001cf7dc25b9a25881fb1e3db2d970630c9c998d938bce1ba78"
+    },
+    {
+      "file": "models/providers/brave.json",
+      "sha256": "39d6ef30daa693e4b07e6304f105822946642e08f692ee9f84687940303b195d"
+    },
+    {
+      "file": "models/providers/bria.json",
+      "sha256": "c5f8ecfbb1b5b87eea4160b367b9e410f2b0eb7335a9f41d3ca00d234b05aa8d"
+    },
+    {
+      "file": "models/providers/browseruse.json",
+      "sha256": "82399ce93e813c5fd0e795a448de4c36ec4c8d29212761a88b97bbfe9d4593fa"
+    },
+    {
+      "file": "models/providers/bytez.json",
+      "sha256": "eacf51fd1bfb6f516a0966d69f70fb09c85569902ae2289bbb4d4e8b318e6cec"
+    },
+    {
+      "file": "models/providers/cambai.json",
+      "sha256": "1e4533dde1c0ab31d857959a82c9019273081ea59f21a2092865fb49081a3d05"
+    },
+    {
+      "file": "models/providers/celeris.json",
+      "sha256": "8211edd8cec26ba44cfe767b1c79b5625b16285de9563c5a90349b7522a81b6c"
+    },
+    {
+      "file": "models/providers/chaingpt.json",
+      "sha256": "d6b3a80295939ac999d87d7b1bf84f6baed96ac117c5e58cf8d09ffbfbad4872"
+    },
+    {
+      "file": "models/providers/clankie.json",
+      "sha256": "c1e8beed5e82c71dd5adc4f690fd4a8a5403dc8559ebc269986ea6ea44c2e565"
+    },
+    {
+      "file": "models/providers/cline.json",
+      "sha256": "b30c56a29492e74a651dd9227b92b0899ebbb8897f845a22d80cf98d2e23b879"
+    },
+    {
+      "file": "models/providers/cloudferro.json",
+      "sha256": "4a90aad907cba6252caf8687e133e81ece42b7093c893a5a212655335d556007"
+    },
+    {
+      "file": "models/providers/commonstack.json",
+      "sha256": "ed7fb886d40ae7614caa2fcaf399bb681e1edec94c5752c9852c771608ac1d19"
+    },
+    {
+      "file": "models/providers/copilot.json",
+      "sha256": "f8d291a3ff78ef70414cd5c4d6fff68eccbd57062dfeb48e7b27eb2fbe74ef3b"
+    },
+    {
+      "file": "models/providers/cortecs.json",
+      "sha256": "be3f93ff31815009ff7b7abd9fc95a684152d81b87cc2e6623d318c79e06f980"
+    },
+    {
+      "file": "models/providers/crazyrouter.json",
+      "sha256": "0bdb688c87ed78cb22c431e74f53e467c791438d996cb60a6aedf342ae2b090f"
+    },
+    {
+      "file": "models/providers/daglo.json",
+      "sha256": "cde6cc0f8051e8e2cc4063a1bc3bd4a9c0f625410486056874ea4b1181886c49"
+    },
+    {
+      "file": "models/providers/decart.json",
+      "sha256": "15562d772901a04a7eec56167121467e14d9ada6a587cd0d66599a6d7eea2a24"
+    },
+    {
+      "file": "models/providers/deepbricks.json",
+      "sha256": "589e542635033c185d19353917c105a519482d6c06c91231da340737d065e243"
+    },
+    {
+      "file": "models/providers/depaza.json",
+      "sha256": "725cc68c3a7e1b8d4f3b101a3dd369ed2e74cf81eafb79d2cdc23811c304640b"
+    },
+    {
+      "file": "models/providers/ecoia.json",
+      "sha256": "0857d25852f580b676b51d3d649701bc0ac96f51054fb5ea470db92622ce98a5"
+    },
+    {
+      "file": "models/providers/edenai.json",
+      "sha256": "7528b54d3ba6b5040b42e0187ed119dff935de9df1ee367c9fa37eee87f795cc"
+    },
+    {
+      "file": "models/providers/ellipsis.json",
+      "sha256": "1b29c6b5aa25c350955a3970ccedc541f268174a1182c60376208d5a63bcd78c"
+    },
+    {
+      "file": "models/providers/epho.json",
+      "sha256": "778cc64130192014eb1530b9c607d596bfe0798725c23f7d812e9db055156e30"
+    },
+    {
+      "file": "models/providers/eugpt.json",
+      "sha256": "687e0096a00e74d19798f033c485d975723a61fd99e99b027910a3c5d94be285"
+    },
+    {
+      "file": "models/providers/euqai.json",
+      "sha256": "8fe7638a50a9b7551a624fe3c9fbf18b00fe186d3f591fede8571e2827bd7963"
+    },
+    {
+      "file": "models/providers/everypixellabs.json",
+      "sha256": "04444a3b2527f5462c5eb0f55f7f8262681ae3ce22a5430d4da73689233f5534"
+    },
+    {
+      "file": "models/providers/evidencemd.json",
+      "sha256": "11703d91e9fb1856e949ac910862e521381ca6f34dddc6077b79c20c6ce24ca1"
+    },
+    {
+      "file": "models/providers/evolinkai.json",
+      "sha256": "093152e1a6f8c2e2dc217e7470c24a7e5e9c77219662b87b194d4aa0133caff4"
+    },
+    {
+      "file": "models/providers/exa.json",
+      "sha256": "d120e316f7ec772e4a90ef267e91449d53db01d9466865744dff91e7b664d5cb"
+    },
+    {
+      "file": "models/providers/fastrouter.json",
+      "sha256": "189696980e6aafe80d6f655d984b964544d5a118b4a675a1e3d3ac3e2620955e"
+    },
+    {
+      "file": "models/providers/fikra.json",
+      "sha256": "ac3158b5dac98a6aa91cf9149fddf920153a4068457882a14f8dbc1116157041"
+    },
+    {
+      "file": "models/providers/fishaudio.json",
+      "sha256": "1b6da87f6e3cda0ba8932f7279803bf7a4b0b1155c729f58f187e48060f4eb68"
+    },
+    {
+      "file": "models/providers/fred.json",
+      "sha256": "3ab7b89e7b00001d2f387978bec63eb22901cd920b446b67bbfb29a5f9253ed5"
+    },
+    {
+      "file": "models/providers/freedomgpt.json",
+      "sha256": "4f8270070a632cb3fa98a58e8980dd7bbe1966ddcd1ee78a41c8de08b5fdee60"
+    },
+    {
+      "file": "models/providers/freepik/image.json",
+      "sha256": "b3e0298a15ec6fb6f008844e352114d4de07566bfc6dff73274b0fe59b87512a"
+    },
+    {
+      "file": "models/providers/freepik/speech.json",
+      "sha256": "c45f28d594d1d5295d642cc36190d5cefec4aaaf8cf527452d319b381975fa38"
+    },
+    {
+      "file": "models/providers/freepik/video.json",
+      "sha256": "7a278c1e2a93f75865c3676d7e7a8954b0c59ea61ba8c069131948eb586ecc63"
+    },
+    {
+      "file": "models/providers/friendli.json",
+      "sha256": "78c50eac3aed548d8fd73104e471145d2f29a1ba7a9b62bb7e728871ee49a328"
+    },
+    {
+      "file": "models/providers/gladia.json",
+      "sha256": "f3aa8a0ec64afa57f1899b733fe8c4bc217ea82996cb6a9895c6a2830ae31a0c"
+    },
+    {
+      "file": "models/providers/gmicloud.json",
+      "sha256": "78373ba4bf8a80c1a715b278866bd0afd5276ef5908b89d129acc70810401b02"
+    },
+    {
+      "file": "models/providers/helyxai.json",
+      "sha256": "4a1d6795660e414c299d6d241ee96298049d2d35a4162ec2f78d67effd279574"
+    },
+    {
+      "file": "models/providers/herma.json",
+      "sha256": "4aa215b892f3c8eeb5196a0aec59e8e2e65e166f096310e647ad0c869f7ecd9b"
+    },
+    {
+      "file": "models/providers/humanbrowser.json",
+      "sha256": "8605d1f778b6ae13d0799d1fb038303834c90f501d54b4aab7af461c5104bd1b"
+    },
+    {
+      "file": "models/providers/hyperbrowser.json",
+      "sha256": "f46f571a732eb810ec3f64f77ca7e0f1fd4ffd05831786a27e0810db3b15e09e"
+    },
+    {
+      "file": "models/providers/iapp.json",
+      "sha256": "11506a301ec830f22824ec4aef38fbbf7a4cce9f2b192a2752c2b348e162d063"
+    },
+    {
+      "file": "models/providers/ideogram.json",
+      "sha256": "12c4cfca4f9b58785c9a24d1332f4447eee4a379e15cd054c39ebcdc7d8fe1bb"
+    },
+    {
+      "file": "models/providers/igpt.json",
+      "sha256": "ed515faa9fdc12b968712c0ac8261927bff0b4e78d21fe1df8df9b56cbe40b3c"
+    },
+    {
+      "file": "models/providers/inceptionlabs.json",
+      "sha256": "cb115b901a56809b304da9d4b305e59baee42531888ae3c052fc8f233d24d684"
+    },
+    {
+      "file": "models/providers/inferencenet.json",
+      "sha256": "9ddaac48cbf9c966444b672a39833d1a88cfdbb5d550ada9eaac8780cad638eb"
+    },
+    {
+      "file": "models/providers/infraxa.json",
+      "sha256": "66b9b1ffffeaab929d070f674ee84e3f55b4a427aade833f54f5ec914bcce1d0"
+    },
+    {
+      "file": "models/providers/inworld.json",
+      "sha256": "4616227d46c9730f947107cf0bfc8bdbb614802ce32ff7d13b97bc2fd1bf387e"
+    },
+    {
+      "file": "models/providers/isaacus.json",
+      "sha256": "8a0744ca0e7fb548a2f043d37bbf037190224c60ed930954719d14a7828b5261"
+    },
+    {
+      "file": "models/providers/jassieai.json",
+      "sha256": "3b32a0b2e5738b32e183ebaeaf06ccbb28ae5b9944d6f637871b1a9026a16e5a"
+    },
+    {
+      "file": "models/providers/jigsawstack.json",
+      "sha256": "1072079fba6a9ab27b9aea40e632a63adda9f08368a8ee39041b40d6a640dbaa"
+    },
+    {
+      "file": "models/providers/jina.json",
+      "sha256": "c90ea6a3e00da83660132814ff3ea5991675e428cfec9c3ae8e81ef654a59f3b"
+    },
+    {
+      "file": "models/providers/json2video.json",
+      "sha256": "d6628c4d344136cc0e155793142becf2313fbf4f437ce825c8c54df97e3dfef4"
+    },
+    {
+      "file": "models/providers/kirha.json",
+      "sha256": "e03de73e6ceaabc92430709a8a5b86a8cf7e8a996ce170581876edef36688eaa"
+    },
+    {
+      "file": "models/providers/klingai.json",
+      "sha256": "53db7047b59b5690a162002c54e86b860ff6ba8e66f208cee75b7828e0a585fc"
+    },
+    {
+      "file": "models/providers/krutrim.json",
+      "sha256": "90b6c107a128cf02bf03a13da6aaa95b3ec849956f114eba0333b2e2fcd7cf29"
+    },
+    {
+      "file": "models/providers/langbaseagent/anthropic.json",
+      "sha256": "66a39405c9c739a8aef3fb74ce68e34bdb5c8fec76799ec4abe0e80927579682"
+    },
+    {
+      "file": "models/providers/langbaseagent/azureopenai.json",
+      "sha256": "3f207d38f826bc4704c1d799c16c7ff489669a7bcdb0f27f0e389f5d4d0ed2ae"
+    },
+    {
+      "file": "models/providers/langbaseagent/cohere.json",
+      "sha256": "3c0d8a1623b835f558dea4830da57477f4cafbfb01d504302e6a0a96bb75036b"
+    },
+    {
+      "file": "models/providers/langbaseagent/deepseek.json",
+      "sha256": "aacc8eae58dc3f844be12fe971709d5d39af0d8024c6d60902759fe3a2957a9e"
+    },
+    {
+      "file": "models/providers/langbaseagent/fireworks.json",
+      "sha256": "3949abbd04a0a45fadfe658ba49123eacf52f9cd34cef95b967b9550e438ec1b"
+    },
+    {
+      "file": "models/providers/langbaseagent/google.json",
+      "sha256": "7f6fd6ae5b378a95533bf063568a8ebbac3ada626c9ca2a91418112e7845c8c2"
+    },
+    {
+      "file": "models/providers/langbaseagent/groq.json",
+      "sha256": "f12f33ac9a5830402bbbe6e38e3ea27ee4bff59da550a10c1b70d2028787ec9f"
+    },
+    {
+      "file": "models/providers/langbaseagent/mistral.json",
+      "sha256": "b208a54f1377da0cb7ae05392a2ea41ff7bce3526cfd88ba7a55ba860258bf9b"
+    },
+    {
+      "file": "models/providers/langbaseagent/openai.json",
+      "sha256": "6c400ef302b40e795994f60ae7a6e88771c64545b0c5dea74246ec972d97c8d5"
+    },
+    {
+      "file": "models/providers/langbaseagent/openrouter.json",
+      "sha256": "a0be2c82cd564d7cee1c5359930ca3966be207dd3710692de1d67303d5952e9b"
+    },
+    {
+      "file": "models/providers/langbaseagent/perplexity.json",
+      "sha256": "931c5097f1fd51401b37913b3b80cc9ae6c78fffba73ab3ba32903e8dc025cf7"
+    },
+    {
+      "file": "models/providers/langbaseagent/together.json",
+      "sha256": "5e6ec6bb9b31a599c5e6354a77794f9e5b3be608f80800f3f214589be7b1db94"
+    },
+    {
+      "file": "models/providers/langbaseagent/xai.json",
+      "sha256": "b2a93874041d943f4dccf6d2f0297bc3f850764edcb33f4e4f86c52b55562e5b"
+    },
+    {
+      "file": "models/providers/langbasepipe.json",
+      "sha256": "f9d0332e66f3b4732ea3dcaec11e97dfe8eae5c390a8bb3e40e08e4649b7e220"
+    },
+    {
+      "file": "models/providers/lelapaai.json",
+      "sha256": "0c0d7edf50dbd65c1678eb8b8998bec1d2b9fd895a917be08d8eca43b7f9b32a"
+    },
+    {
+      "file": "models/providers/levantolabs.json",
+      "sha256": "ae33b9c1be9127691af3abe425780745f2622449c4ba7cb454b81eda2182ec6b"
+    },
+    {
+      "file": "models/providers/lightcone.json",
+      "sha256": "f35cb3e3c6093def4d766fa392f5bd889cde7156b41f2ad2c7a7fce940a8a4ea"
+    },
+    {
+      "file": "models/providers/linkup.json",
+      "sha256": "c3a7d2f25375b46821cd199758d78b68e7dd711de1b70a8294e5a0fb7db109e9"
+    },
+    {
+      "file": "models/providers/llmlayer.json",
+      "sha256": "877b070b6491fe91daef16624694a6ad4a6f996fcd3d3e5f703b76ccf693a9aa"
+    },
+    {
+      "file": "models/providers/llmwise.json",
+      "sha256": "6c34c531f63d285a6c82f863a8b95494cd17519b4d944960380b4c9d8a0548d9"
+    },
+    {
+      "file": "models/providers/lovo.json",
+      "sha256": "b60830a7320fbd044a9a1c02b8631f13ac72f7f36f7f0c0a2d0b4baa633ea7c7"
+    },
+    {
+      "file": "models/providers/ltx.json",
+      "sha256": "a96d4b06ea6dd12d187c9770229c996726a98ab981d7f9b2715444ace3469ca4"
+    },
+    {
+      "file": "models/providers/lumaai.json",
+      "sha256": "e936acb25a6bd0450002d0006845b5a16bea7ffa36624ac43bdc4e6b087e3922"
+    },
+    {
+      "file": "models/providers/machinefi.json",
+      "sha256": "91dfd0407bd090cae85d826aed6e982c1432baf5e6c7479e1a0c56e4680bdbb7"
+    },
+    {
+      "file": "models/providers/magisterium.json",
+      "sha256": "369dd9ecdb0793e35fd1bc9634418ba221eb062550ad6a2b422cddc0e68ffb9c"
+    },
+    {
+      "file": "models/providers/meragpt.json",
+      "sha256": "b86f09f4b8ad7f7b60189333ea5f7b0656666efc4cc54eb0df94d9d412bdd074"
+    },
+    {
+      "file": "models/providers/messari.json",
+      "sha256": "adb3da2ae011bd92f09a330bf8091623b6b8cf2d7bc99d643c63ad53f4300ed7"
+    },
+    {
+      "file": "models/providers/miapi.json",
+      "sha256": "916ffb2869d79491a6c968707930a34866864394085bf87c3a167284c7c87dbf"
+    },
+    {
+      "file": "models/providers/mimicxai.json",
+      "sha256": "993219e6d932740e311de673993bad80a6e34c7da00fec94532431d823a3fda1"
+    },
+    {
+      "file": "models/providers/minimax.json",
+      "sha256": "a6f82850539020e9cba74170be2e45ce1c3dccfe6af827dd06bddf5c4d426693"
+    },
+    {
+      "file": "models/providers/mixedbread.json",
+      "sha256": "65ad0cdf3d8a7e8df7f1d2d063c4994bcbd1b5c2764cb7783ea2465c96b54876"
+    },
+    {
+      "file": "models/providers/modelslab.json",
+      "sha256": "366b2a56fdd2685f5884350a24d122c2ed6867a213cc3ec15946e3d43a269be7"
+    },
+    {
+      "file": "models/providers/monica/image.json",
+      "sha256": "18d06412d67ed8dd607c6c29b44d93536ae27580791839ad8b4e26db9cfaccca"
+    },
+    {
+      "file": "models/providers/monica/language.json",
+      "sha256": "0bb4dad7f54324138da221ad48b717358839e4306cb3e792020e1e78ca34beb7"
+    },
+    {
+      "file": "models/providers/mulerun.json",
+      "sha256": "5256229ce9bb459205ae6844e5f49081f170c91109dd802d85df8838b313b57e"
+    },
+    {
+      "file": "models/providers/munito.json",
+      "sha256": "6822d05287304c46a3824925ecbe7842cc3923a46be98743744c13c8955bc522"
+    },
+    {
+      "file": "models/providers/murfai.json",
+      "sha256": "df3ab0ad8e9d3bce09017c712c34bf8050a2d0a84fec263dddd98cf3e367f060"
+    },
+    {
+      "file": "models/providers/naceai.json",
+      "sha256": "de86da9479bab05e02787fa7ab8b080a5429c2facf58a61ba141f9cceef56c7a"
+    },
+    {
+      "file": "models/providers/napster.json",
+      "sha256": "122436c9bf50b4924eb9cc947df637ecef28be4c1df393d36f4b0c8afaaf8295"
+    },
+    {
+      "file": "models/providers/nataris.json",
+      "sha256": "550f1554e4898f5ddc3cd1b453cbcfecfcf3628bf97377e1371df10f2d61cd6f"
+    },
+    {
+      "file": "models/providers/nexusify.json",
+      "sha256": "04bc4372fd6eca7087f51f8731bf01cadad410ac2c9187a16d3ba18bd2b152b0"
+    },
+    {
+      "file": "models/providers/nimbleway.json",
+      "sha256": "e812d9c6620d0a4b40807f0932a1c3a1d08d6438e1bbb97bc93c4bf6e30ed06f"
+    },
+    {
+      "file": "models/providers/ninjachat.json",
+      "sha256": "3ee975efd5e14b9849ca14cf2eea62949732d61097b01af87c3f45f782abbdc1"
+    },
+    {
+      "file": "models/providers/nomic.json",
+      "sha256": "260634d7ca8c70185ff07357311f49395dc1bde52226d365f3ce431ff41182b8"
+    },
+    {
+      "file": "models/providers/notte.json",
+      "sha256": "7972cc037fec91583a8fb14591dd87b6c4e3f42336e6aef4f96931c2575b03f2"
+    },
+    {
+      "file": "models/providers/nousresearch.json",
+      "sha256": "b26388ac1863b6cd5803eb125dd91ab9ebbb9810d56dd074a78ad700345997b4"
+    },
+    {
+      "file": "models/providers/nouswise.json",
+      "sha256": "55c75b40d60185f14ccd7c9350f5fcb729a97251c19c64479c4b37f7a2a9f5cc"
+    },
+    {
+      "file": "models/providers/octagon.json",
+      "sha256": "67bcd0b27fc524b07dcf7de58bace58b6984f0001a51220548d75cb22ec297ed"
+    },
+    {
+      "file": "models/providers/opencodezen.json",
+      "sha256": "64cb4f2a2ed5fccc40155e34bdba1de6cf059e6d1c2932a38ad9bce4530bec80"
+    },
+    {
+      "file": "models/providers/openhands.json",
+      "sha256": "ac89d5eae9dc245d33fbacf85fe6bb35eb4ef638109f14d036bca4a52a554bf0"
+    },
+    {
+      "file": "models/providers/opperai.json",
+      "sha256": "47691926bf43b21265b7bb91c7ba909ac5ff732c28c6d1062161ef26483c51fe"
+    },
+    {
+      "file": "models/providers/parallel.json",
+      "sha256": "fb210c1c4dd45613402e0f7de01ac47be9d64fc1fff434c1eccddb1b44e179b7"
+    },
+    {
+      "file": "models/providers/parasail.json",
+      "sha256": "b966317475685f13e8721a665df0eebf10c6c391312598325d9abf8f6c70ce3b"
+    },
+    {
+      "file": "models/providers/perplexity.json",
+      "sha256": "a0db287236a47f0c906ddd0a3119d5f01be8e08e9f58257538efdd35e14fd528"
+    },
+    {
+      "file": "models/providers/picsart/logo.json",
+      "sha256": "34831a9314917f11cf0fbba3317d6fd09807c086af92938ea6ca1264a8e998d1"
+    },
+    {
+      "file": "models/providers/picsart/text2image.json",
+      "sha256": "bca8c3130f17fb5462a1d7a93d719d594daa111907969bed169085db860cd8ba"
+    },
+    {
+      "file": "models/providers/picsart/text2sticker.json",
+      "sha256": "cba8a03fb0158f1b197e17a02945b9927a43dc2d26e063376d151141d9eec92a"
+    },
+    {
+      "file": "models/providers/pollinations.json",
+      "sha256": "ef9dc0bb09c899c1e37f3b18fb743e17ca07d01e5b7f54bf2c95d068ddc8d3ff"
+    },
+    {
+      "file": "models/providers/prunaai/image.json",
+      "sha256": "7184fa20066a867f308d15c60dbfe96035c617fa41f1b38cdc20ce989015a035"
+    },
+    {
+      "file": "models/providers/prunaai/video.json",
+      "sha256": "f0f577377a856ccb84fd14bc8e0fefaf2cbbd88416c01be7bd8e0de051a4f7d4"
+    },
+    {
+      "file": "models/providers/radient.json",
+      "sha256": "e0b0899d01657c2bb5ad16d079fa30b80e1a4020d2108a999c0b630d4d12f121"
+    },
+    {
+      "file": "models/providers/rebytemodels.json",
+      "sha256": "352c600969c879d6cf83e79bb4c553daf1ff9901b9596677b374e4efb01f0693"
+    },
+    {
+      "file": "models/providers/rebytetasks.json",
+      "sha256": "0e1e8a15c6c3698bce319622d07a016d150c7ff508b332706cd44e2c65e2c940"
+    },
+    {
+      "file": "models/providers/recraft.json",
+      "sha256": "b97c22b914600afda38d248d5be9f440aaf7bac53d9830969af0092b551a1109"
+    },
+    {
+      "file": "models/providers/redpill.json",
+      "sha256": "40345d010a24671a00e5829c0a1b56f8c344085cae7406350fb748c375592fb1"
+    },
+    {
+      "file": "models/providers/regoloai.json",
+      "sha256": "deb6f9da9e602c11952e4736e7c42643d6e4836aad3bac7fb36e7e17b9997790"
+    },
+    {
+      "file": "models/providers/regraph/image.json",
+      "sha256": "8075ffd16e491c18b1db122d2b0082e8cda60989a2789e5ca1eabce0275e525a"
+    },
+    {
+      "file": "models/providers/regraph/speech.json",
+      "sha256": "edb140bf63f4ff49cb0b4c7a411b3e66fabe276ebce8e09f5856d8ca49a551c3"
+    },
+    {
+      "file": "models/providers/regraph/transcription.json",
+      "sha256": "b6498f2ec8acbc6f72c1e4ac3580c436dcd5d859564d6e25d14475b636b89d74"
+    },
+    {
+      "file": "models/providers/rekaai.json",
+      "sha256": "599cf5825d52ea0153ee5c34997271f4bc9080d21429cdd68b258713a2e39a07"
+    },
+    {
+      "file": "models/providers/relace.json",
+      "sha256": "b43b190bc7b2692cf4b42771384c8576d877acc10170c390168794e51927e9b2"
+    },
+    {
+      "file": "models/providers/relaxai.json",
+      "sha256": "b58aa43d9d0a1de851bcde4e9ef36cbac552b25a0d9f2d0bc3d60641a3ba82a6"
+    },
+    {
+      "file": "models/providers/replicate/image.json",
+      "sha256": "ca5a7b49bcec811d48274466246e51698ce505f03f556a911c8388a54187d81c"
+    },
+    {
+      "file": "models/providers/replicate/language.json",
+      "sha256": "25af0ecdd76bdff604d3d390d5a297c27bcfe87fcf9cb50ff13f9d8c8919cec0"
+    },
+    {
+      "file": "models/providers/resembleai.json",
+      "sha256": "e420e765a4b9c9006ec3ec4e82f220de672864b5060e7760ae6b3cfbed90775c"
+    },
+    {
+      "file": "models/providers/respan.json",
+      "sha256": "197421d9fca218f741b30aa9b9c10934bede560147d41f582aac2f3941673fc6"
+    },
+    {
+      "file": "models/providers/reve.json",
+      "sha256": "982954207c3531d62e8d6afccea39442173a261d0f9e05800115d76e897695b3"
+    },
+    {
+      "file": "models/providers/routeplex.json",
+      "sha256": "baec758f64e3b98de17cf8fa1db78bb2ed7ff04f56b4e5d538949c7e59354d84"
+    },
+    {
+      "file": "models/providers/router9.json",
+      "sha256": "2b56c13219f27a202260b9ebfd01afa6b42e011f9f07c02be259f82d355e8b0a"
+    },
+    {
+      "file": "models/providers/runpod/image.json",
+      "sha256": "d0b7dda147efdeb465f322cdc9e615c1f38d5c37ea8c694b2a8044743156588e"
+    },
+    {
+      "file": "models/providers/runpod/language.json",
+      "sha256": "500650610a6db82823b95f311f9cd6084c583e85c25273d22b903e3efc94e823"
+    },
+    {
+      "file": "models/providers/runpod/speech.json",
+      "sha256": "6bbc6ee9755a082833b0b5050214d5f2376654813b6c5ca733cb859d1c03066b"
+    },
+    {
+      "file": "models/providers/runpod/video.json",
+      "sha256": "a985de4d3f22ab5620f24b1699bc50ab55d6733d47e2a13e805b77b4a6a5021d"
+    },
+    {
+      "file": "models/providers/runway.json",
+      "sha256": "9806ee3b657b20db75581ac9a6ed6fa78829db305b31b4b7dd1cc36576038ee3"
+    },
+    {
+      "file": "models/providers/sambanova.json",
+      "sha256": "5023aa93b97b37c2412e157a0376df245d6e60d072f10bdbf6bc9c4c4be90b68"
+    },
+    {
+      "file": "models/providers/samtal.json",
+      "sha256": "c2179a19b6f3d4fd55b19835780bab31d34ad1a2a4aee59b5288a4362b0e1e68"
+    },
+    {
+      "file": "models/providers/sarvam.json",
+      "sha256": "be57e35f09ee7a97ce60ce19e2cca368d969718d9785636bf40c9f12ab7dbc3b"
+    },
+    {
+      "file": "models/providers/scrapellm.json",
+      "sha256": "11f9aba6a01469a1ef5df4956ca806e0d8b7ece36add90c53cf97cfe60a07805"
+    },
+    {
+      "file": "models/providers/segmind.json",
+      "sha256": "e3c3ffbbdf3f4b2b3a8a56ae22d4934a0e7241b78ba85b8a27940587927977b8"
+    },
+    {
+      "file": "models/providers/selinaai.json",
+      "sha256": "d8cff56cad2cb5826bd1075156eea8188d3b51c0a47f333de0d5cfd458069216"
+    },
+    {
+      "file": "models/providers/shadowos.json",
+      "sha256": "9a408f419db70b3b3ca2507fed9bd4cab12e7c4cddbe0ecad7fea6afc7101c67"
+    },
+    {
+      "file": "models/providers/shannonai.json",
+      "sha256": "5e5af4906193462f0f55b1c6127f7bcd788cf1a5a728b9a280175992bd62e366"
+    },
+    {
+      "file": "models/providers/shareai.json",
+      "sha256": "ffe3375bff2628611006a574bc3fae05b647438eb893ec912c57ceb225a2b8f7"
+    },
+    {
+      "file": "models/providers/siliconflow.json",
+      "sha256": "a1208fa96b4d793e7ff6d4435738d066330ef2dcb2899abec7c21ada3ecc7b85"
+    },
+    {
+      "file": "models/providers/simplismart.json",
+      "sha256": "7b43500d4c4715a3f2e119a52932648f8f33c3aed216f72655ac3e253bffde7f"
+    },
+    {
+      "file": "models/providers/sluis.json",
+      "sha256": "90c49df3ecef9e473b7dc9eb65d58538465e6ef304304230f04f1a89718408b1"
+    },
+    {
+      "file": "models/providers/smallestai.json",
+      "sha256": "c6ee30a2b0159647be4f5a2092e424a718770322e328cbc7ba2288a7736cf034"
+    },
+    {
+      "file": "models/providers/smooth.json",
+      "sha256": "7a1ce5d2f7536ff3c946f7a8c7efb14ff387159f2a95251e4cc5e6d5506e11ae"
+    },
+    {
+      "file": "models/providers/sovrgpt.json",
+      "sha256": "083c1bf8a647e0ef242c748c64ab77ac0cb866f48f36efe327796fa8e2ea710a"
+    },
+    {
+      "file": "models/providers/spacexai.json",
+      "sha256": "5777d647cbf2ca7b798dd994e05339fdc663aff1458ae200a308582f1e79b5cb"
+    },
+    {
+      "file": "models/providers/speechmatics.json",
+      "sha256": "02d02b060ef1415009c6ceaa2967e2726a19608c08b0ab68e88bf0f9da282a4e"
+    },
+    {
+      "file": "models/providers/stabilityai.json",
+      "sha256": "37bdfc6b78c98ad9f34d1ad87e45b44163647d423cdbbb87df9027a5c9d88bbf"
+    },
+    {
+      "file": "models/providers/stealthgpt.json",
+      "sha256": "ef15d166f4ce4e5407e422951a1835dddc97166fd02f3ffaffe7636e20dcb20f"
+    },
+    {
+      "file": "models/providers/streamlake.json",
+      "sha256": "6901a071dbdf7a6e0706cae8d594e13816992c6dbd82724da090fe223c724144"
+    },
+    {
+      "file": "models/providers/strikeai.json",
+      "sha256": "bda8e96d421fa6ac609398a26a3fff40d9a0a9c379d2bade20c5fcbc4e61352c"
+    },
+    {
+      "file": "models/providers/subq.json",
+      "sha256": "6ad946194919c73ad87b8449c08976068f8f45e0e32e70f836d35cf2524306cd"
+    },
+    {
+      "file": "models/providers/sunbirdai.json",
+      "sha256": "2bcceced8608debd49162e06771fc45e9b08c846767e69505a79a99f3059c286"
+    },
+    {
+      "file": "models/providers/sunoapi.json",
+      "sha256": "231c730525dd44540e9632a2c4d785148cfc40412f0b6f3cd30ce68274e936be"
+    },
+    {
+      "file": "models/providers/supa.json",
+      "sha256": "4e18b9d91477efcc1dcadc321caac4b0ee8eee7d2eccaacd9b653943d0ae63fc"
+    },
+    {
+      "file": "models/providers/sutra.json",
+      "sha256": "a90144ace771312055a0568798b5f452a1740628efa9b5ad8a14f557d91fa357"
+    },
+    {
+      "file": "models/providers/synexa.json",
+      "sha256": "e3301bfefc85fc4a9d22ab0aecf67d137f48ac1443d9eed95140708f9017d80e"
+    },
+    {
+      "file": "models/providers/synthetic.json",
+      "sha256": "a73100d8e8d33b37ceddacd51c11d8a32af275fb1fd5e78bd841acc0efc1f016"
+    },
+    {
+      "file": "models/providers/tapas.json",
+      "sha256": "125fa9d1703ebe24171c5072184468ed311876c6afa19579c202fec1c7190c6c"
+    },
+    {
+      "file": "models/providers/tavily.json",
+      "sha256": "6984901384d243334f9abc79e1a9a69d67620e39bdec5b463b6870b572fe48b0"
+    },
+    {
+      "file": "models/providers/telnyx.json",
+      "sha256": "2e9a21dd26c6f4e4ab1bc149dc035be497e2570e5a8317eaf4055357c151c149"
+    },
+    {
+      "file": "models/providers/textsynth.json",
+      "sha256": "7b67ee4f9598d486b85fafef1e45268a37b9753e0a3c06aad37c452d37843721"
+    },
+    {
+      "file": "models/providers/thaura.json",
+      "sha256": "8c9a314975839df5c31a16458ece9b32144f295f38aaf6b6ef50ceff83e71018"
+    },
+    {
+      "file": "models/providers/therouterai.json",
+      "sha256": "e78fe205047f9ff8cdaeb8fe5ae134e944f39e6ecb14415e78da317b36a721bd"
+    },
+    {
+      "file": "models/providers/tierup.json",
+      "sha256": "49b4644f395c570bf5810776b8cd4d50f36959381d51d74fe2b0c03dd6c97abd"
+    },
+    {
+      "file": "models/providers/tinyfish.json",
+      "sha256": "d462d78212a96d066bd14f6b189cd9377912e43cabaea0b7264db9791b9fc091"
+    },
+    {
+      "file": "models/providers/trustedrouter.json",
+      "sha256": "243e9027df0eaa414b1e6a181afc051a555154b7717953c97208b7d1a783ef22"
+    },
+    {
+      "file": "models/providers/ttsreader.json",
+      "sha256": "8b88e64b07f286050e711b1bcc6b376b0f81223a8175a1cff213ad09ee7d1489"
+    },
+    {
+      "file": "models/providers/twelvelabs.json",
+      "sha256": "7d4aca4f3cead9a9142eec8e114c8d3100ad815bfacabbfab14723f0fa1d61dd"
+    },
+    {
+      "file": "models/providers/ultrasafe.json",
+      "sha256": "fbc261065c88a19f0786fd97a04ad5d83dc6c207a1618a3bd1be2e120b2f714b"
+    },
+    {
+      "file": "models/providers/uncensoredchat.json",
+      "sha256": "ab84f1859c1c5017ebcc36637406ec285802721a518f1f762ac405ee23d63a70"
+    },
+    {
+      "file": "models/providers/unrealspeech.json",
+      "sha256": "00d503cbb3d1475925959866a65d655af32b6d52ddd0220303585decaddf405f"
+    },
+    {
+      "file": "models/providers/upstage.json",
+      "sha256": "9f1a8950f00ebff8b89fb78375936ce7f97425898400de2943b0ab4aa853e19d"
+    },
+    {
+      "file": "models/providers/valyu.json",
+      "sha256": "2f35b14017f8e59bb8c3f4ee29b7b8b54f165fa6a517acc10f9c0bb188ae5ed1"
+    },
+    {
+      "file": "models/providers/vanceai.json",
+      "sha256": "79893c2bab3f5c510af72653d38f3728e18bfe77f073dba3f73686271edecff8"
+    },
+    {
+      "file": "models/providers/vapi/language.json",
+      "sha256": "7530788ddedb1ed61724a2a3399a4f2163f882ca679a0764729df9bbb828921b"
+    },
+    {
+      "file": "models/providers/vapi/speech.json",
+      "sha256": "d7fba1ca6bdfdff422453893935f97d48bb3502dffed87988d6f704d48a16e59"
+    },
+    {
+      "file": "models/providers/vapi/transcription.json",
+      "sha256": "e6898939707c03f3f930196a23172eca9ddd3bbac4d076ceb8fe7f2b9a2be8bb"
+    },
+    {
+      "file": "models/providers/venice.json",
+      "sha256": "c023e8bf3d61458f5d93d6e63dfcf88e1bc4cbf8da5e732b6ac2fa60737f15af"
+    },
+    {
+      "file": "models/providers/verbatik.json",
+      "sha256": "6dca57c2f81c0aedc2a2eb729e5da0f7c869075866e734648225e1e7d4f5f88d"
+    },
+    {
+      "file": "models/providers/verda.json",
+      "sha256": "3efbc6a590cea7bd1bba7127e7df5498ba9be33c2cb99173605cd7561446fd67"
+    },
+    {
+      "file": "models/providers/vibekit.json",
+      "sha256": "6dcfe4bc59b8684b1081b3dbef5d85efdb27e4911411219583c32681bf3d1d19"
+    },
+    {
+      "file": "models/providers/vidu.json",
+      "sha256": "ab15f6c40a7c469667d22c8f6d549466c50a0e5e938f179262da8607f1d8c768"
+    },
+    {
+      "file": "models/providers/vlmrun.json",
+      "sha256": "8974301cc038fec2bea2584724a4dc2693c43662945993e9ddf970f435b02f91"
+    },
+    {
+      "file": "models/providers/voyageai.json",
+      "sha256": "81132d3cef4df9a9a1abe39fa642464583e673d38ee6015e4625c1d1d01bf186"
+    },
+    {
+      "file": "models/providers/webcrawlerapi.json",
+      "sha256": "f92a430da3b7803c30e5778025cc71392402ece436e1110697faebce62d576f9"
+    },
+    {
+      "file": "models/providers/websearchapi.json",
+      "sha256": "b1b428143b0fb9fce4392c1836e4b655e4ac2f2dbec7a0c0e89d8fc5e3ca8805"
+    },
+    {
+      "file": "models/providers/wiserouter.json",
+      "sha256": "0b9be40c2b038dbdd1fc3e7155dba3a4e28ae17a33281363f1b4b5a5d5bee012"
+    },
+    {
+      "file": "models/providers/youcom.json",
+      "sha256": "a4ba54c3c068ba6faced1be5067b9f7f32f53196dd8a4e8d543a3117b3c3651e"
+    },
+    {
+      "file": "models/providers/yourvoic.json",
+      "sha256": "57316e4b6da208030f316fcfd2626bb4cbb3de5caa8a75d336caeb6b4e4600a0"
+    },
+    {
+      "file": "models/providers/yutori.json",
+      "sha256": "d726736009544390a6056cfd469c7e1411488ca2acd599de34707af6c5527547"
+    },
+    {
+      "file": "models/providers/zai.json",
+      "sha256": "2ca8b8b8802db7c44c5a210adc90b81fb7a584576dd59003fc95d6926a3be762"
+    },
+    {
+      "file": "models/providers/zebracat.json",
+      "sha256": "0a18d4b4729dcbb93953082609643bfb0e6830e1ac2b97c817b2b6c81bb85cda"
+    },
+    {
+      "file": "models/providers/zeroentropy.json",
+      "sha256": "22650572a6461e375f1dff0b7e4c61da3d0e3f470e4acb150359942a99d22043"
+    },
+    {
+      "file": "models/providers/zoom.json",
+      "sha256": "b94eef98e80e1cc447809a07191d6e08cd56e3b427029c6c0c0f9b273f356792"
+    },
+    {
+      "file": "models/providers/zyphra.json",
+      "sha256": "6040bec694630c172faa54cc69f9433727f6c13a0328350e4f9c1dc4558a16ee"
+    },
+    {
+      "file": "pricing/providers/abacusai.json",
+      "sha256": "21686e052c71ce1a2dce3f35ba1dde58f304617069eed4dc8aac2b27fd9699d9"
+    },
+    {
+      "file": "pricing/providers/ai21.json",
+      "sha256": "846cfc722694ea12f3a641cdfae58ff8ba85c398e67a098616c6a751ee46aa6c"
+    },
+    {
+      "file": "pricing/providers/akashml.json",
+      "sha256": "9a917f81daae11730827bb8da284cee681fad1079d707947bc0482f756460d14"
+    },
+    {
+      "file": "pricing/providers/anthropic.json",
+      "sha256": "526dfe72df7f14979a87588a113b93d452ffa7c1d39f2f771ddf5366ede18a0f"
+    },
+    {
+      "file": "pricing/providers/arklabs.json",
+      "sha256": "cf8af09e39088763a4b83d73a40a78d9bb2d05144a1dd037d4a9ad90ff74415a"
+    },
+    {
+      "file": "pricing/providers/assemblyai.json",
+      "sha256": "269ebea3a6bc733bdbbe981e7cdd6922fc5271a64a10bf2e3f11f8b40079c1d0"
+    },
+    {
+      "file": "pricing/providers/async.json",
+      "sha256": "d3954b38b59521d68f7b3cd2b5a3f9f4627c3393282716a98368a7dfc537785f"
+    },
+    {
+      "file": "pricing/providers/augure.json",
+      "sha256": "916bd13bf09453084331f4230b64960f1e3ffee65ee1f9dba561c71f77a0d774"
+    },
+    {
+      "file": "pricing/providers/avian.json",
+      "sha256": "eeb85a04d63e8b3d91db98178dc2b8074e63e86a9b6aa331b1c0fd6cdd1dd50f"
+    },
+    {
+      "file": "pricing/providers/azerion.json",
+      "sha256": "811a3e292579594ede081cbb056579d72971b52db77a467f18dc9928a83e995e"
+    },
+    {
+      "file": "pricing/providers/beastlabai.json",
+      "sha256": "84e8bf69afa26a5645ef14ee3108fbe19bcdca6197454a9f4c9b8ceaba23c106"
+    },
+    {
+      "file": "pricing/providers/byteplus.json",
+      "sha256": "6d883bfb07b39ce29f44b784f5222a03a0d2d85ddc237c8714ddc68bdb927c23"
+    },
+    {
+      "file": "pricing/providers/byteplus/long_context.json",
+      "sha256": "2578f335e6365f4fe09337faf1095bb576d8522f76c38d0c838fe5a0fe6f6bbb"
+    },
+    {
+      "file": "pricing/providers/cerebras.json",
+      "sha256": "0683a262f2ddfe0f689c9103a63acf4a0745967738da3dbc22f6f637544e6f99"
+    },
+    {
+      "file": "pricing/providers/cohere.json",
+      "sha256": "97ef4681ee503eb3c66a6da9c4f5c1b1cd4c10310980584ef6840219893af0cf"
+    },
+    {
+      "file": "pricing/providers/deepbricks.json",
+      "sha256": "5103660750dc8bbfd56d16c964822b7a9c5f0e890b467670a8279debb6d03158"
+    },
+    {
+      "file": "pricing/providers/deepseek.json",
+      "sha256": "c8f78b03c64d2b77e0347a163fc36751f0df710b43e7f95de092ee69a5307422"
+    },
+    {
+      "file": "pricing/providers/depaza.json",
+      "sha256": "0c2598cec9f58d3c03eee2e4be033bb1a68bbc137ccf6c1fcdef3508acca2bc4"
+    },
+    {
+      "file": "pricing/providers/euqai.json",
+      "sha256": "be7c3f4f5d55dd5b49c93d832016ae27476fc6fbc02ff964ce9847eec5d988ca"
+    },
+    {
+      "file": "pricing/providers/foundry.json",
+      "sha256": "5a1e4d7313d15216f8ea59e42e31fa429de4b3d79cfd1aaf43aabed496b1bf57"
+    },
+    {
+      "file": "pricing/providers/fred.json",
+      "sha256": "2af3d9ed24cde0c2274c24ab1dc6a52471099ec23423107997f0efaf0da094f1"
+    },
+    {
+      "file": "pricing/providers/friendli.json",
+      "sha256": "f0a18e7c3401c36f50dedda5dfa6e3bea614c41125e4de27979a1a8441a61787"
+    },
+    {
+      "file": "pricing/providers/gladia.json",
+      "sha256": "5ee8da311629cb9b931467a347a3d464dbb371ec7224f727070a23371c6b9e5c"
+    },
+    {
+      "file": "pricing/providers/google.json",
+      "sha256": "cbf1ec56037cefdcf43a8bd2955f79fe6f9ea6db70a3bb5eaf6e8403158f02be"
+    },
+    {
+      "file": "pricing/providers/google/batch.json",
+      "sha256": "07454f5ea26f57a5ac61970773d09f09045e99c9dee034af54fb9e8076b5d291"
+    },
+    {
+      "file": "pricing/providers/google/contributor.json",
+      "sha256": "07454f5ea26f57a5ac61970773d09f09045e99c9dee034af54fb9e8076b5d291"
+    },
+    {
+      "file": "pricing/providers/google/flex.json",
+      "sha256": "0cbf3cba7c5b599c61c998033a6cba376e1fa2d940275ad896cd1963334f799d"
+    },
+    {
+      "file": "pricing/providers/google/priority.json",
+      "sha256": "5f8e66c296c7fd9d07964c1c7a4ca0d061e07f551a739d0a93e07370bb6173fa"
+    },
+    {
+      "file": "pricing/providers/greenpt.json",
+      "sha256": "f4a725826592ec02f9769f047ce8d5e423033524d79ba728b0f7362e0d496875"
+    },
+    {
+      "file": "pricing/providers/groq.json",
+      "sha256": "39e2c62adce4d77cb8dbf74a61373b734af8ba90a389d05467e92bb3f8e9ae27"
+    },
+    {
+      "file": "pricing/providers/inferencenet.json",
+      "sha256": "2fc4c1e03265454350ff33c068903b30d225abeca25db4f06421cdbd24220f3a"
+    },
+    {
+      "file": "pricing/providers/inworld.json",
+      "sha256": "9553a69d557c940ad82c5cf5e27847c84effe6560519b2b21dc3803725beee43"
+    },
+    {
+      "file": "pricing/providers/jina.json",
+      "sha256": "72b2c540eaddee685200ec6246d55a8cd3fe9c9c9e605141dee3780f1315a7fa"
+    },
+    {
+      "file": "pricing/providers/llmbase.json",
+      "sha256": "0f44ad8a091162086062875ac66246013a53bc7d77043509003779cba7702573"
+    },
+    {
+      "file": "pricing/providers/minimax.json",
+      "sha256": "d59d236e9e0abce932ede9e1ed0d9edf4731151a6f1ee3dc9d3ca9f19311649c"
+    },
+    {
+      "file": "pricing/providers/mistral.json",
+      "sha256": "c6f75d25e61100207b4b67460e5a37a4208d7989f2e4ce28d50794b4a2dcb7d1"
+    },
+    {
+      "file": "pricing/providers/monica/image.json",
+      "sha256": "a7380a71ced7799636349ce80a99a7252784bc7ebd51344b34313f0f01f323dc"
+    },
+    {
+      "file": "pricing/providers/monica/language.json",
+      "sha256": "1063d766c31c0250e183d8fc1e66c0e976925a875604e63b135bf5f42cb340a5"
+    },
+    {
+      "file": "pricing/providers/moonshot.json",
+      "sha256": "cb15384de71ffed2eb0b6a83a8cfeb74d18483b1bc08d3abc526f235841616ad"
+    },
+    {
+      "file": "pricing/providers/munito.json",
+      "sha256": "47271810f22545834d61923fce9e2850fe997b55ca4a7049f06630f1ca2ec79f"
+    },
+    {
+      "file": "pricing/providers/openai.json",
+      "sha256": "16526f15207c18f59622847832e89c015cc7096ca3bcd80d72383bc34a4e8d6e"
+    },
+    {
+      "file": "pricing/providers/openai/flex.json",
+      "sha256": "bde5cfb58f9e0614208801784240cc04e84b6d1df8f0cbd3593aa1aadf0d5425"
+    },
+    {
+      "file": "pricing/providers/openai/flex.long_context.json",
+      "sha256": "7296c0f07ea078eb0f625ec8f3735f40818e46e1f7481949ebbc29e253c6f3b1"
+    },
+    {
+      "file": "pricing/providers/openai/priority.json",
+      "sha256": "ce815318ff8317e6a061e6ca44c15835b0eccd57e0b581a1e8064cd656e15596"
+    },
+    {
+      "file": "pricing/providers/openai/standard.long_context.json",
+      "sha256": "f288564a594c2be59c11469ae48498319b3d95fb3c33ebf9729004ec944f82cf"
+    },
+    {
+      "file": "pricing/providers/opencode.json",
+      "sha256": "27c486f15055bdd9b40d4d724f5da923cfc1b2a27c3f6da17b8378c1778b8e18"
+    },
+    {
+      "file": "pricing/providers/perplexity.json",
+      "sha256": "e845591693feb4bdeed13ed371f3ce6703430e8aa5ac4d90044447c5c21349bd"
+    },
+    {
+      "file": "pricing/providers/resembleai.json",
+      "sha256": "391d7481fa9919dd6cbc08df8e2f6dd69a25a2a8cf23838ba1c318c34923b509"
+    },
+    {
+      "file": "pricing/providers/reve.json",
+      "sha256": "87abce5f2c348144b5ff8692d03956ae062d01907fb39430bba380896fe4b4b5"
+    },
+    {
+      "file": "pricing/providers/runpod/language.json",
+      "sha256": "dcacabb5db826122f1996c4ca567737690998c9e115ff82fd67676b145af9129"
+    },
+    {
+      "file": "pricing/providers/sarvam.json",
+      "sha256": "985316a34a5fe49b66e1bb384f62fd80625c437e551314bcb495389e608e34cd"
+    },
+    {
+      "file": "pricing/providers/selinaai.json",
+      "sha256": "9a1524090a9cd10f3d2255b1ebcd1e969eb871b3f23b728f7eb49eca3a5e91e0"
+    },
+    {
+      "file": "pricing/providers/shareai.json",
+      "sha256": "da79d7177339bf619905e67334eb21bde328c356d5eceeb20daf92748c0ddb11"
+    },
+    {
+      "file": "pricing/providers/spacexai.json",
+      "sha256": "b0ed99b6d7bbca9a4ef34572a447d4dd8f48a6c96b554935b13f6b92b39a1e0f"
+    },
+    {
+      "file": "pricing/providers/spacexai/long_context.json",
+      "sha256": "62634351c92e7d890ec3e05d534505f1889bab007bf2f96907bf209abe01530e"
+    },
+    {
+      "file": "pricing/providers/stepfun.json",
+      "sha256": "1317bfb6c2d1dc627beee39047a199bc5276885de617ab708371f1e9aa7e7d3b"
+    },
+    {
+      "file": "pricing/providers/synexa.json",
+      "sha256": "5994d2d54d0de564fc711114b23788f8ab3f8e99df06c6e6e634cb2cb959e37c"
+    },
+    {
+      "file": "pricing/providers/tierup.json",
+      "sha256": "b1395a464af6e3fd794588043a1fb13ddd4a6900c045fa1e8b5829645f8f52e1"
+    },
+    {
+      "file": "pricing/providers/ultrasafe.json",
+      "sha256": "7d9b96f878e3252b00f4ef525e5584c58bda368cf431047234bcae5e26a9b75a"
+    },
+    {
+      "file": "pricing/providers/upstage.json",
+      "sha256": "8b73dd68c25193b331214acef11b2b196c7243e79dcc86fd6bb3f9d065f22afd"
+    },
+    {
+      "file": "pricing/providers/verbatik.json",
+      "sha256": "7cc00e50d9cb41f2f4f143c617587fc3c05eb9342f51c03f145081fb70f40c1d"
+    },
+    {
+      "file": "pricing/providers/zai.json",
+      "sha256": "dea4cf54ae25148cf8fd9032bd2ef22e36424fe890773821c1a18750f2532692"
+    },
+    {
+      "file": "provider.schema.json",
+      "sha256": "92f5116a528282b515f2547ef78e48ec256be9254231778ee51c38682c966fb7"
+    },
+    {
+      "file": "providers/302ai.json",
+      "sha256": "2f817de4276b8ce2870f620963f287561e92bdea18f4fc7d84d0e4aec274c1a7"
+    },
+    {
+      "file": "providers/abacusai.json",
+      "sha256": "b51f474fe548737c7d3ae820c82b32c7bedb612bed1adf4c6244d8acabed7f9c"
+    },
+    {
+      "file": "providers/abliteration.json",
+      "sha256": "7d1f320fdbb10083c4927b98577d510502ae64c85f15ea2349e0e1f21a18654e"
+    },
+    {
+      "file": "providers/addisai.json",
+      "sha256": "b9cb8b7bdb3d6d80ab1e42dc0623b0ba158bb4341fa1af20fa1f808ce05a645b"
+    },
+    {
+      "file": "providers/aether.json",
+      "sha256": "0c3db810404891c40e527c4189f52506bf950e31826a34ffda8b70ecefdd7247"
+    },
+    {
+      "file": "providers/agdev.json",
+      "sha256": "6899db211ef6091df8a490536e0021ac519504ef969bc5155d1078950797dbeb"
+    },
+    {
+      "file": "providers/agen.json",
+      "sha256": "a6bab5bd3ffefd14b093f4edeea1db3354e6656ca7d0304b5a4f3ce3f88c449e"
+    },
+    {
+      "file": "providers/agent37.json",
+      "sha256": "6f059d7c7aa866c39fc632c1e5c9547ab1cfcc0587146d75bc728eeba891ec6c"
+    },
+    {
+      "file": "providers/agentaigateway.json",
+      "sha256": "0f8a785e01394ad0ebcd9705bb0e99f0c19d1f500d74394752f539c6bbf5b7f2"
+    },
+    {
+      "file": "providers/agentcontainer.json",
+      "sha256": "322f9c841567ebebcf9f26e8d915b636145845ed83b8ca5317cf054d999afa70"
+    },
+    {
+      "file": "providers/agentdiscuss.json",
+      "sha256": "bfa129ace7b6d068063b279676a4d418d2f540562d40eec9c35e7c493451aa33"
+    },
+    {
+      "file": "providers/agentics.json",
+      "sha256": "b4aca2655d2696737b0fc554c479eb52e5d2e4aae431c3de6685242835d95e0c"
+    },
+    {
+      "file": "providers/agentphone.json",
+      "sha256": "4ea04de1f639fcbeadf80fc57b7e678b3c3668fe3cb76776df1416e1bfba1aa3"
+    },
+    {
+      "file": "providers/agentsky.json",
+      "sha256": "0b16855a1774606ce94896acc6437b697f3bf4b943dc5bd231ae9d6e3a406bb2"
+    },
+    {
+      "file": "providers/agnesai.json",
+      "sha256": "b2913fb49698618c794ecad650378655814b8f8b066afe94e867475e19ff6a72"
+    },
+    {
+      "file": "providers/ai21.json",
+      "sha256": "4382637deffff9089d8f820de8421be253967df229199bef46b878ec13ff02cd"
+    },
+    {
+      "file": "providers/aiapiworld.json",
+      "sha256": "fdbcd997dedf15a2801cf669df75cc79bf132828cdf9f5ca5f32f6d39591fc9a"
+    },
+    {
+      "file": "providers/aibadgr.json",
+      "sha256": "2b07b6d495931679583af8f78af5dc23d56b277be909b671570a6fec83502155"
+    },
+    {
+      "file": "providers/aibramha.json",
+      "sha256": "64db1f9f998913a7f8144bcca3be038f3f6583b1c64f03cf5952141f3cf3d5d3"
+    },
+    {
+      "file": "providers/aicc.json",
+      "sha256": "d3ce1510353c7dc107745ff05c403dc3e975970a95da12dd828e7131dafa8c75"
+    },
+    {
+      "file": "providers/aichixia.json",
+      "sha256": "67c4919c98034525039baaf9ffd8a18d523fda83ec18ba1bcf470d9c6764020e"
+    },
+    {
+      "file": "providers/aicredits.json",
+      "sha256": "3b8d0ffe732c36e61f437cfa657959abd091453c09c4a19b559112431b324b99"
+    },
+    {
+      "file": "providers/aigateway.json",
+      "sha256": "6d1ee6a8dd95f2c992627ef8d3085afa8c9924ae05e6b3950cc9370b01114491"
+    },
+    {
+      "file": "providers/aihorde.json",
+      "sha256": "00f668968ccaf414c08231b72bdcca530d29b35ecfa624e6e5ac00cf4e5e234a"
+    },
+    {
+      "file": "providers/aihubmix.json",
+      "sha256": "c63966e1dee5e153a5110f0387b7747bc44b7016f22cf0ddbc164db999879876"
+    },
+    {
+      "file": "providers/aimagicx.json",
+      "sha256": "7c630c0e303310ee98e35efd2193dc73d1cccdf57c8f747caedcecf589a57089"
+    },
+    {
+      "file": "providers/aiml.json",
+      "sha256": "a53917bdf2733fef07f478a9847a2e8ab4e1113c6a29bde39d25bbbd5a6ed0c3"
+    },
+    {
+      "file": "providers/ainative.json",
+      "sha256": "06a4f30d2fabef294b5934863cce13c8fc594aae18ad816a33b735108873b7e5"
+    },
+    {
+      "file": "providers/ainvented.json",
+      "sha256": "555e7273751a9f83277aaa87dc2782b3325e14b471295fd202b53babeb1b6e48"
+    },
+    {
+      "file": "providers/aionlabs.json",
+      "sha256": "3b939fbff71f0cd53aa77c0d6d7958364c910067c8db25f3340d4b3de32d2ce2"
+    },
+    {
+      "file": "providers/airouter.json",
+      "sha256": "a76784d2534a6eeff4ca0c04389e25e13ff9314bfb5516948ddc7aa1580c2209"
+    },
+    {
+      "file": "providers/aisa.json",
+      "sha256": "0ec26fc9bb0114b18010a05a33b1e5cd379bf329bded1387c63eeea523e20caf"
+    },
+    {
+      "file": "providers/aivara.json",
+      "sha256": "aa0c9c180d7fd5f5893d32ba7879b97bf05b97b1f3866d95d3cb0e3ab269bd83"
+    },
+    {
+      "file": "providers/akashml.json",
+      "sha256": "71d54936ef075d07aea8f608b6ffa1a5a306a76e0175e9d03030a45407f462cb"
+    },
+    {
+      "file": "providers/aki.json",
+      "sha256": "5ef67368f06692e65c035708aae52a5989c69f3a9a5838fa48b9f2209d6e3be7"
+    },
+    {
+      "file": "providers/akumi.json",
+      "sha256": "a55852ec59ecb0e54ae5915007f15965bc0ba507beecbc615e36c68c7afc01c2"
+    },
+    {
+      "file": "providers/alibaba.json",
+      "sha256": "8357972ab1df9ac59758d439eee20da56017b6ed571471336510f041918bc5d7"
+    },
+    {
+      "file": "providers/alltoken.json",
+      "sha256": "9732a1eb7d27630473d8b9f0db99a3aa61b30085a45458d8e4f64b8c748b8d33"
+    },
+    {
+      "file": "providers/alphaneural.json",
+      "sha256": "31f210be65164bd180b58f812fa843f8fc12f48f4a3bc674b9a15409ba415407"
+    },
+    {
+      "file": "providers/amazonbedrock.json",
+      "sha256": "66e5fdef18e6915f8a34c6cc37740a13b8d10423c13087f4d8e681763fd5e1ed"
+    },
+    {
+      "file": "providers/ambient.json",
+      "sha256": "7348d1492b723233dd93472e6ad93c5244e000f4d94eceafcba86d65d14d9e28"
+    },
+    {
+      "file": "providers/amnt.json",
+      "sha256": "732b60f3ba83b2e3266fdb1f6e9a3773bb9b0279d9b2886a106f66bb8d14630f"
+    },
+    {
+      "file": "providers/andyapi.json",
+      "sha256": "c80470f35607fdafdafdeb6253c25df0ba85c41b37fa3df6ae825dfb5a0afa22"
+    },
+    {
+      "file": "providers/antbase.json",
+      "sha256": "2697ada4c75014be05a7c65a7ec2646f0bac5963a59464bb5a897481717c00f5"
+    },
+    {
+      "file": "providers/anthropic.json",
+      "sha256": "4e21abb9fb50ab3e720e959b1d707c2d871698bd6691652edd2540fcd00a79e4"
+    },
+    {
+      "file": "providers/antimatter.json",
+      "sha256": "1aa057f3172baa8bc420b98d4ec71da73e84e46487b1bfa46a9a2052a95dd3a3"
+    },
+    {
+      "file": "providers/anyrouter.json",
+      "sha256": "d50e8016e9a2de335a704bcfa6beacef29c88abe9f6231ffc54dde4df4318df4"
+    },
+    {
+      "file": "providers/apekey.json",
+      "sha256": "5d5c60740e6f833faa2f4d257468650abe5a25b10fd9cd9b8cb3386300b6ccc1"
+    },
+    {
+      "file": "providers/apertis.json",
+      "sha256": "48ead2af574c925d4e6f49c3269f2e77780271157903d684cf8523a9fe6c9522"
+    },
+    {
+      "file": "providers/apiairforce.json",
+      "sha256": "926a2a1b4b09129118057218d00a8791bd2ef33ec50e3f7a39ec5975153987a1"
+    },
+    {
+      "file": "providers/apipass.json",
+      "sha256": "c67328f9f843522915d21acef3a2b4c50deb4b0412eb3b7c9bd2636425d70dbb"
+    },
+    {
+      "file": "providers/apipie.json",
+      "sha256": "3166d93603724955f267052005234aa99d5553a94f258a30766559ca6774c805"
+    },
+    {
+      "file": "providers/apipod.json",
+      "sha256": "d0ebd544367af5aa9c59cc65e89b9cad017e594350d19f50759d13b00d42f64a"
+    },
+    {
+      "file": "providers/apiyi.json",
+      "sha256": "c3fa9d2ec4a68e987c4555f886d92665c8a21940cdd13acd22d36529e6921c03"
+    },
+    {
+      "file": "providers/appnz.json",
+      "sha256": "734bf28d2632e6da6659da69c3fdb891fa6ccb51c64b137d541144817880d27f"
+    },
+    {
+      "file": "providers/arceeai.json",
+      "sha256": "547b95c0549b3f942331b3cd4e51bee25e776d6d518afb477affac1e03d451bb"
+    },
+    {
+      "file": "providers/arklabs.json",
+      "sha256": "765a02e1c243110328850d84b9172c831f41662ba58a3ee8080fb1fb4c9127d9"
+    },
+    {
+      "file": "providers/arkroute.json",
+      "sha256": "077cb484863fd3e12836455fb74d8360bb9c44d29cd099c279e539cc59369827"
+    },
+    {
+      "file": "providers/arliai.json",
+      "sha256": "d5e96acd51d75e2f8a188658db60cac5bfbcef01c4ad3caf7306309e7361b159"
+    },
+    {
+      "file": "providers/arwriter.json",
+      "sha256": "abac72ae6b77f0daac341bb3588e7df4de8c217e8b7200c60d6d7d7fda0cbc34"
+    },
+    {
+      "file": "providers/asione.json",
+      "sha256": "d15a6d2bb65fa44d060c68adc93621a18d72f46f9a1bde7ca8d46e19ba578055"
+    },
+    {
+      "file": "providers/askarc.json",
+      "sha256": "e8e8243aa01b61d95608917bb0a0818d254efd0e1eab90ceb9f6d6befcb3a12b"
+    },
+    {
+      "file": "providers/askcodi.json",
+      "sha256": "0ae23de6b77ac6f350511e51f1998dd9ab54f2b0153ce3e7451bd5fa30c22e57"
+    },
+    {
+      "file": "providers/assemblyai.json",
+      "sha256": "45eff02bf9b8cd6fde38faf24fa4bc471b9546dc5aaab9f3172d47304a19e23a"
+    },
+    {
+      "file": "providers/assisters.json",
+      "sha256": "7a9c855fe48abd531e163400de7a26cd1e6b32e51a8b23059cbf1ed96342a154"
+    },
+    {
+      "file": "providers/astica.json",
+      "sha256": "f6ad54c0b2ef6d445ecf44fdf165c3321e9782338e666a2cda10622ba7543495"
+    },
+    {
+      "file": "providers/astria.json",
+      "sha256": "08dc12a32a552707e3ee01d41e0acd64144c0c2e00337fb184b849fec15f83bc"
+    },
+    {
+      "file": "providers/async.json",
+      "sha256": "cb4e3c6fd690a467cf30bbd52174d129d61082cf9613a3177e0e5097f645102e"
+    },
+    {
+      "file": "providers/atlascloud.json",
+      "sha256": "c8a1521eb0c5bba952142bc3b7c3b5ed38a924140b26bd53a9bfa1a8d634784f"
+    },
+    {
+      "file": "providers/audixa.json",
+      "sha256": "edb352032ccda8bd808e3359dc793447831d680923573cb153c8ec39bb0c61ff"
+    },
+    {
+      "file": "providers/augure.json",
+      "sha256": "266ae7ad78432e1c296343958d220609bf59211ce2671f3182ff5f4e69842f7f"
+    },
+    {
+      "file": "providers/auriko.json",
+      "sha256": "a019bb6b6b132e2acb318cc9c2d5b65b0180b89667ed8cd7db1bbab32e9be84d"
+    },
+    {
+      "file": "providers/avian.json",
+      "sha256": "3c24f3ac372fbc5dbc80d2e777f4694d300e942fcbc44d14eb3f868bc7945de0"
+    },
+    {
+      "file": "providers/azerion.json",
+      "sha256": "d1b6e2c0351ab8711e53c2817bc3a32f83af29aa23e1ffa8f7b51de3ac63c405"
+    },
+    {
+      "file": "providers/azure.json",
+      "sha256": "e0d4f77c6f3f10955ca73397c4991b1b9638048543f858408520d7b21291982f"
+    },
+    {
+      "file": "providers/baguettebot.json",
+      "sha256": "01cbb615a1ea958fe7e3033a1574a7411a138a7467e29ad162856fd3ed4c7cb3"
+    },
+    {
+      "file": "providers/baidu.json",
+      "sha256": "7e13edb4d43e315df9f081ce5826a30d09e702e8a69a86590bda3a2b78468592"
+    },
+    {
+      "file": "providers/bananapeel.json",
+      "sha256": "da809bcf7f5f19d97c233abce6d68391f8bff50fe9cdeb44b22509d5b33304a3"
+    },
+    {
+      "file": "providers/baseapi.json",
+      "sha256": "03aa8e1bbb863f3c26ec2e1ae17553f0205e4235461e315f47cc310f0804afbb"
+    },
+    {
+      "file": "providers/baseten.json",
+      "sha256": "0543b1bc4765c1083f555c84450159f19d22a6e1905d935365b7411b2a58f53e"
+    },
+    {
+      "file": "providers/bastiongpt.json",
+      "sha256": "bdc7b89ea2d894717d9721790688497b16ecc43047e14d9edb6462eb06c89c72"
+    },
+    {
+      "file": "providers/bazaarlink.json",
+      "sha256": "259b6ce3252d6481e87f4ca07e65f3a19279bfc1a8f455f691c09e370520cf1c"
+    },
+    {
+      "file": "providers/beastlabai.json",
+      "sha256": "9bfd01565f94363565945e1ad772b4d82f580aaa2375f5ae0c0fb454d19c18c3"
+    },
+    {
+      "file": "providers/bergetai.json",
+      "sha256": "0580ece74e5caaa9d2bc31139fe376fe9cb43acb32ed6c8cb7bc7e0c18a9b10d"
+    },
+    {
+      "file": "providers/bespokelabs.json",
+      "sha256": "24d42abbad2f016022aa09d0782a5c1dd83c6eeb48d5de0211c2f9a94b558b6f"
+    },
+    {
+      "file": "providers/bineric.json",
+      "sha256": "2e809f4d49c682f448fa40ebe677aba4ce574fd8881665d5b7c0bac5e39c32b3"
+    },
+    {
+      "file": "providers/blackbox.json",
+      "sha256": "39708f110a6e5e5261dfd8c416cc9f53381ef0dabd1a780798a967e6f51a9de3"
+    },
+    {
+      "file": "providers/blackforestlabs.json",
+      "sha256": "4e5d593d9288c3f98cfd9d1118b77f76cb6f3b409f423db0f045df2661a85bba"
+    },
+    {
+      "file": "providers/blink.json",
+      "sha256": "21a3c8831eb76a664484cb94668fe054ddbda9d69a03d4939119c8fa1a0310dd"
+    },
+    {
+      "file": "providers/blockrun.json",
+      "sha256": "c283fcf5552af8bf3a6e9f6e5a496a17a960c6fe14a28a7746964d89e292c4f8"
+    },
+    {
+      "file": "providers/botverse.json",
+      "sha256": "c10e084122963b2746119542102889657e3dbe6a9d90b36e0ead260cc7925430"
+    },
+    {
+      "file": "providers/brainiall.json",
+      "sha256": "eba526009573ef11483e274e1d9016f9ab84e0427767ca1db0c88c84c437c2c2"
+    },
+    {
+      "file": "providers/brave.json",
+      "sha256": "d642ef1e586a87f26f2f4499f35cc093283537a8c1f44405d46b7594063e0bd5"
+    },
+    {
+      "file": "providers/bria.json",
+      "sha256": "3a7da3c6142d63a5133e3d0b978ec774bd54823915ede2af338c63da97502b17"
+    },
+    {
+      "file": "providers/browseruse.json",
+      "sha256": "e33cf8db3216d3555e9d7df99b57da67c792d25f79ec0a7052c97e21ede076f5"
+    },
+    {
+      "file": "providers/byteplus.json",
+      "sha256": "9a524cbde666fcf65e9db234d27acd7e68c74924e5ae26403298181bae5e21e6"
+    },
+    {
+      "file": "providers/bytespace.json",
+      "sha256": "8ab7bab2b12edb8eb8e4932bc331076c211dfdfa9d53f875b7f1c8a37b0cb658"
+    },
+    {
+      "file": "providers/bytez.json",
+      "sha256": "019821bfb22732dfbf2d0254000cf69c2289bffd47b341f5af5a250981caa39a"
+    },
+    {
+      "file": "providers/cailos.json",
+      "sha256": "2649bbb8cf79a4201eb0d4508eb7031120e9bc04d4c11fbe1f958983245a181a"
+    },
+    {
+      "file": "providers/callmissed.json",
+      "sha256": "aa6743df9e1d36103505adab5a752b19d5de1b429dd1aaea56560d3b3aa5b3a6"
+    },
+    {
+      "file": "providers/cambai.json",
+      "sha256": "b405508a4c5a1349d2d8fc677db3e4e6af30d018e61df80f7a91ee5f2d7a9dc5"
+    },
+    {
+      "file": "providers/camelai.json",
+      "sha256": "cfaa1342aab2b66481a37bfe17f1adf33b9e8999cdf6497d8b15f8190f46e57c"
+    },
+    {
+      "file": "providers/canopywave.json",
+      "sha256": "42a6298d4b8a469bb7451531556c9e549c46022ffa0aed13c498c0f776b1e4bb"
+    },
+    {
+      "file": "providers/canrouter.json",
+      "sha256": "0a9e67bb863b9870a0c18d09249f1573ca67a0e682e59d4a4736ad33e1d3f6d1"
+    },
+    {
+      "file": "providers/carouter.json",
+      "sha256": "18846ed227150ab6e4641babb60daa63da5a1eac50bf3a4469554c99f5f3fb86"
+    },
+    {
+      "file": "providers/cartesia.json",
+      "sha256": "a37d41893d9069aa6f334ce3a2fc204091536398edd11daeb742be6c411a8257"
+    },
+    {
+      "file": "providers/casedev.json",
+      "sha256": "3c1f9edac99ca49e29bf4aa0f3773979d931195fe70e69acc70a45c3bc9e64fc"
+    },
+    {
+      "file": "providers/celeris.json",
+      "sha256": "6711cff2203f27f4be5ed265ea0f40a1966dc498e23655b0fe08fdd9e503d803"
+    },
+    {
+      "file": "providers/cencori.json",
+      "sha256": "233dbf6b8091966a017a13b9cf299e890f2237be0d6bb690a0547b55c6870acc"
+    },
+    {
+      "file": "providers/cerebras.json",
+      "sha256": "bc8c525a2864a0e2815e2d412ac76e839310e64b21dc43052aa7bd382555cdbd"
+    },
+    {
+      "file": "providers/chaingpt.json",
+      "sha256": "91b0ed1f968ddae8dd85776ad54aa1d5f4631d4c5f5d88c53dbae4a8f1d4dec6"
+    },
+    {
+      "file": "providers/chainhub.json",
+      "sha256": "825918646c5b071979373dffc0c10fc3d335b3fdeda163a9980ab47236175c2a"
+    },
+    {
+      "file": "providers/chatqt.json",
+      "sha256": "8926891f54eea60a443c2f046b0113eaae27ddb6e79f43d96182a981206b650e"
+    },
+    {
+      "file": "providers/cheaperinference.json",
+      "sha256": "e175598fabce9175206da7321555c0e4021e73d86b3898816bb133abe203ee3b"
+    },
+    {
+      "file": "providers/cheapgrok.json",
+      "sha256": "f978fc966f73ddeb7003eace228d4279e9782bfef8623d08e7c44819cf33540d"
+    },
+    {
+      "file": "providers/chutes.json",
+      "sha256": "3844d6cf1f70523a21fe5f86372fbc855058b14a5d8e7416fc058e18d9423d2a"
+    },
+    {
+      "file": "providers/circuitnotion.json",
+      "sha256": "e4ee4be6e4515130a46e768f85bd8d6e80185ea9d1721aea8af528c9b24df15b"
+    },
+    {
+      "file": "providers/cirrascale.json",
+      "sha256": "ef3132fca3593aecc51fdc525cf2c8b592cb1cc7c5c40b9a3f0c2c2d8174f1c1"
+    },
+    {
+      "file": "providers/citadelis.json",
+      "sha256": "32690a1a397f44addbb68644c75b351fe3596e71db29f7b0eb709ba003f4803d"
+    },
+    {
+      "file": "providers/clankie.json",
+      "sha256": "bef0aeed7ffc66d2eca6276cf587cfce705b10d2562d039a402447fd76da60b9"
+    },
+    {
+      "file": "providers/clarifai.json",
+      "sha256": "e8c8e05bcde16794f9078aaf51ab60b1fb7be02a7b58dbb5f47822de2be0bbc3"
+    },
+    {
+      "file": "providers/clauddy.json",
+      "sha256": "11f62414ec1b4bc57e4a5c20d6c42bfa48e100ba75d329f3933cc83ffcb3688d"
+    },
+    {
+      "file": "providers/claudible.json",
+      "sha256": "9c6e26efb240bcc5bd19db603cced30dec6a1e7f61d6adbf01abceb752f557a1"
+    },
+    {
+      "file": "providers/clawhub.json",
+      "sha256": "ca7d76d52e97fb4bea89c668ae8a23dca7b56f001f5409eef6bbd5582ee6c883"
+    },
+    {
+      "file": "providers/clawlite.json",
+      "sha256": "7469c76259d6931e39b1162a7f62526184a7ae390901c6d4cdc3fdbc7cae25ad"
+    },
+    {
+      "file": "providers/cline.json",
+      "sha256": "2bbe0d7283d0c8493b1ec2487b413a2c6b7e73dba2b6f4d19b3f9635aae7cd52"
+    },
+    {
+      "file": "providers/clod.json",
+      "sha256": "8ca384ca1ae193818d0b02d0bf5dd0c397114c2b8c0125f347e2eb3c611b7529"
+    },
+    {
+      "file": "providers/cloudferro.json",
+      "sha256": "e6d68a6f6f31b57552b54955fa5cd527e61edc94e93eff1d84938200aadf032e"
+    },
+    {
+      "file": "providers/cloudflare.json",
+      "sha256": "0e661be6cf317fb94c17278abd4d6a732dcf9be0a1f28607c88f60e553db16db"
+    },
+    {
+      "file": "providers/cloudrift.json",
+      "sha256": "870646e8c373424c749e90648b32e0a3a74547e9ccab2b2e8aa77ab48864c600"
+    },
+    {
+      "file": "providers/codebase.json",
+      "sha256": "9b49a09c291b0b0cd5282528d4af2ed00d03f7c3375e30f969a809b9f6413963"
+    },
+    {
+      "file": "providers/cognitivessai.json",
+      "sha256": "8cc4d0f4d54806f4fd321abdbd047c95021797eb76bf25c14c97db7cb631cdcf"
+    },
+    {
+      "file": "providers/cohere.json",
+      "sha256": "c127aade15e0ccc0050cf17b8e37f4cdc3a17111e240fd68099346e6e833d448"
+    },
+    {
+      "file": "providers/cometapi.json",
+      "sha256": "9757137195326965077aad64552bf8c755ae5e06e66fcc54180d3c58695df2f7"
+    },
+    {
+      "file": "providers/commandcode.json",
+      "sha256": "a4dad162820124d1689802165b6023141acd76d85df073b69e94f98597578f20"
+    },
+    {
+      "file": "providers/commonstack.json",
+      "sha256": "1de5edc069b015ed4d288cc5c4865d6e1a844f30be20de4d8448a30fe7639bf5"
+    },
+    {
+      "file": "providers/concentrate.json",
+      "sha256": "587b27de4ccfa2cf998dc5f689f9732a5702b2d1e79400bcf5920ec696241eb6"
+    },
+    {
+      "file": "providers/condensechat.json",
+      "sha256": "fad195855cd9d58d35e37351891f634e9a5bc90fb39bb4b0b5430934fe52aba4"
+    },
+    {
+      "file": "providers/connect0.json",
+      "sha256": "98911af771121c8c22f7277e4820149697da9f48692bd03a0567c4f0152ff029"
+    },
+    {
+      "file": "providers/copilot.json",
+      "sha256": "74ba7914c7b794c914053898a3de923a4aec5c39a2eeb00e9b6ecc6da4beef87"
+    },
+    {
+      "file": "providers/cortecs.json",
+      "sha256": "197148781940d6c6028333eac597f1acd8602060ae2113d0f0b4792f0c20dba5"
+    },
+    {
+      "file": "providers/cortex.json",
+      "sha256": "73957e1dbb665ee47077872be7cd82bfc0e9957a4d2caf6bec5ba56720861a95"
+    },
+    {
+      "file": "providers/crazyrouter.json",
+      "sha256": "1ffbe1341fdf67992b29383e75eb74189f5bbcbcf3c4b4a4419e1c1b1ecc0f38"
+    },
+    {
+      "file": "providers/creora.json",
+      "sha256": "2c78f027106aba43e1adaae78fffe87d143c324955c3653f70b5d6e07d6bba20"
+    },
+    {
+      "file": "providers/critique.json",
+      "sha256": "b4aeb35af99365ced7b4fdd835d9a3bca1433445ab0d640d25d154569d0348aa"
+    },
+    {
+      "file": "providers/crusoe.json",
+      "sha256": "b79b3802d9f2a3f59066bbe865e30909da76e7408d89de82370ddd350f4b511f"
+    },
+    {
+      "file": "providers/cursor.json",
+      "sha256": "4c6a5a82e938d6c04429b27d1e951388758f782c5c09a4a43b4dcc3802da9b14"
+    },
+    {
+      "file": "providers/daglo.json",
+      "sha256": "aaefaa9dac324fe42e0f5a8f2e4b08028300031b9774bd2955c00b227e4c7232"
+    },
+    {
+      "file": "providers/dandolo.json",
+      "sha256": "b8e4196e45af462872a638cd8b6e1d272ecdc21640fdcdb0bcac2c5051d1f1ea"
+    },
+    {
+      "file": "providers/darkbloom.json",
+      "sha256": "f224b4a97c6f1429f64b783ca1c166d35c0136cb45650f915f96660c9598f190"
+    },
+    {
+      "file": "providers/databricks.json",
+      "sha256": "ac1c694bd62501481fec24282235ad220366da3469ee52a359532eb4d1d4e628"
+    },
+    {
+      "file": "providers/dataforseo.json",
+      "sha256": "fbff596a243aa75e3f6841d31a6ad633df6fac235e28d37b13449b6c18149047"
+    },
+    {
+      "file": "providers/deapi.json",
+      "sha256": "02cf63b461578e0ef5c95a724309423599f746ab6e0fdcce507a8630af2b928e"
+    },
+    {
+      "file": "providers/decart.json",
+      "sha256": "98a7a3b31f9522d0534a28a3dd9f447770049ce6758658cb601abc6147e4985d"
+    },
+    {
+      "file": "providers/decisionmodels.json",
+      "sha256": "463a5829dfef206a716ef3f7639ee6530a3186c4cbd27d579125c250930b38b5"
+    },
+    {
+      "file": "providers/dedaluslabs.json",
+      "sha256": "c028e1aee0881eae9ab568d34e3018193cd75c932170cda5d091306770511787"
+    },
+    {
+      "file": "providers/deepbricks.json",
+      "sha256": "69533f99d963990c6d575bdc62de01d48c256013323f242050e99eca69e0654a"
+    },
+    {
+      "file": "providers/deepgram.json",
+      "sha256": "c05cec6234d3acb06d04713cd031f305cbdb45015189d1a50a4088a85b4c26cf"
+    },
+    {
+      "file": "providers/deepinfra.json",
+      "sha256": "d25c3b72595c60822ab95e651d752444ee4336f0088aa462a6ffefa19f7bb8ad"
+    },
+    {
+      "file": "providers/deepl.json",
+      "sha256": "cfd4df4b58215894ff9e4a0eb254ece6d2a4a63231331ee4ca874a89405dfe6e"
+    },
+    {
+      "file": "providers/deepseek.json",
+      "sha256": "43e81b63d00022d7f9f9a97ea06f47141d109b5349885631657c79fcaff7b2a3"
+    },
+    {
+      "file": "providers/depaza.json",
+      "sha256": "87c51cd2c8362a2111f61c575be0c0f0486f84c5624868182af97dd95272ad26"
+    },
+    {
+      "file": "providers/devicai.json",
+      "sha256": "55b6a8dce55ccb3643a0d75f03c5ccf25bf9e99f8fa90f8090753af45a706e5c"
+    },
+    {
+      "file": "providers/digitalocean.json",
+      "sha256": "5df1f353d9e27762f1cceb7669e1ee20272efaa66662348970fc4f04ebad76de"
+    },
+    {
+      "file": "providers/docketrouter.json",
+      "sha256": "cf6c3a3f21e2d7b6d22fe2eaba3280447f4140a566a8b3fa6688895285e89e7b"
+    },
+    {
+      "file": "providers/docsrouter.json",
+      "sha256": "328ba297e1348ed83d922fab144de0d942c01f1d74b81413ea8ac35b96cdef98"
+    },
+    {
+      "file": "providers/doubleword.json",
+      "sha256": "ae02f1a0f2775b263763aee1cf41554e1f4b789d0ffd9dbbb6cc3ec7fe1296f1"
+    },
+    {
+      "file": "providers/dust.json",
+      "sha256": "b5c4ffa48c62600168f77b95210c3ac8fc1c99b4bbd7b99011e37e49557cb72e"
+    },
+    {
+      "file": "providers/eachlabs.json",
+      "sha256": "71437eab801e0de40a0fa18c619d0043414e6d7d62385bf08e052b4212d9292d"
+    },
+    {
+      "file": "providers/eagm.json",
+      "sha256": "355992cedbe779a327a5973159429cbac57ae4b9cbb3b7184d69d3268e47618d"
+    },
+    {
+      "file": "providers/echo.json",
+      "sha256": "f8996b150a63e83f46ed6be6d5cbfb6fff0a6097b36e8eb91f7296a401922230"
+    },
+    {
+      "file": "providers/ecoia.json",
+      "sha256": "ff5e96481732ea3dc2f88884bda316b6c353f1212d0f48bd3388a121494f2869"
+    },
+    {
+      "file": "providers/edenai.json",
+      "sha256": "28337f6f51ebb9c045df48f90dd5260ae5c29b2262041ca1359729685137e622"
+    },
+    {
+      "file": "providers/edgee.json",
+      "sha256": "dca2d77beb5adbb8ee2f93fd23e7f8e7440f6f670841cd17b491c109ef2be397"
+    },
+    {
+      "file": "providers/edgespeak.json",
+      "sha256": "836acc6f46c92c46920c7f05abe354a0bc18b562710c4bcc68b06b5562c4da64"
+    },
+    {
+      "file": "providers/electronhub.json",
+      "sha256": "b0ac19d22682f8e4490f5d51e64151ae717bb6052de712f885dfdd352521eae4"
+    },
+    {
+      "file": "providers/elevenlabs.json",
+      "sha256": "fa2afe36929bd76bd27562ccae03fd110748228580d263a42f8c20a2aefbcd71"
+    },
+    {
+      "file": "providers/eliza.json",
+      "sha256": "894289f59366fa18541994a6774af2a0e3af45743ad2e5553e7c4cc228e928e9"
+    },
+    {
+      "file": "providers/ellipsis.json",
+      "sha256": "a3417acbee07f8130d6b5ad479e1ffb15a4e3741800abcaee93f6ef340d4902b"
+    },
+    {
+      "file": "providers/embercloud.json",
+      "sha256": "961f63191e2cafb05f11caf2b0ecbb3f0eea77428e5121dbb86c206c207454d4"
+    },
+    {
+      "file": "providers/embyai.json",
+      "sha256": "d2bb08689227e8d83511b516d45f8f3871022303f739b236600af43403618f9b"
+    },
+    {
+      "file": "providers/empiriolabsai.json",
+      "sha256": "720a3132aa63c55a09c0033b3be45ad9b6c08098799e412570abba1a9e28ff32"
+    },
+    {
+      "file": "providers/entrim.json",
+      "sha256": "786f068eaa4bca9674daf42f1bfc748dc1bf3dd04aa086366454fbd4387fbd11"
+    },
+    {
+      "file": "providers/epho.json",
+      "sha256": "978dd80a0c44a07869f4199f783dc03a9b5b87e20b7bfeea9893a97d3354e2d2"
+    },
+    {
+      "file": "providers/eugpt.json",
+      "sha256": "ca74c5b9ea649a2d84e8dbecfe0ed4d3bf3a9bf1e4c5b2af2efdf5d5d76d9057"
+    },
+    {
+      "file": "providers/euqai.json",
+      "sha256": "2863113bd7e328728ac258e263d4deb70f78544e512a8eea22415af95d933b0e"
+    },
+    {
+      "file": "providers/eurouter.json",
+      "sha256": "45cac2811816bac55ebc960c7e4dde41700c3e9f0e299fb442646757ac790349"
+    },
+    {
+      "file": "providers/everypixellabs.json",
+      "sha256": "770c51982f9822cc8f7e1c80ee14ee25cae0f7e7cd67ad9b695c6019905f6e44"
+    },
+    {
+      "file": "providers/evidencemd.json",
+      "sha256": "68e573ba078f33b4a128eb4bd984036470c0796a7af9656b6e35d05fe6e08f45"
+    },
+    {
+      "file": "providers/evolinkai.json",
+      "sha256": "99bdf17370b3aaac648b72f88e0784b56c4b091afcad7a946ba678c99db58f1e"
+    },
+    {
+      "file": "providers/exa.json",
+      "sha256": "d87258f264c6c014a73e6ee89514459a6bd8465c0a153fb63743f0561dba29ba"
+    },
+    {
+      "file": "providers/fal.json",
+      "sha256": "eeb3daed2ec1cd1fe4602af0dab48f3ad03df8a9c7d1bda57fea3013510596a6"
+    },
+    {
+      "file": "providers/fastrouter.json",
+      "sha256": "fb447a21e8ddd836d49b07a6795935588472173f794f7e32c80c997126ae7d87"
+    },
+    {
+      "file": "providers/featherless.json",
+      "sha256": "1a61891bff7c1758d8b5f0b093c6b1e1ad395d3e9afafb1c7881d01b0c9f76b7"
+    },
+    {
+      "file": "providers/fikra.json",
+      "sha256": "664dbbbbc3a6e1245787a5eab8f95387727767fbfc99656935926a07694e9df5"
+    },
+    {
+      "file": "providers/finora.json",
+      "sha256": "472262a7c118e63d422fc1b6a581f27a2c553eda8ae19f9c69335a732601498b"
+    },
+    {
+      "file": "providers/fireworks.json",
+      "sha256": "656463857a8483c3ebe597a3aa9a4674be0a5caaac5005a86bb898ebd19812cd"
+    },
+    {
+      "file": "providers/fishaudio.json",
+      "sha256": "46ee54eaf212a6d6575f2803af44d7f673fbb4f452da2183963ad2dec867c9a5"
+    },
+    {
+      "file": "providers/fivedock.json",
+      "sha256": "6a337a5795df9129aff9753402b243b1401d5b85f80e6cdea0aa645867402b8f"
+    },
+    {
+      "file": "providers/flatseek.json",
+      "sha256": "9f3f469d7337b6aa84cd7c3a88b73a6a1c2dcf574c7326a70c039fe8239d0915"
+    },
+    {
+      "file": "providers/fortytwo.json",
+      "sha256": "4f79a794f856371b881a67d0a23229b8b7617be5f6eec4c31b8e8659d06721a6"
+    },
+    {
+      "file": "providers/founden.json",
+      "sha256": "b02b74098994200ccfc410105e1186a6b20d16a28f234b345a64ccb55f911901"
+    },
+    {
+      "file": "providers/foundry.json",
+      "sha256": "fb8b9d3e8ccfd7d2d4c2f1ce39a88a6ea41dc57ea6a0325bf133c569bff5c2fe"
+    },
+    {
+      "file": "providers/foureverland.json",
+      "sha256": "9cff0f40017b9ef3d0b56bf100c231440b27b188e8a65ce39ee12c41105543d8"
+    },
+    {
+      "file": "providers/fred.json",
+      "sha256": "2e3fbecb0d9621bf87d9f2150fbbea9a5d096a9ff7b9fabaccf41e24135a2ce0"
+    },
+    {
+      "file": "providers/freedomgpt.json",
+      "sha256": "f3961144c524cbf63d3e30d9c59335ecb577f0561763458a1c745dc2769e9eab"
+    },
+    {
+      "file": "providers/freeinference.json",
+      "sha256": "c0a29d1fcebbecf04b8f696393883907323ed241f856bf869601ecc06c846e2e"
+    },
+    {
+      "file": "providers/freepik.json",
+      "sha256": "c5cf4e04a01217ca324d8b2764e19647c57e586860b5abd6a7025f46b08fa628"
+    },
+    {
+      "file": "providers/friendli.json",
+      "sha256": "3e0ff7c9e3ef8a2546013f16d3f89f96eecc66b73b7647cf31b55eea1c3f878e"
+    },
+    {
+      "file": "providers/fullai.json",
+      "sha256": "31266a8f7b02fa52980b29dd748a54e275dd3dd62bb26aebb4870da7bbd6fd15"
+    },
+    {
+      "file": "providers/gaterouter.json",
+      "sha256": "a9cab3d4dbd167322e2cf49e35846d5755019e855bb89b5be05d3f435b4c3abb"
+    },
+    {
+      "file": "providers/geekai.json",
+      "sha256": "e141029563ac7f6ed75e98023b7acececc318ab7f91772af78f7a5e3c187068e"
+    },
+    {
+      "file": "providers/generalcompute.json",
+      "sha256": "b35232579556de61774e40107c653870351093293dd7aa35b3f7d72545611d67"
+    },
+    {
+      "file": "providers/getgoapi.json",
+      "sha256": "eda6834e91bde34a9c518176dd6282faa68ad82051e1837a9670870edb9f16c1"
+    },
+    {
+      "file": "providers/getimg.json",
+      "sha256": "8ea433327125085a207922188238e984c27efab58ee64e85c7352616d0002ea2"
+    },
+    {
+      "file": "providers/gigachat.json",
+      "sha256": "7fb86cddb2c3a3c3d8e9af31b454c7cb30475b512b65238fa2e26183603a0765"
+    },
+    {
+      "file": "providers/gladia.json",
+      "sha256": "30cc9ad8a8164a8ba2e508b81ca94651b947563a5a8571384a852a4e6bceeea9"
+    },
+    {
+      "file": "providers/glio.json",
+      "sha256": "099881089e76428210615c6c003a939703c2bce7bd05fd1c244e66092c0c8b4e"
+    },
+    {
+      "file": "providers/gmicloud.json",
+      "sha256": "4f31655d01cdc85799512f919195b72f4fba83b97d39e69ef789246e9a31dd55"
+    },
+    {
+      "file": "providers/gonkagate.json",
+      "sha256": "643a49b50bff858922807ba206af3b5e938c2a780bc6a6334f4e74a17f737620"
+    },
+    {
+      "file": "providers/google.json",
+      "sha256": "a591150c525796e0f78e3d89331c73d84e7887f012308e12b82826060a723ba9"
+    },
+    {
+      "file": "providers/googletranslate.json",
+      "sha256": "8be9ea07841bae543954d30f81dd1bd6f014ab8895aba5eead97ec7037735c9d"
+    },
+    {
+      "file": "providers/gooseai.json",
+      "sha256": "b76403e12ad7fe89e828a585098aa0d745659e22ab27be74f851e5b16e9b6b41"
+    },
+    {
+      "file": "providers/gptproto.json",
+      "sha256": "4a9b6b5cb393f1d97af87b788c4ee869c3d01f3872b3aed9251888bd77e4a69e"
+    },
+    {
+      "file": "providers/gptsapi.json",
+      "sha256": "4639c4900ef3a4ceb2d11733abcf22df1d1b7e5a5d440b98a27eaf79263ec1fe"
+    },
+    {
+      "file": "providers/gradium.json",
+      "sha256": "0da7256f2c9d40aa302d37cac5bb069b80110a5b3499d45c21788686077f702e"
+    },
+    {
+      "file": "providers/greenpt.json",
+      "sha256": "ed6822dd3dbdba6a1af46d5781b24e9a002534b443036459a0f9cf2019410bcb"
+    },
+    {
+      "file": "providers/groovedev.json",
+      "sha256": "a8c10557a9f133611d519911943d6a20186de1e6706a777bb8f21e5e84bbf4b7"
+    },
+    {
+      "file": "providers/groq.json",
+      "sha256": "f89477c24eda994d9fb84816974fa612861ba70e5bb5adc554da0c1eb4208b53"
+    },
+    {
+      "file": "providers/gtranslate.json",
+      "sha256": "b5d6196f7262ab50a5780f6cc7f59c4e2422988604fd6f25965b40d2d5d7c402"
+    },
+    {
+      "file": "providers/gwdg.json",
+      "sha256": "fd3a31518cafd3941e63cf132667e2958f0b18235e0d445245e7547a7fd73e13"
+    },
+    {
+      "file": "providers/haimaker.json",
+      "sha256": "b21dcc13be69f0750662a62e5988265a65390e989674ccf6bae9ddc151d1c6f1"
+    },
+    {
+      "file": "providers/hanzo.json",
+      "sha256": "f44de6ebd0fd3110515f7dc6d04e89a6233ce7058ed62313949a3b30dda6f7e9"
+    },
+    {
+      "file": "providers/harnessrouter.json",
+      "sha256": "f84199733b8f3853e18a748e8bd63435562e072645341b14a87053e09fadef69"
+    },
+    {
+      "file": "providers/hcompany.json",
+      "sha256": "ec01c2c32ed4a1931ca65a9bafca1831d9dd3c87d3087ee0438258bad811db66"
+    },
+    {
+      "file": "providers/hedra.json",
+      "sha256": "e42476cc3be6e0af2e6867e17ef883a3dcd35b51796565a29863b966c5c8c361"
+    },
+    {
+      "file": "providers/helicone.json",
+      "sha256": "928e1e7a19f934a800e832956bd1d6860c1b5a7da1dce646e46c4688b19ee281"
+    },
+    {
+      "file": "providers/helyxai.json",
+      "sha256": "35fcf43ef6afa360750ce5f363b28cb8466d4f0d0928064956129a225e18d106"
+    },
+    {
+      "file": "providers/herma.json",
+      "sha256": "89cec217007e58d7f55303b0c2dc59c5b5ba058fd35affe61f4366460d0c765e"
+    },
+    {
+      "file": "providers/hetzner.json",
+      "sha256": "c89704ca291c16c5bb3283bdf30aaf703dcf55a1ff908da54572dee298e18711"
+    },
+    {
+      "file": "providers/heygen.json",
+      "sha256": "7ec0a4dfc3b101b8d887c424e181a76f666a3923c158edeb76a56996b14c83f3"
+    },
+    {
+      "file": "providers/hicap.json",
+      "sha256": "7c610c71c5b015e3a3ed2ea26843bf9076c13fc6c542037a80ab13beb0ff5276"
+    },
+    {
+      "file": "providers/hinow.json",
+      "sha256": "df824489ab65f46ae1f0e28bae9dc715eccdabf5a44bc5dacbf2f81ca22b9574"
+    },
+    {
+      "file": "providers/holysheepai.json",
+      "sha256": "5204c73374f4fbe4efec8923ef68f20e9fefcc75460968fe9b5c5d118192d0c2"
+    },
+    {
+      "file": "providers/horayai.json",
+      "sha256": "1670560c014f272bbdd0a316bed8472afc3d31a35d872ce437363037cc75fd1b"
+    },
+    {
+      "file": "providers/hostyourai.json",
+      "sha256": "01c7ec7a962f4a419e89c60c1e87b588ae6717ba97221aae7828f523bbff90c0"
+    },
+    {
+      "file": "providers/huggingface.json",
+      "sha256": "446d6bd6f7b30777ad82ad977b5480419ecce0a67a01c5bf569b5f84243824d1"
+    },
+    {
+      "file": "providers/humanbrowser.json",
+      "sha256": "22b46a0a6965182bbd4e0099e061c14659ece10f543f620aeacdcc42c6be6d86"
+    },
+    {
+      "file": "providers/humeai.json",
+      "sha256": "afa58afe27a1f36a27668ad2cd0ab8c9041d5d85e7493934c63235638cbea5d9"
+    },
+    {
+      "file": "providers/hush.json",
+      "sha256": "9f8829dc08d941f6825cd6bc386e374b68a8492324116a331b13c725f83808a9"
+    },
+    {
+      "file": "providers/hyperbolic.json",
+      "sha256": "a0c6797cd53451ec75152db123cfbbb79a53895779dd2d8ada3ad444bbb3a80f"
+    },
+    {
+      "file": "providers/hyperbrowser.json",
+      "sha256": "dd5e77481baf572788a5d19472dd881085a92eef65f75082ca692fc155e16aae"
+    },
+    {
+      "file": "providers/hyperrouter.json",
+      "sha256": "11ded2299bba066e5aae31ba54cf1f55da20d3042a9f5de380db52bf3feec7af"
+    },
+    {
+      "file": "providers/hyperstack.json",
+      "sha256": "55646f406efc211906a2401ec59f9917db06d71b280c9ecf10754d158f5a5df7"
+    },
+    {
+      "file": "providers/iapp.json",
+      "sha256": "d8f0a683a234e76202065b951853fa84d72dcb8b277e2ae417382f9574e8eef2"
+    },
+    {
+      "file": "providers/ideogram.json",
+      "sha256": "7ec9022e491074a8f124adeea687268941c5e4b639ca0317eb3e71ebc5e5d5bf"
+    },
+    {
+      "file": "providers/igpt.json",
+      "sha256": "e269066f012a35556513fbd57ff0e0550ad5d7866ee110e1b2b766926786fc17"
+    },
+    {
+      "file": "providers/ilmu.json",
+      "sha256": "a3c2ec5f3c21263fd39ee5f61689334809995f2543e91c119c56482d0d3dc904"
+    },
+    {
+      "file": "providers/imagerouter.json",
+      "sha256": "d3374cc7f27ae3c60e3f03959146e5314e73c0ead6717a4ac3d2b280c023a46b"
+    },
+    {
+      "file": "providers/impossibl.json",
+      "sha256": "cc25379e4e383e24cd75ebc4ba35af5700ca6b6a42651d4697399cc4f6a5f32e"
+    },
+    {
+      "file": "providers/inceptionlabs.json",
+      "sha256": "4219a023a6890ff93bf3beeea3eaf15aa1feac99aaeb97940fb82b0f156c5b14"
+    },
+    {
+      "file": "providers/inceptron.json",
+      "sha256": "ed54166f3e86f2460599e1edec845ede39b3bf09a1f18bbf359895fa449b6c93"
+    },
+    {
+      "file": "providers/index.json",
+      "sha256": "24f261d10c694d7a32630dda416cdcb8d7d3e7eb09c29329d624debf2c4989d3"
+    },
+    {
+      "file": "providers/infercom.json",
+      "sha256": "6aba5d7498072b881b37695ec601e2d10c154e461622a90fb6d9dcf145383a9e"
+    },
+    {
+      "file": "providers/inferencenet.json",
+      "sha256": "2ca8bac60f4008327feaba88670f7f265fd8d9f881de0102f68e7a5410dc5e85"
+    },
+    {
+      "file": "providers/inferexai.json",
+      "sha256": "c07086785e530ae01c4c7e8ca15e48475f859fe7fdd6492a8c7edadca56e63f9"
+    },
+    {
+      "file": "providers/inferlink.json",
+      "sha256": "244ac5adf80caa9d7c6c8880b636ab29b8df1e12ceb090084de6bbe887cd7627"
+    },
+    {
+      "file": "providers/infermatic.json",
+      "sha256": "d5e02dc0614e6360c08b92fd17e9e817aee23315088679420d8e9d556fc47718"
+    },
+    {
+      "file": "providers/infomaniak.json",
+      "sha256": "c3a0e930c82e05f0dfc672638121a2ed00a9de64899e3cf36c98505de5cf4a95"
+    },
+    {
+      "file": "providers/infraxa.json",
+      "sha256": "1acdaaff91168b1c3cfd526a536e497fb7747824a7ee911beb77e8bf9ba571f8"
+    },
+    {
+      "file": "providers/infron.json",
+      "sha256": "07db1aafc54c5e420baa8c5c36e5e24406ed8fc05ba3baf7e974349c45872096"
+    },
+    {
+      "file": "providers/interfaze.json",
+      "sha256": "14d277680210e818b5668d52d050cdf7236a0ccb78e8415adc591f58073d68b8"
+    },
+    {
+      "file": "providers/inworld.json",
+      "sha256": "7f1b290727eb331eb4b81363381071298b3dfa86a412c0cd36a3e1d5eb497320"
+    },
+    {
+      "file": "providers/ionet.json",
+      "sha256": "0b754d66e9a94f3ea46d6dd616594d9b94c9bd3baa9afdf77c1ebb9dafd89fdd"
+    },
+    {
+      "file": "providers/ionos.json",
+      "sha256": "2ec2a307cfb9cdf7c36cdfaf448b7bbd473a753f0b0548c9d3c65fd656aa63df"
+    },
+    {
+      "file": "providers/ionrouter.json",
+      "sha256": "38b2f004f5b469c00c852948fb811aaea6cde6ad3bdabf3210d30e36498d990a"
+    },
+    {
+      "file": "providers/isaacus.json",
+      "sha256": "3337ea521d5c21a8cdf21d6cfc24811775a8d59f8441893a508ae8070dfce597"
+    },
+    {
+      "file": "providers/ishi.json",
+      "sha256": "a686b10c3764f721e77f9dbb2467d10dafb26346a45c13f034e9fe57e02c71e2"
+    },
+    {
+      "file": "providers/jassieai.json",
+      "sha256": "e232deb3eef1372c38e8c9abaca45628b4ea83233edfab9d005822807143d33f"
+    },
+    {
+      "file": "providers/jenova.json",
+      "sha256": "046fc4ba3ab9af69d54696a513f3618ad846c2c58582fe3a23e51ae3a2a603e3"
+    },
+    {
+      "file": "providers/jiekouai.json",
+      "sha256": "10b74e3fe6b45e1318e1ae882a17ee621a4d2b09364a394df8b1cca59389c197"
+    },
+    {
+      "file": "providers/jigsawstack.json",
+      "sha256": "ec8eae3630f633c04d9941880b89bbd66d5871f99294d2f1307d40f7d386c7b5"
+    },
+    {
+      "file": "providers/jina.json",
+      "sha256": "f85a34871c4a1db2657531564aa73b2af18337d450f3937b835508790ee90030"
+    },
+    {
+      "file": "providers/jkaihub.json",
+      "sha256": "36aec406b73b708c1d2f329bc46c3719240f70ab0bae687a8f9319ef500e51e5"
+    },
+    {
+      "file": "providers/json2video.json",
+      "sha256": "81ce7ee34ed64806eb9dae387763f4dfff82c23d02f4411c043f363179870618"
+    },
+    {
+      "file": "providers/kalpalabs.json",
+      "sha256": "b0f86d9563f739cfda86cf12da19b718a756453926c57a79553a0c2026049d2a"
+    },
+    {
+      "file": "providers/keln.json",
+      "sha256": "ee127b605fcf65d586910eb12b651ce845c332ccfac7bc97578aaca0ac2cb9a6"
+    },
+    {
+      "file": "providers/keyplex.json",
+      "sha256": "983d1342f26888301f4ed213e5b3f9a5b942d126a6ef56285c665e9f5b3d92c1"
+    },
+    {
+      "file": "providers/kilo.json",
+      "sha256": "4810c0d4352f259d49bc4676ee59faaca90f461a5bc8c1ea802bbae71b765fbf"
+    },
+    {
+      "file": "providers/kimrel.json",
+      "sha256": "a90cb652483001f7cf3223df88a6b78bacd63d4facac6637bd2fa97e2bd9efa1"
+    },
+    {
+      "file": "providers/kirha.json",
+      "sha256": "4b43b561542b901625eac0cffaa052b0b45743a8aa8ef2c1c01c79d3aa753ca1"
+    },
+    {
+      "file": "providers/kissapi.json",
+      "sha256": "e29545a643e15286c91ed7cd031d0e670cecb5e3dac5dda3a1e8faad68d6dcd2"
+    },
+    {
+      "file": "providers/klingai.json",
+      "sha256": "ac7b8019f5739fa99fdc95fde868e1af2e2c2e709df8900643471287f7c2d8db"
+    },
+    {
+      "file": "providers/knoxchat.json",
+      "sha256": "6aab3c8d20a3abc6706cb549a2dd0d21744c4cbd08f5ac22b07bac5b421f9390"
+    },
+    {
+      "file": "providers/krutrim.json",
+      "sha256": "c11463fa5c7e9ba0320a0b6f70d3f27a45df38ad261559c1e21174e6db2760c0"
+    },
+    {
+      "file": "providers/kumorouter.json",
+      "sha256": "cd0e0e21b12ba8febe837af942d012a2cc3de13a99b05f9f2d7f2b7a354c02d3"
+    },
+    {
+      "file": "providers/langbaseagent.json",
+      "sha256": "42d36a3de5a042cfbbfb311125266185659e602a9e51e0542635f7055fb23bf1"
+    },
+    {
+      "file": "providers/langbasepipe.json",
+      "sha256": "6a753b45cfb8ec0176bca0890b073c0f36d672fd06bf65bd5fdbcb771e6b103a"
+    },
+    {
+      "file": "providers/laozhang.json",
+      "sha256": "f480d068dc322def6234c806905520e6e9faa1a6d6627a942f8f72c5777cfbd5"
+    },
+    {
+      "file": "providers/lara.json",
+      "sha256": "502b681c67351f841670b5ac642e1acae1709c883359c1f67a1da25d33e135f6"
+    },
+    {
+      "file": "providers/lazu.json",
+      "sha256": "98965df1b15edf23a6b170545137fff6583c35b7bc2f10bd3e923e5a41cea03a"
+    },
+    {
+      "file": "providers/lectoai.json",
+      "sha256": "04630624719170189e58836396b4469b9514f0763cf84e1e04e75467c45ed9f2"
+    },
+    {
+      "file": "providers/lelapaai.json",
+      "sha256": "0ae2eebe32d22e8c291de35b200ec8739b519314f451fdfe133f3e54d67caf8e"
+    },
+    {
+      "file": "providers/leonardo.json",
+      "sha256": "9a0d855271f3e06af72db71ac55ebce4d2e5ebe5bd2e1a0e3c5d605539e8078e"
+    },
+    {
+      "file": "providers/levantolabs.json",
+      "sha256": "0df37f314d225c8c115d3a6484e2ad8724a0b98169e788b9f1a12cb4fb8f0d53"
+    },
+    {
+      "file": "providers/lexico.json",
+      "sha256": "3afad0918a192d830eaeddf4debe8396798988422aa866f31168b6ad89647c7d"
+    },
+    {
+      "file": "providers/libertai.json",
+      "sha256": "a4d2d5bb9c27216f2795946af3f93f51bb91edce1d93e85c05c3e2a7460f1d15"
+    },
+    {
+      "file": "providers/lightcone.json",
+      "sha256": "10fd38239811c284b1bb2863e55dedca6a5b34453b46a0929bbf6c02d5b78e97"
+    },
+    {
+      "file": "providers/lighton.json",
+      "sha256": "6f111a31bc4c05497a4e90361cd455d92569d898ff8cd2b6d43c019e92b4b405"
+    },
+    {
+      "file": "providers/lilac.json",
+      "sha256": "6541a5ba935459e4f81fb5f20229d61e96521f06ddf3c2dbc74e28fccd9cbbcd"
+    },
+    {
+      "file": "providers/lingvanex.json",
+      "sha256": "8269f1dd51e41b94611c88bc6ebda56fb8b54a44eaa4f94d641d92a0f13dad3c"
+    },
+    {
+      "file": "providers/linkup.json",
+      "sha256": "c579d447547f8d583764b0006c57dcfb7b796e1c7eee4a2c58de85e389c750b3"
+    },
+    {
+      "file": "providers/litai.json",
+      "sha256": "af38bde542491053475955b2881548c6b2ed2bcf68bb34cfa9df4d34f1bd0894"
+    },
+    {
+      "file": "providers/literouter.json",
+      "sha256": "f395a113f5d2e3f9447bf506391e35f35ecb709a72375e80a8745fa2b8981515"
+    },
+    {
+      "file": "providers/llama.json",
+      "sha256": "a923744e71192a9d10ade60629d49ab8554c804578fe6403466e6f1bfaf57627"
+    },
+    {
+      "file": "providers/llm7.json",
+      "sha256": "98ccc3a540cc487e0694ffe33b53a9bdccbbc413370ffc7e937eefb7a7a96930"
+    },
+    {
+      "file": "providers/llmapi.json",
+      "sha256": "6516b8c779b96b4ac069865a525d2fc8ad75ce14571bcc1f02ddbead280b9dfa"
+    },
+    {
+      "file": "providers/llmbase.json",
+      "sha256": "87eb33a02fb4ee9b0d77ab2a45cc140e520fe7790efc51f1cd223aced56fafe8"
+    },
+    {
+      "file": "providers/llmgateway.json",
+      "sha256": "3d86a19780d83356efd14c2b1f7f0c69ec12f909f7d28c9fa60a71fa352cd0d1"
+    },
+    {
+      "file": "providers/llmkiwi.json",
+      "sha256": "8d4f7673ee47e5475a5e2a2cbbd566de93c655b0f3092bfa014ca22b7f166017"
+    },
+    {
+      "file": "providers/llmlayer.json",
+      "sha256": "1140d51ec77234712a9f33fb8eb241ba8299b737c00a048999eb611a57c2bbac"
+    },
+    {
+      "file": "providers/llmstats.json",
+      "sha256": "14853506fba2982207588b6bd47d47bd75cbfd6f9003d66d633befd8e56995f0"
+    },
+    {
+      "file": "providers/llmtr.json",
+      "sha256": "fba566408a8af6a841fd12774943485368b4de35b1b1d2e48f256bee9f981442"
+    },
+    {
+      "file": "providers/llmwise.json",
+      "sha256": "4f171b3bf4f8dd7619957f1fbed0ada53ae2677de415267bc274498627f9570c"
+    },
+    {
+      "file": "providers/lmrouter.json",
+      "sha256": "1553fa56c19d1f648ea096162ec0de8a011c53e2a7c40eb27d13c0ab84b0b953"
+    },
+    {
+      "file": "providers/logfare.json",
+      "sha256": "7a0eecfce581dc81a8fd14e383d52c16bb47e6483885c1245f30e74bfa63df1f"
+    },
+    {
+      "file": "providers/logicosllmhub.json",
+      "sha256": "7cf4a666239f9a250d0041f69f448382e103bd2bb0640f6c99134ca26e1dfba3"
+    },
+    {
+      "file": "providers/longcat.json",
+      "sha256": "73cbc11acead095f6a698d6ef9f887b5ee8fbde030a09b9809666e3c573a65f0"
+    },
+    {
+      "file": "providers/lovelyrouter.json",
+      "sha256": "f738e2528085334b0eb74913e9b53ffee506a148496b7c6d15c7fdebce3e52c6"
+    },
+    {
+      "file": "providers/lovo.json",
+      "sha256": "4e721db8e1777176cecd3a0091473986874d9462822dc9911cab347e01f72e06"
+    },
+    {
+      "file": "providers/ltx.json",
+      "sha256": "b3ed71a473173cedce6ee26ad1b55e0b6bcee5e71d74d57a0ad1b426d19fb300"
+    },
+    {
+      "file": "providers/lucidquery.json",
+      "sha256": "ff9146d974324d7b4e421747fa459cf8beef9e970adf02e1818eeccee2c672ab"
+    },
+    {
+      "file": "providers/lumaai.json",
+      "sha256": "fb0455e4bf37a9b2b588e5f833ed4bd9cebacfa75e2640fbdeb8c2c8b07f9731"
+    },
+    {
+      "file": "providers/lumecoder.json",
+      "sha256": "11794a37594e142cadcd74e4a73c63cf87d23895d490bd214484d37716d886fb"
+    },
+    {
+      "file": "providers/lumenfall.json",
+      "sha256": "70fee073d07134643fbd9dd14e722244bfb95559f80c659581cd0d66d9f84dcc"
+    },
+    {
+      "file": "providers/luminoai.json",
+      "sha256": "3ff77d0365c7e659dc14bee3a63fcec996b025c41787cf5b6814e78f81adbca4"
+    },
+    {
+      "file": "providers/lunos.json",
+      "sha256": "a438f1b4f4187303b415ffaa4a6c184dfe8ebfa65881501f6725b0d4c525bf5f"
+    },
+    {
+      "file": "providers/lxg2it.json",
+      "sha256": "46f28ace386b6e912722c5ee65cb22a9868dc3837f9a9e43eb87999a39187122"
+    },
+    {
+      "file": "providers/lyceum.json",
+      "sha256": "c8cd8a5ea231ec67332e7e2949ef8e57fbdb46f143ada7888d1165447c7fd74a"
+    },
+    {
+      "file": "providers/m8tes.json",
+      "sha256": "efcc2de73c62fe505235cd051408ad5731632da37d08720775c068076f830ef7"
+    },
+    {
+      "file": "providers/machinefi.json",
+      "sha256": "da098740c519598b33f7eec5b15c61a2b7c8b082a1548758bee8c70605ae8edb"
+    },
+    {
+      "file": "providers/magisterium.json",
+      "sha256": "cfbb884a8a2cc3f88921aa48fbfb7d826adc223be29f1d3459448eb3ed00e18e"
+    },
+    {
+      "file": "providers/mammouth.json",
+      "sha256": "bf0ad41bf8f1d98a411a16750b9e64eed6755620b342eab80b8086bb156b4e2e"
+    },
+    {
+      "file": "providers/mancerai.json",
+      "sha256": "2ca00b76f6582dcafd33f8079fe87631bd67465a5a29fd9f4cfe76a611d5fbfa"
+    },
+    {
+      "file": "providers/mangoboost.json",
+      "sha256": "759c59c5f129aec3947804831d871c4dc393f61e60ec3ed21239942203dedf8a"
+    },
+    {
+      "file": "providers/manus.json",
+      "sha256": "1d96a4c7725bc78cabd19848a2add8fc4d46e1252c931f81bf1a40a91d94fa96"
+    },
+    {
+      "file": "providers/manyfold.json",
+      "sha256": "8426026813d0394c8b3c0574d1082108911934279c3c63709f02202c6eddf467"
+    },
+    {
+      "file": "providers/mara.json",
+      "sha256": "26c0dd68f71ee2206f6271ff350ccbd6129f3575f097c5c5c16e003356f16ffc"
+    },
+    {
+      "file": "providers/maritacaai.json",
+      "sha256": "0d3e4eecab0973e469fd4f361a9dac8b19520098be3d5cc9ae293a53142fad60"
+    },
+    {
+      "file": "providers/martian.json",
+      "sha256": "591f2831afd1709fc10636c80edeccf20b03c6982a262445d1a04b7e615ef8c5"
+    },
+    {
+      "file": "providers/matterai.json",
+      "sha256": "1f08f6882dcf9d5294f35cfe38073545db38a1b3a5906aa84625243f56d88647"
+    },
+    {
+      "file": "providers/maxlayer.json",
+      "sha256": "c8cd68a77590c6f7eeb700b38ac36d14061855fb21d8e5bcb860cb053c60e25e"
+    },
+    {
+      "file": "providers/megallm.json",
+      "sha256": "8deed780db60e36a62a11a8aaaa44210a1de3436ef61c4d7435d4e26f44af711"
+    },
+    {
+      "file": "providers/meganova.json",
+      "sha256": "0026a8b93c3ab6b8ecd19f4a33b6be94dc08b30f88dfe6fe76b7e9dd87949a00"
+    },
+    {
+      "file": "providers/melious.json",
+      "sha256": "bde607950028623d5281b3304276a3882db236bb06750445bef1648d43f9f3fc"
+    },
+    {
+      "file": "providers/memoryrouter.json",
+      "sha256": "2e6022e9e82b87725d64a5e2a1325db6eafa5364cea0d9c110c2db6e9f123cf8"
+    },
+    {
+      "file": "providers/meragpt.json",
+      "sha256": "ed74839a6564f2e6cbe4ced4f91d75edfee6865976dbdee8cdccc9a67ab73676"
+    },
+    {
+      "file": "providers/merge.json",
+      "sha256": "c64877835343306784e867a93da9e7cead0926d804c059917fb4fa559876cf04"
+    },
+    {
+      "file": "providers/meshapi.json",
+      "sha256": "38837a725baf4de91a006c5120b4089dd0f70951af2eedfda77cd2a3602d0c22"
+    },
+    {
+      "file": "providers/messari.json",
+      "sha256": "d2756bb096b897c6cc36a4d9fb602d7d4a438513bd43887cb902c6b26dba1536"
+    },
+    {
+      "file": "providers/mia21.json",
+      "sha256": "a8f3ccbfe51fe78453a1bd1685dce07f7e874798e1780db1ee434646511ff8c2"
+    },
+    {
+      "file": "providers/miapi.json",
+      "sha256": "5f05925ed55fe02af5fc71e8103ea52cfc2b40eb5058e6d528752fe8422c6281"
+    },
+    {
+      "file": "providers/mimicxai.json",
+      "sha256": "b1a1749e6670a646c799ee522afe87b486729d8928034f8137f78a9c17710f8e"
+    },
+    {
+      "file": "providers/mindshub.json",
+      "sha256": "6b1268a46f36ae2527eb06a1dc739acaf8370c7b5421e861e94fcd597cbbc2fe"
+    },
+    {
+      "file": "providers/minimax.json",
+      "sha256": "6ede026121417043d1cb4bf1828957f89bb0704e7fae36beadfe9a240e05ba5f"
+    },
+    {
+      "file": "providers/mintrouter.json",
+      "sha256": "aa89db1a5aac1bf35f3a7dd196c381ebe06f80668cb484f3d32ecd98c3b19c7c"
+    },
+    {
+      "file": "providers/mireye.json",
+      "sha256": "eda737275b7ac8cb710ceaf24117d05c2f93cab1027ccb3aa66e4af9772b3a45"
+    },
+    {
+      "file": "providers/miromind.json",
+      "sha256": "d74f8013699eaff3b6bff851ee3a4993ca2fa6d104c81897531cda50e8cf9627"
+    },
+    {
+      "file": "providers/mistral.json",
+      "sha256": "97f6c4bc4a55e5f32737743d119de30392f182b649533c3cd26a83200a82ebae"
+    },
+    {
+      "file": "providers/mixedbread.json",
+      "sha256": "a69df40b33433b3f56379bfffc0f9138e69f256d1cd8f74c1b3a5744644a49ae"
+    },
+    {
+      "file": "providers/mixlayer.json",
+      "sha256": "2504feee051d25096ee3313c772bb84ec10d8f058770f5eef45ab9a84db341a4"
+    },
+    {
+      "file": "providers/mljunction.json",
+      "sha256": "77b97d57ca494441ea638784fa5262a81cf803d155448fb1334e937faab023b1"
+    },
+    {
+      "file": "providers/modal.json",
+      "sha256": "cad9307ca5e76fd1cd0ed6745eb0d61a96074e14ab879e1d728159407d11bd83"
+    },
+    {
+      "file": "providers/modelmax.json",
+      "sha256": "71a1f5d3929014c9d44a0ff71c2bf1016407ba3df0fdf9d8bdd40b95c7d324d6"
+    },
+    {
+      "file": "providers/modelrouter.json",
+      "sha256": "622f31d543a19503741aeb5d7c0ec910de421738fe179fddb4944f3aedbd8f42"
+    },
+    {
+      "file": "providers/modelscope.json",
+      "sha256": "8d9c11aa5c0e45497e6f5888cd909c0ccf21a443711d702bafe2f5b300b98645"
+    },
+    {
+      "file": "providers/modelslab.json",
+      "sha256": "38d1e189c9a599038fd260e6564bd4f2c9174a46502c8c6da73679d102e89314"
+    },
+    {
+      "file": "providers/modelsync.json",
+      "sha256": "604b503c5d6311da69dd35d3f9e2a07140c56fcbeb7a0317408c1cd0e2631932"
+    },
+    {
+      "file": "providers/moleapi.json",
+      "sha256": "9fb195a390be301aec198fd782bc2823e9bff410ed228cc34d9099ca9b0eb6db"
+    },
+    {
+      "file": "providers/monica.json",
+      "sha256": "8dc0a86a8860eefc98bc4ececa705691af01b378dde11fd27f2cde55c31371f9"
+    },
+    {
+      "file": "providers/monstergaming.json",
+      "sha256": "043bf9fbfe0f259a7b83bc71f7e37bd551deb6339b007239b13621b9c255900d"
+    },
+    {
+      "file": "providers/moonshot.json",
+      "sha256": "ead1ee481e3737e35ab5faa8605813dba4ba2f67d244f5949c535c428e06f760"
+    },
+    {
+      "file": "providers/morph.json",
+      "sha256": "74abd8e5d58b6887700ef14d4e6f390d1ee90351718ddf25b6b6b7e49109d1a2"
+    },
+    {
+      "file": "providers/morpheus.json",
+      "sha256": "d9e48b93d5e31b9c174a4859011aefe17048641ecc3f523de60ba4d4cce84648"
+    },
+    {
+      "file": "providers/mulerouter.json",
+      "sha256": "06d33ab22336b9109184b5f036fc23dc4063446bf0b7d74956684fdf95a11778"
+    },
+    {
+      "file": "providers/mulerun.json",
+      "sha256": "e64cd865573c0467bea2b68600171dbcb282174f52642d841b2e0cf7149cb0fd"
+    },
+    {
+      "file": "providers/mumeai.json",
+      "sha256": "9f430d24f5ff7aef76268dcf3650ea9b1a7cb4bfb36e9d51892895cd96baae50"
+    },
+    {
+      "file": "providers/munito.json",
+      "sha256": "0934537664d119fa47dcd48e7f2a103a16642fd3ad591b1da3c69bcfc297c323"
+    },
+    {
+      "file": "providers/murfai.json",
+      "sha256": "a06b80566cdf0118e872a4f2ab361b801564cf2cec78796fc9db16a05be36037"
+    },
+    {
+      "file": "providers/mycoai.json",
+      "sha256": "2feec32969aedea821e69ce94f4f0f931c99793e1145d65aededf93bc79373db"
+    },
+    {
+      "file": "providers/myrouter.json",
+      "sha256": "922ff30d31fd6eba04ac2e396970157d047a8a16d50e4e9a008b88796307982e"
+    },
+    {
+      "file": "providers/naceai.json",
+      "sha256": "f0aea4b2b2a79784c96d1648649b2a6978c719766daaaf4e3728402f3a1416c7"
+    },
+    {
+      "file": "providers/nagaai.json",
+      "sha256": "fce01a24261ebe6e21818b67811f7ebbf8685ee9823406963b5d63be1bd0f3cd"
+    },
+    {
+      "file": "providers/nanogpt.json",
+      "sha256": "0846b1525cb36b1e124b2efa37f99d85589c10cc26f2544eea932c30083f6712"
+    },
+    {
+      "file": "providers/napster.json",
+      "sha256": "c2d5858a6fdf69901e102e4d5e497b0e98ae570aacf1d4a1663e1d9ebbb0e4d7"
+    },
+    {
+      "file": "providers/narakeet.json",
+      "sha256": "d752833745543cb5c2776f8ec568751a34a6467abd4b8479626f0828ebd40235"
+    },
+    {
+      "file": "providers/nataris.json",
+      "sha256": "fbba0d3ca6ad11e43e297bd7e722019dadde4d072aaa2289b1a30d34263d8f67"
+    },
+    {
+      "file": "providers/navyai.json",
+      "sha256": "5bb53643e76e9ad81a88c23d7ee04619e26b28193dea14cc4a0024d790011a88"
+    },
+    {
+      "file": "providers/nearai.json",
+      "sha256": "fb7d020db033694b2d7318fa7d677c3739af1dcadd5d35d181cc85a77a660cab"
+    },
+    {
+      "file": "providers/nebius.json",
+      "sha256": "077bce5c46453d3949d7414119614cae746bc65fea08cb8d8f085ddaebd6ad90"
+    },
+    {
+      "file": "providers/neosantara.json",
+      "sha256": "868bd0b89c8ca8d6cb2c39fce11824b9f7cd288e9afe8a1093c44155088f6576"
+    },
+    {
+      "file": "providers/netmind.json",
+      "sha256": "0fed3a868a364cdefee38d2e7982109ed9270416c00aa993ddb25a7142c53f6e"
+    },
+    {
+      "file": "providers/neuphonic.json",
+      "sha256": "b9749872cb8377057d3b7dbe89c370ec5fafb0df69c9d99e50bb739aa4aed3df"
+    },
+    {
+      "file": "providers/neuralring.json",
+      "sha256": "307b42f94ec22640f5af284c776681b684cbd897d5f797bc074a746631dabd3e"
+    },
+    {
+      "file": "providers/neuralwatt.json",
+      "sha256": "2a13c3e191736b3ee77d8ff704e63511fa4c21a3169d7c1bdab46af2e013731a"
+    },
+    {
+      "file": "providers/nexosai.json",
+      "sha256": "613ac8bc96954d771e7b0bfae690ecefb05d893e7c909c9e146f2515e78486dc"
+    },
+    {
+      "file": "providers/nextbit.json",
+      "sha256": "a63a6cdae9407fb2cb1ac95415f2ce0c09c9685da3ef6544e7e5a64ef22c68d0"
+    },
+    {
+      "file": "providers/nexusify.json",
+      "sha256": "09462dcf4551659d07647e238774f215817b4083411ced4cfdd1e808e06877a4"
+    },
+    {
+      "file": "providers/nimbleway.json",
+      "sha256": "8a015ff2d355ad169e2c7ca6663b67b136dfd931cbb971fa947c47b229dfcf9b"
+    },
+    {
+      "file": "providers/ninjachat.json",
+      "sha256": "b6b6d6fb45ced16c62b1c1c9076fd136c86e305dd01b30064edf4031c5e1cee8"
+    },
+    {
+      "file": "providers/nlpcloud.json",
+      "sha256": "2a3638da68a29717b451f166cd1fc91441f184bb65280e4f2ea1f98c3b9003db"
+    },
+    {
+      "file": "providers/nodebyt.json",
+      "sha256": "326813f18db250bff847d670b6dda81a05b6a0dd296aeb2761896afebe40cd0e"
+    },
+    {
+      "file": "providers/nodion.json",
+      "sha256": "457c825efb312a038839cd5b7ecc5637564c5fe9efcf188a319019dc73d032a5"
+    },
+    {
+      "file": "providers/noiz.json",
+      "sha256": "23075fcd70b5b7513a4db55155ca4fec125e89935b83f6208bb27f4cf5e09226"
+    },
+    {
+      "file": "providers/nomic.json",
+      "sha256": "90978991973045e6c0114d253b23ab9193506eda35cc5c0eb688cfaf13440463"
+    },
+    {
+      "file": "providers/nonkycai.json",
+      "sha256": "fe5936638db12e79c95caa3f47df4edb76378462a48284685b9cacc2cc7f2b50"
+    },
+    {
+      "file": "providers/notte.json",
+      "sha256": "3db87cf6efe5c10c27ec0ea6a2defd236d4a5d800455257a27dc0ad76bd44552"
+    },
+    {
+      "file": "providers/nousresearch.json",
+      "sha256": "8779d0b20120d97125bbea88decdf65ed768fabef8920fd210de7cd7b82abfbf"
+    },
+    {
+      "file": "providers/nouswise.json",
+      "sha256": "aac1625cc6401e5a851d3737b8bc691bbeb8e74eeba9aa87f594c0bacaf1b1b4"
+    },
+    {
+      "file": "providers/novai.json",
+      "sha256": "e1edac0ff9dc3bd1670a32ba68ffdd7939505ad81a5131fcde1ff15d18b23b47"
+    },
+    {
+      "file": "providers/novita.json",
+      "sha256": "2247aa92a1b2c92af94e7ce921e2dc73ef35b1e1cda6ca3b9b00ecf91152cf48"
+    },
+    {
+      "file": "providers/nrpnautilus.json",
+      "sha256": "7adbdb9daca675726f54433f400cdbada3d8aac03534aa245ea9d6d848f1a3fb"
+    },
+    {
+      "file": "providers/nscale.json",
+      "sha256": "28a9fa8a3c249e6d9110771084187c876d833cfdab3512bdfeadf0ca4b139e80"
+    },
+    {
+      "file": "providers/nvidia.json",
+      "sha256": "36adfde356d8309b9eaadb69946ee553904e4dff576d71da57c594ac9bd09bc8"
+    },
+    {
+      "file": "providers/occludra.json",
+      "sha256": "cafceec1edc7c608c9e2e6e48cfb88e0bebd3984d5dc1d3f41fdfb17bf93616e"
+    },
+    {
+      "file": "providers/ocrskill.json",
+      "sha256": "33554cb9120b939adbe17f074372937d0771a065eeb64c4b2658d04363f1c83c"
+    },
+    {
+      "file": "providers/octagon.json",
+      "sha256": "b0d5979b6a3b092ffd7abe2dc58a14dc59adbe51bd9f0bb2bf82e2887dc884ea"
+    },
+    {
+      "file": "providers/ofoxai.json",
+      "sha256": "06d7b5ccc82416dd727a5dde409ada33ad9cc2ceed32389fb333e7a529e2d7a9"
+    },
+    {
+      "file": "providers/ohmygpt.json",
+      "sha256": "4cf77d6b89b9e4ab864ff29d017c45cf221c8dd3fba877e2e53458dffd318a4d"
+    },
+    {
+      "file": "providers/ollama.json",
+      "sha256": "4f8ad42fa9173106985765b7a6a7072490def5b94dca755b54e6e662e0b55d3f"
+    },
+    {
+      "file": "providers/omneity.json",
+      "sha256": "7adedac7d2f51e15e1fab22f0589f762f4721c332f7efb22434bb926c5547f1b"
+    },
+    {
+      "file": "providers/omniakey.json",
+      "sha256": "dc0bdb4792f039368c12807154da6273e5a11c82bc7f56f7929decd20b2b61bb"
+    },
+    {
+      "file": "providers/oneinfer.json",
+      "sha256": "4d0a5c8bf1993a38574f23cad53ce840b260394e38d50f09da0ae3ac46a46fb5"
+    },
+    {
+      "file": "providers/onekey.json",
+      "sha256": "b8ee522122a3f524f988cf5596c800f5576060c53464828e406f68bcf8926ddf"
+    },
+    {
+      "file": "providers/onlypixai.json",
+      "sha256": "dc3a515f836943f8d61f6a4bf377638b09321c6bd7a58226d5360e4b88f365ab"
+    },
+    {
+      "file": "providers/oodaai.json",
+      "sha256": "cef430af3c1360dc0972cddb6f21befa0c55b00c63bf45b7181bf281079146e7"
+    },
+    {
+      "file": "providers/opeai.json",
+      "sha256": "545cb848898ee5646611aa67ef00a2d9430071e1109ef4f053c2e639a84f56c7"
+    },
+    {
+      "file": "providers/openadapter.json",
+      "sha256": "37fa6b4e8e0eb609e798455edde04a6c1cc582a5d22aac454b4f2d0cb8b3b172"
+    },
+    {
+      "file": "providers/openai.json",
+      "sha256": "84381bea254d214e1605654ce1e566c677d63e588e015bd6890193fbf2228865"
+    },
+    {
+      "file": "providers/opencodego.json",
+      "sha256": "7314ca2607a771e7d90f744ebfe7d6cd4768816b5ae556549a1be58fc55eb7e7"
+    },
+    {
+      "file": "providers/opencodezen.json",
+      "sha256": "0ddcad77532d676f197e46afb4f82581140209111bd97478f48978a596b6ed93"
+    },
+    {
+      "file": "providers/openference.json",
+      "sha256": "adfc0db998ff8ca3ede70343a916096c4c699487e41644ecc0acadfd4aa98529"
+    },
+    {
+      "file": "providers/opengate.json",
+      "sha256": "2c752e321838c0895fd5288db0b542073911326121ffc50c89922915fa362e18"
+    },
+    {
+      "file": "providers/opengateway.json",
+      "sha256": "d924c47d653c4d79ed5915e75f7fa55a442e4c24b07ab67de69caac913cdb606"
+    },
+    {
+      "file": "providers/openhands.json",
+      "sha256": "52f9332f253d650d98476d8a6bf5e32a063a3fdf7a44704bb6488aaaf4cb9e7b"
+    },
+    {
+      "file": "providers/openlimits.json",
+      "sha256": "3aa553cd37302fa4ab72939ce77ee979ff3d485f204701ae19672190c61f04da"
+    },
+    {
+      "file": "providers/openrouter.json",
+      "sha256": "fce7c3f6cadb5c600093eabed83f016e46ad90f4aeaabc096b971384b352c59d"
+    },
+    {
+      "file": "providers/opperai.json",
+      "sha256": "c4a729a43d32b76490ac4150270fe8e9d8aeb7bd9e0e5bd66ac9b86bbb02617e"
+    },
+    {
+      "file": "providers/opuscode.json",
+      "sha256": "b491dc5580407a8e1fbfa15a3710fdae736cb4d91aa197dd1ab4a5243b921fc4"
+    },
+    {
+      "file": "providers/oraicle.json",
+      "sha256": "0506130f65c62b09ed5e91d5ae5895560e89d7621c9cd62ed0b4238ee2f9457c"
+    },
+    {
+      "file": "providers/orbigpu.json",
+      "sha256": "d38027f658028d953dd37cbc8e06efedf0429eb11ae1c76f70975ee0d8de4fde"
+    },
+    {
+      "file": "providers/orcarouter.json",
+      "sha256": "fd2cc7382b12775a60b2909f03edf9be6d540aadef9bc6aa864ebae22c2ee063"
+    },
+    {
+      "file": "providers/orqagentruntime.json",
+      "sha256": "6d03278ad727a2c9f76b86c606268fcfe2b5f85461cf0595fe37c56a43860e96"
+    },
+    {
+      "file": "providers/orqrouter.json",
+      "sha256": "ae92c59f4db3cb98b97900ae399ba562ac32e75e73f409ab8a4eef0c15d4420e"
+    },
+    {
+      "file": "providers/osiris.json",
+      "sha256": "9c3d9b0f2a9bfa94f070d6f719e42842e1996828e6318d2b01c043282b498a54"
+    },
+    {
+      "file": "providers/ourtoken.json",
+      "sha256": "74aa3a15413d54d928e32c010ad00b75399bf6d03fc33cbfb9f1485935e099ba"
+    },
+    {
+      "file": "providers/ovhcloud.json",
+      "sha256": "fb6f9a6499b611c69fc55206f93f3a306c586a89d3dd2c40a2c1c002b20f5384"
+    },
+    {
+      "file": "providers/parallel.json",
+      "sha256": "6857a1dffef0b5e34857080182263d8c321bcc09d294bf371047bd96dc758f9d"
+    },
+    {
+      "file": "providers/paraloncloud.json",
+      "sha256": "77df364c8294de0541a88b265ff2068f6712e39f5a37e1b211586483ece88c6b"
+    },
+    {
+      "file": "providers/parasail.json",
+      "sha256": "f18c07568564663005183f9b2a7d737c6808c81613be64fa35967f841f18865a"
+    },
+    {
+      "file": "providers/paul.json",
+      "sha256": "b9df9c0f2bcecf5550bb26647dda1a303565ed1dbeba200465ea43b10a857b85"
+    },
+    {
+      "file": "providers/pawaai.json",
+      "sha256": "2d5d8916479dda20a6e5d97dffabda1a332763860d651e72af0127be15bad6ec"
+    },
+    {
+      "file": "providers/paxalabs.json",
+      "sha256": "375bb96510560f4a6809771db351834d65ba98dbcc4db7bbf571a4c6601c9dec"
+    },
+    {
+      "file": "providers/payperq.json",
+      "sha256": "60cb4dc1e64322610a9552bf1e5010d2db39bb8dcc0fec32cb9bc0fb30dca972"
+    },
+    {
+      "file": "providers/perceptron.json",
+      "sha256": "957cf8a948e38e8a26943561ea84815a1807c61067974f13a1c27a8c6921669e"
+    },
+    {
+      "file": "providers/perplexity.json",
+      "sha256": "77d21d5714d6b9eec1d8da09f686c83bf712c924efa72ee3532e91b0238beb2d"
+    },
+    {
+      "file": "providers/piapi.json",
+      "sha256": "ff148586bb00769940d1c61662529b4a4981ddf86d9a8813806c6369f210fa73"
+    },
+    {
+      "file": "providers/picklyone.json",
+      "sha256": "40bba5e63f9ec9db48b5df83b5b6c4b7379d5b7693dd66cf2eea9f9a089b1c9f"
+    },
+    {
+      "file": "providers/picsart.json",
+      "sha256": "9a3d29b6af6f06285d2610ec462a83033e17601eb94421b47e8f2546513e45a9"
+    },
+    {
+      "file": "providers/pinecone.json",
+      "sha256": "642bbce86768196c0540a15cb47004911695ecd891be7fb6786bd1261b41288c"
+    },
+    {
+      "file": "providers/pioneer.json",
+      "sha256": "6098da75d1c54c3de26d41ae1f73c7f3880d0d6471193e65de1122527548f621"
+    },
+    {
+      "file": "providers/pixserp.json",
+      "sha256": "f184e9d9e88adb9fea0aa777fda0c809c9abd634d999a7f43c7d1db1bcfadcf0"
+    },
+    {
+      "file": "providers/plamo.json",
+      "sha256": "bbaac81f284bd16c056f0227c5708935e346cb49e235def912efdd0b733cf0ca"
+    },
+    {
+      "file": "providers/plori.json",
+      "sha256": "386709218e964b877d9eb836c84bfa1b4947a8d964c5a8b917ca3e098881291f"
+    },
+    {
+      "file": "providers/poe.json",
+      "sha256": "677b64637ab78a343234808a60be2cabb3a5628d413914e96420af09814906f5"
+    },
+    {
+      "file": "providers/pollinations.json",
+      "sha256": "8bc8175f277d8761a51185ca65f33dabd2f4d29894a1d2580ff944f3e874a572"
+    },
+    {
+      "file": "providers/poolside.json",
+      "sha256": "086c73545acdd9d6ac9a3ab42028af8eb0b949face3018e2a3f32ac024053f4c"
+    },
+    {
+      "file": "providers/portkey.json",
+      "sha256": "565459c0478d84a0b45bbcc7f9e852081d6be54fe7330351747bb934834d73e7"
+    },
+    {
+      "file": "providers/preapi.json",
+      "sha256": "34e8f176c21408f327cad84a23da6709506446dc5aebbe453d69e021149a5d9c"
+    },
+    {
+      "file": "providers/predictionguard.json",
+      "sha256": "3a70aa7e08bb5045e178352a1df3dc1a0c6630d2a9ed7c2193137517af88e1c9"
+    },
+    {
+      "file": "providers/primeintellect.json",
+      "sha256": "42c2d01142c5475096af5a35b56d1711c20c1020c5bc1a444cef1ef3e54b76c1"
+    },
+    {
+      "file": "providers/prunaai.json",
+      "sha256": "ee49274dc877a9d9d5bac0febe8be6697edba9f9d7c7b599ca3b092ad54e2938"
+    },
+    {
+      "file": "providers/publicai.json",
+      "sha256": "fdccf3102ccc94ce02d1ff927f7680b8b8bd0d4cf495098892913cab461facfc"
+    },
+    {
+      "file": "providers/puter.json",
+      "sha256": "0523e645897050cc9849d6aa486c338ab734ef078a2c02fd33f812a748a81b90"
+    },
+    {
+      "file": "providers/qiniu.json",
+      "sha256": "ccd045e77632cccf23f88a1c9fecd6a28ac255384a1a39f24c88e400aed18a99"
+    },
+    {
+      "file": "providers/quantanova.json",
+      "sha256": "8ed26e04a05050bee37f4a7ddfe382a533c36e32c10c26235d08b98de6eaf538"
+    },
+    {
+      "file": "providers/quiverai.json",
+      "sha256": "5676bfd5eb01d25796f49f20a81a2492568c5d22876a8478e8f0135b4f789c43"
+    },
+    {
+      "file": "providers/radiance.json",
+      "sha256": "c3d933db6b399adaccfedfbe3eae70fce831aae3d96bcbbcbea9790d492bbf52"
+    },
+    {
+      "file": "providers/radient.json",
+      "sha256": "3f0039bb6d2454647bd85ca4af9833eef925c02e84f0237f9ee81a899ceaeeff"
+    },
+    {
+      "file": "providers/railwail.json",
+      "sha256": "89470ce4be478588d2d33ebd81182ea9f086cef5b19a96a5fbadfbe2daa324b7"
+    },
+    {
+      "file": "providers/ramprouter.json",
+      "sha256": "9997766be304ab1c09d65b6e9e6dee7e749860a10670ece0c4151da78fb1a4f7"
+    },
+    {
+      "file": "providers/raxai.json",
+      "sha256": "5c9da8ec92d4c0a8b5eeafb4d64344898397607f2fce50619e7a3efb0df008e2"
+    },
+    {
+      "file": "providers/rebytemodels.json",
+      "sha256": "7ddb4c7544f550b6a3fa3fa89984367b6e03bcaa0b8fbbda7d4695afcf32da63"
+    },
+    {
+      "file": "providers/rebytetasks.json",
+      "sha256": "f121c330cb8ff1e3515a83088bd2ad8147188478ff23d3232c297fd7f86d6557"
+    },
+    {
+      "file": "providers/recraft.json",
+      "sha256": "ebb77fb9f19d19e236616c911ab218bc7c2fce40e0bb94f00095c8e51c05fdaf"
+    },
+    {
+      "file": "providers/redpill.json",
+      "sha256": "66f3ab390a75caf9d23bb71ab4b67a601583ff32ae430ab43073be28c3ee5643"
+    },
+    {
+      "file": "providers/regoloai.json",
+      "sha256": "a8eac445ad98822a77aac19898e13643a3a65656d0896fd9dbc6ea1dcbfc745e"
+    },
+    {
+      "file": "providers/regraph.json",
+      "sha256": "fb99fb0a227a86495f4e9fd418692d88c43731ea787874da7c5517e47e2ea999"
+    },
+    {
+      "file": "providers/rekaai.json",
+      "sha256": "60ccf07e71342da6ffb84109bc9bff6377c7dbdde6e849c1f2786b796e884587"
+    },
+    {
+      "file": "providers/relace.json",
+      "sha256": "8d4f8df14fa5b0d5a1211bf0712ddaf84e06031712d8ed3ae9bfda005cce1e0e"
+    },
+    {
+      "file": "providers/relaxai.json",
+      "sha256": "841d44a2266d1d29123404de9b3be2de5294548a407a999c19eb16a333989c65"
+    },
+    {
+      "file": "providers/renderful.json",
+      "sha256": "d1e9d8f7164b5eb395632342a31016bdbdb2137af4c3fb38742eb81823fe5e5e"
+    },
+    {
+      "file": "providers/replicate.json",
+      "sha256": "2b647521ca64326e490579c3964f232a6dc5b64d22b575cc4e270a87346e7c0e"
+    },
+    {
+      "file": "providers/requesty.json",
+      "sha256": "80d6528389b6ca87569024afa93c7e9ff2786eb3bc549e97ba06c5c7e0bfc333"
+    },
+    {
+      "file": "providers/researchagent.json",
+      "sha256": "ef2bffe3f83cf652af144e03b72f51103c64370c13ec81de0265547c2a7d532b"
+    },
+    {
+      "file": "providers/resembleai.json",
+      "sha256": "e88cb26ba923a035e65cdb4db5720e6a45f73184ce992b3edce41b9dd1e43a18"
+    },
+    {
+      "file": "providers/respan.json",
+      "sha256": "c0c087f9dc46f01282b1317eeb7d07c98a5a4bf485cc90e5082de04ef9bf3742"
+    },
+    {
+      "file": "providers/respeecher.json",
+      "sha256": "9dda54468b61bcd1e376b98d56e021e0fa9a7fb2fa4820b19876adcba14ee484"
+    },
+    {
+      "file": "providers/reve.json",
+      "sha256": "e76f2bdf007c1d87dcb31b4bc0c9f7ac25756d5f9967b7f5e3bb15f06b4ef32b"
+    },
+    {
+      "file": "providers/rewindai.json",
+      "sha256": "37143705e395f67f377c82e4bb12602f643065c8d25fab91d896fec5c751cc0a"
+    },
+    {
+      "file": "providers/rime.json",
+      "sha256": "671f59b8a2c26a4e4811fdb73957320598481a7f8b712201cb14d7f34edd65e7"
+    },
+    {
+      "file": "providers/rodiumai.json",
+      "sha256": "0246b87a018c5fbbdff624a87927d89ca1d7d3d36fca70c7696da171bb82375b"
+    },
+    {
+      "file": "providers/routeplex.json",
+      "sha256": "4b2ee57b503d7cf21d9f78c625cba20e278ee1bb960a6bf98ada5cb3e38a058a"
+    },
+    {
+      "file": "providers/router9.json",
+      "sha256": "46af218ac005240f9d32e72ee978f5dcddf56baf9b6264260eb27f26aa3e9e7e"
+    },
+    {
+      "file": "providers/routera.json",
+      "sha256": "24d496c9aad83ab5ec2321f094120df6bf4a66ce7b30ad992986671235c1a38f"
+    },
+    {
+      "file": "providers/routerlink.json",
+      "sha256": "dffe80529b20182abde349fd254de89717fc84d62b42fbd5de16e8afdcd4ee0f"
+    },
+    {
+      "file": "providers/routerplus.json",
+      "sha256": "1a2ce3ad33a389af9dbef90bb9422a53356f6037d9ebb29c6b47c9c64ddc906b"
+    },
+    {
+      "file": "providers/routeway.json",
+      "sha256": "e09d019b175521abf9b3e425f0f4bfbd4686ee55b89bb2bae7c9fdf9b06f3835"
+    },
+    {
+      "file": "providers/routmy.json",
+      "sha256": "5b259e67c776f50e55b86d3807b1c7706363b3f54273e3191136c7418f590565"
+    },
+    {
+      "file": "providers/routstr.json",
+      "sha256": "eb5e43c13c8dda6f701050ef7bac8db8e855f68ceb04ef90f23b3b37f45d74d9"
+    },
+    {
+      "file": "providers/roxy.json",
+      "sha256": "b2b5a3e2b2a0cd44f94026bb3c2e633a6184615e0a9230b8969f808c72c5e1d8"
+    },
+    {
+      "file": "providers/runapi.json",
+      "sha256": "a8fc2e946a14a472f386a41582659182d8463997fd652057aa3565c7e3bf7aee"
+    },
+    {
+      "file": "providers/runcrate.json",
+      "sha256": "67f54c82971943b60d64c7fba2011ba8f0a6393cbf6a41271e58e5b22da6ee8a"
+    },
+    {
+      "file": "providers/runpod.json",
+      "sha256": "547dd65f80f94188f269d35c5081f45e7cef59828a768848a6d95f69fe45ddda"
+    },
+    {
+      "file": "providers/runtimo.json",
+      "sha256": "88f9cf417afff05edd49db30184a31ba58bbca95386f8d89926508297836e029"
+    },
+    {
+      "file": "providers/runtype.json",
+      "sha256": "40d74fe188065cce43dfe1151941a658cb62c3a2c6bb6deeb268b05b07744137"
+    },
+    {
+      "file": "providers/runware.json",
+      "sha256": "2e6f9ef6e3e3cee093c947308e51779906b5f2b413012d994f598cd8cce2841c"
+    },
+    {
+      "file": "providers/runway.json",
+      "sha256": "347b7ed7f01c101eca73e83ccabc70bb9d49066b9fae3a090eb262b665827cbf"
+    },
+    {
+      "file": "providers/sailresearch.json",
+      "sha256": "0af83484ea0b146668f172cbc0b188bfcbac1a24db2eb3e0a7a3ea9030238487"
+    },
+    {
+      "file": "providers/sambanova.json",
+      "sha256": "2fdf900403ad8d3c3189fd22d3368a20e376f8ff79252b5cca0e8b6e20d1e8b6"
+    },
+    {
+      "file": "providers/samtal.json",
+      "sha256": "3a936cbfd2f660c6a442585b46b8d96592f4073b542ada42f5cc9c3609719eec"
+    },
+    {
+      "file": "providers/sandbase.json",
+      "sha256": "f4fd8e7541dd4df945cd2406a85dd756e3fe676942c305831b71d39b1871e75a"
+    },
+    {
+      "file": "providers/sapiom.json",
+      "sha256": "3116a02e41e711bd5a9dc1c4ded84986d5aee1e8fbeaa1567f6d9097b93a648f"
+    },
+    {
+      "file": "providers/sargalay.json",
+      "sha256": "cdf0c4114c6539bf2eff8cdb2efeea92f89723a0206b4e4857dfafe9f3c5f62a"
+    },
+    {
+      "file": "providers/sarvam.json",
+      "sha256": "cf19e3655b528ba20f6ea1409c8e0ba6d3f97e7eb63814d4870adec6373b1888"
+    },
+    {
+      "file": "providers/scaleway.json",
+      "sha256": "198688afed563eb62f60b71cd113e5c65b8c1c131d9ff1036bd713e70768dbc8"
+    },
+    {
+      "file": "providers/scalixworld.json",
+      "sha256": "0318b8248bfc6efdc506daab159ab29bb04962c444b44dcf4c4a8768f28bbd2b"
+    },
+    {
+      "file": "providers/schatziai.json",
+      "sha256": "3e11814bc105b3970fbce7625470c80e4cf172ef26b3b0a7bc12916bcd27cda0"
+    },
+    {
+      "file": "providers/scrapellm.json",
+      "sha256": "facc64005fd2947a04b4bd6510f58fb8d9ea50dfd48a9eacc8d87cf12812e6a3"
+    },
+    {
+      "file": "providers/sealion.json",
+      "sha256": "a34815702a2f48dab09c855c6168a0c3165191fdeed85d7ea14c55428ef7c7c2"
+    },
+    {
+      "file": "providers/secrypt.json",
+      "sha256": "7590a329dc6154391bcb95119b3938999a447a5f90478837c470538954c81128"
+    },
+    {
+      "file": "providers/segmind.json",
+      "sha256": "6fd5859e972d1564b0de6ab9565b36930345acc6ce10ab090fce78600853fc62"
+    },
+    {
+      "file": "providers/select.json",
+      "sha256": "994481a66a7730c073acd14c8deda9f496a56ee6981a0fc87344f8ffc5b812fe"
+    },
+    {
+      "file": "providers/selinaai.json",
+      "sha256": "22f7ff47a03817506170305fa80c77d3649446144f042137811e9248986831e5"
+    },
+    {
+      "file": "providers/sennoric.json",
+      "sha256": "29c70225e360ae44e330e8033721bc662657e14a3ee208a9fa0872f642b9269d"
+    },
+    {
+      "file": "providers/serenityedge.json",
+      "sha256": "7a9a49288439288272de590278f63ad75696da879d15573b8607de9383d633bb"
+    },
+    {
+      "file": "providers/setapp.json",
+      "sha256": "58bc9dc09cb3c84717c5b055048a06b2d72b0840d03bcce7c30a38d5c4c7d648"
+    },
+    {
+      "file": "providers/sference.json",
+      "sha256": "64d46bfafe7b1f1da938fcde95091d395ec874d9680dde40b2c4c347ae8f04f8"
+    },
+    {
+      "file": "providers/shadowos.json",
+      "sha256": "c0554e3e818ffb3ffe7ff4f90df195d4fcfc536c2049bc2745fd4057c20f9baf"
+    },
+    {
+      "file": "providers/shakespeare.json",
+      "sha256": "6861736ae1615e57477ade957890d18feb4db5dd881346d2b0df87183e83672c"
+    },
+    {
+      "file": "providers/shannonai.json",
+      "sha256": "773b41db5ca5cf097a903f520e2e1ea9d7b2e7ac1b77e2dbf7e018c1de7cfa99"
+    },
+    {
+      "file": "providers/shareai.json",
+      "sha256": "e100ae41b79a5709df2e9b88148dcc96c51015749f0c5258c3b731d26afaa63e"
+    },
+    {
+      "file": "providers/shengsuanyun.json",
+      "sha256": "5edddb96cf1bc6071bdd49d097512efac8d109b6537e8615d40d1a8d82ecf14a"
+    },
+    {
+      "file": "providers/shuttleai.json",
+      "sha256": "af33e95e025f49a964d330b5367e098214f23076862030d1816015cb8da4c3a9"
+    },
+    {
+      "file": "providers/siliconflow.json",
+      "sha256": "00a542b8f0d9ce79989242a09f6cd35afe6c6582634c918b1544b48c540a33b8"
+    },
+    {
+      "file": "providers/simplellm.json",
+      "sha256": "256b75d6a5b90cd21561ebcf2ec10e09c5fe850270040f7f3eabbe9bd975a613"
+    },
+    {
+      "file": "providers/simplismart.json",
+      "sha256": "9eb33f057223c4503df4b15b1e58e7fdfe7874658612741937626f9878a02e16"
+    },
+    {
+      "file": "providers/skypooltoken.json",
+      "sha256": "71ae3728df7fcc4518cc784880563bfd4f9cb891f57fcadbed2e4c616062b391"
+    },
+    {
+      "file": "providers/skyvern.json",
+      "sha256": "29ef037e5b1eaae870f1d54d1fe18315b0b80c0c1072ade2cfdbb945abfdd77e"
+    },
+    {
+      "file": "providers/sluis.json",
+      "sha256": "ae2199587a4ea81d19e9dc40f07a76c22f896dd1b463a557fb10ab9b6dc9bc0f"
+    },
+    {
+      "file": "providers/smallestai.json",
+      "sha256": "bf23fd08c716ef0f3720d7fa129562fabf97cbcf2c90201ebdb8578aefadd592"
+    },
+    {
+      "file": "providers/smartaipi.json",
+      "sha256": "bee0fffbcd42e33f7f610c6a5ce5b2fe2705e77eb7aed162a01a69598234b5ab"
+    },
+    {
+      "file": "providers/smooth.json",
+      "sha256": "9083eaf0b13f31de5d7ca51c8f55cfa9b8b4db49c763a04bc92d20d0fc6b4107"
+    },
+    {
+      "file": "providers/softref.json",
+      "sha256": "95f1bc7fa316e83dac1f51b6e26bb22f3242edf7d7c61bcbaeb6dfbc32d850f4"
+    },
+    {
+      "file": "providers/soniox.json",
+      "sha256": "5ce6a65cda0c506cf63f8996c839871cd24d49fcf4220d5c8184451479cf509d"
+    },
+    {
+      "file": "providers/sovereigneg.json",
+      "sha256": "287d1fbfa11dcbf9f0c9447c7bb9d2e9c7ce39a4496bf95d5ec68b6af834fbab"
+    },
+    {
+      "file": "providers/sovinfra.json",
+      "sha256": "3d14fba8090d4d60da7bb8425650873dbd6c87dfb95319db233c190a195e6135"
+    },
+    {
+      "file": "providers/sovrgpt.json",
+      "sha256": "82da3136d0276cb8a580f45824fd5b448f2500173706e731ec0334274ec1c4b7"
+    },
+    {
+      "file": "providers/spacexai.json",
+      "sha256": "2f25dfe2cc88b525914e3f7e95204aff56ec37a27426bab1e36eabb98332163d"
+    },
+    {
+      "file": "providers/speechactors.json",
+      "sha256": "0407c5faf5b3b02f0c0702ec09301b98be035e1286b03e9dc1f826ade6a82f9d"
+    },
+    {
+      "file": "providers/speechify.json",
+      "sha256": "5e1572bfaa308e2ff495d93d35f32ee59b2286f319be8cb887498417907e2b8c"
+    },
+    {
+      "file": "providers/speechmatics.json",
+      "sha256": "621684a505e517306f0c47afaaa3568fedb88bec220d8ce98db3aa7af512f09e"
+    },
+    {
+      "file": "providers/stabilityai.json",
+      "sha256": "6e14555603b13410fa8cc2446f84cbbe7e819245cc8a194b81fbbba6dc15383f"
+    },
+    {
+      "file": "providers/standardcompute.json",
+      "sha256": "5be4f4a19e5b25b8923a6eadd1a48f1891ac810610798afca8701e4b28d6ec4a"
+    },
+    {
+      "file": "providers/stealthgpt.json",
+      "sha256": "c06e2439a4710827962562b4e84051e0fe329057f594da5845b3a3b3b2735672"
+    },
+    {
+      "file": "providers/stepfun.json",
+      "sha256": "6100b7f7d5f2a06e4743445b76b18a4a0084baf1c193c40a1ac1a1c44b03663d"
+    },
+    {
+      "file": "providers/streamlake.json",
+      "sha256": "3be888477e8bf864f2ce2a36e6247dfcafedcca28e9f886eb5d9dde73d81d94c"
+    },
+    {
+      "file": "providers/strikeai.json",
+      "sha256": "2c0f319a3092d6b911d9764c398e9f8a2d97f25e6595ebdb6ad03094eeabc949"
+    },
+    {
+      "file": "providers/subq.json",
+      "sha256": "51f0cdd9f5fb3950e131bb4f153714634837ef06e41fd25ac8158d8fbf02110f"
+    },
+    {
+      "file": "providers/sudorouter.json",
+      "sha256": "74928ac76182260f4376b82d49ae2f8b5c212b450f2a16e2e1c0aed1e3abd277"
+    },
+    {
+      "file": "providers/sufy.json",
+      "sha256": "fe6bfbd1a249aa5e594e0124ef6ecdb4425119d5772777eb72a685bc0922a603"
+    },
+    {
+      "file": "providers/summa.json",
+      "sha256": "8d0705491a9c8f0136b10c3371751a433836e08b71e3bef3f7295646652cc9c7"
+    },
+    {
+      "file": "providers/sunbirdai.json",
+      "sha256": "67feced2279e22a654d793b04b1581d3fa16cbfd30d1daa7b3878a2e3001be9a"
+    },
+    {
+      "file": "providers/sunoapi.json",
+      "sha256": "14e5509bcc638beefba86e96c77258a902446d80b6a3cf5727f159791d0d32ec"
+    },
+    {
+      "file": "providers/supa.json",
+      "sha256": "d0c6e7cac1b0c115d18b4194ff55a71d9acaa5df4cdd610e00ed38a1644e2b61"
+    },
+    {
+      "file": "providers/surfercloud.json",
+      "sha256": "f40ac0af7f4fd8b5dea25895b365721701023464ace2e609317cd7e93d3d87e5"
+    },
+    {
+      "file": "providers/surplusintelligence.json",
+      "sha256": "307197808ce16310ba64fd33695facb09019763f8f6d22d5bed960df265631ac"
+    },
+    {
+      "file": "providers/sutra.json",
+      "sha256": "61b363af2a1189de6dc6204533ded89c84d30b858244b7c47c512591c4c02ff4"
+    },
+    {
+      "file": "providers/swarms.json",
+      "sha256": "b5fb811d363d763c79b86fc6497fdea2c37e4ce9eca74077ec3eeb0cf6d3d703"
+    },
+    {
+      "file": "providers/synexa.json",
+      "sha256": "5731af7c8f63ad75932104b3fd99275a722001ab98a93b5f2d6ad0a44ef6eb5d"
+    },
+    {
+      "file": "providers/synthetic.json",
+      "sha256": "b26fa217f9c4faa8ef35b4bd5cde08944441bbd512efe1a3bc4a6ec073e91ff2"
+    },
+    {
+      "file": "providers/tapas.json",
+      "sha256": "c634186984fb647c84e276028c564973df2a41f0ac42269ca5211c5a8b4c8ec0"
+    },
+    {
+      "file": "providers/tavily.json",
+      "sha256": "d032a92add88d40a0e71c8ea2d669f82bf49e562a6b97728144734f6ac57a75c"
+    },
+    {
+      "file": "providers/teai.json",
+      "sha256": "bf7a1d10125e577017f37bf21c1d8de256ef690397be5839f327e462942d8ec4"
+    },
+    {
+      "file": "providers/teamday.json",
+      "sha256": "2e1d9305b6fa07ee15689d53dfbb3b9a5372628bff5102e4b2f3441e83332345"
+    },
+    {
+      "file": "providers/telnyx.json",
+      "sha256": "32a3f9a6244f8a3c3e9f6cd43c0fd5fd7da9922a6f987ee6cbedb6ef08ce1e2a"
+    },
+    {
+      "file": "providers/tembo.json",
+      "sha256": "b2f06acfa11653ebfa6144aaf017dd235c465b84a2b2ce381d00f479b5d4eff3"
+    },
+    {
+      "file": "providers/tencenthunyuan.json",
+      "sha256": "c2fc91be843d4aae31536aba69be687d10b6d44542fedecf617363ca573ffd72"
+    },
+    {
+      "file": "providers/tensorblock.json",
+      "sha256": "cb8e50f14fa2ec8f7cef76745f92f6c737f51e7413ceed88a2cf6477c389d97b"
+    },
+    {
+      "file": "providers/tensorx.json",
+      "sha256": "e0ccc6119ad9d43260fd185af0d8c7ef2c7a48409728ed48c94e1f42ac2c0d17"
+    },
+    {
+      "file": "providers/terminalskills.json",
+      "sha256": "0344037b32ef4176a884fad7ea4628f1e2bcd94a2726914c22ab00e2afcfc02e"
+    },
+    {
+      "file": "providers/tetrate.json",
+      "sha256": "ea4c3cb3eab42e9454bdb1e73db641ef5618bab1580b2d565fd668e1083a5b43"
+    },
+    {
+      "file": "providers/textsynth.json",
+      "sha256": "21ad62b8bbdb515e6dc893c1a4da49b5c61f03dbff5374ba4bbef2b651880edb"
+    },
+    {
+      "file": "providers/thalam.json",
+      "sha256": "9abb161a7de0446a032c765c68aef67d9951e968a0ccbdcbae0aff18977b93d3"
+    },
+    {
+      "file": "providers/thaura.json",
+      "sha256": "ccd8556a495b0a14ba3bd8cc6f49c280af55835762cac136ca20aa53f65fb24e"
+    },
+    {
+      "file": "providers/theoldapi.json",
+      "sha256": "adc77adcbf36467d11812a5defa4534527a7e1fae012f531951e11f40c314c1d"
+    },
+    {
+      "file": "providers/therouterai.json",
+      "sha256": "37e808a11067eab6513a5cd9c81c6ab8efdcefa1e332930ba07b1dd65b62105b"
+    },
+    {
+      "file": "providers/tiarina.json",
+      "sha256": "2602536ebd27cd0ed3999e9d543a0c8f59e900897c557106aca2d50415ecfb77"
+    },
+    {
+      "file": "providers/tierup.json",
+      "sha256": "7f0a1adf9c4a0fe028f9692290b783c9aedbf420459f306db5709c4e2ff4b876"
+    },
+    {
+      "file": "providers/tigercity.json",
+      "sha256": "b34eda30edac00cde6c9649d9c888dd890727f3f71fd7ad9fb1fe7502f9c209a"
+    },
+    {
+      "file": "providers/tikhubai.json",
+      "sha256": "dc7f1239d5f4a57b55247dfb0f2cc0117546e81849e74505d572c96eabdc9ea7"
+    },
+    {
+      "file": "providers/tinfoil.json",
+      "sha256": "cdb23ee8c82d6a152d1032c949e0572b61d211ddb7bf34fbaa35e63f3d93bf6c"
+    },
+    {
+      "file": "providers/tinyfish.json",
+      "sha256": "72a783fcd40533f1489f9105665a5cdbec0481d514da631d36a1d919a52e2b2f"
+    },
+    {
+      "file": "providers/toapis.json",
+      "sha256": "0f989c91d99619a8d6dd8fd79411a7ab73a6d74b2f555693f044ff624c1dacf0"
+    },
+    {
+      "file": "providers/together.json",
+      "sha256": "a55819cc1470a34187202dddd93b729260e9d1b3edb1e0295d27f8298bf2d159"
+    },
+    {
+      "file": "providers/token360.json",
+      "sha256": "5858a13c5fbedddaf189e1d454f95ccdffd86a8ba2d423635d18161f1685d807"
+    },
+    {
+      "file": "providers/tokenflux.json",
+      "sha256": "639033223855b8fc902222585be61e3a3d180870d83da30c92492b33865eceef"
+    },
+    {
+      "file": "providers/tokenhub.json",
+      "sha256": "1dcbc29d5e219fa20cff1f5d048d8a4ea2868d97ade1394bfeefbd009ac189ed"
+    },
+    {
+      "file": "providers/tokenlab.json",
+      "sha256": "5699ea0de48f6bb648ba1ba1808ece53ce43a3eb872e025384d769c12af0d9ed"
+    },
+    {
+      "file": "providers/tokenspend.json",
+      "sha256": "6fb510894eb43f644c6535559ebf709d70c076e384374e63de8d2deef180eb83"
+    },
+    {
+      "file": "providers/truefoundry.json",
+      "sha256": "43e28c3a2c5ae70706f042ce3ddfc4131afaf027037b3a75eb6c51c50d5534ec"
+    },
+    {
+      "file": "providers/trustedrouter.json",
+      "sha256": "e4f39c463a368d9deda74d7e60eef86f88c61139c02efb1ab3e889ab88b0d741"
+    },
+    {
+      "file": "providers/ttsreader.json",
+      "sha256": "b225268063b601084452964fe0a155e33d65becb41bee239cb0ed2884e3817ba"
+    },
+    {
+      "file": "providers/twelvelabs.json",
+      "sha256": "caf2f6920c937eb01bbb9286cad9cd80dbd87b847a4c7b4ef6f82ee83871460e"
+    },
+    {
+      "file": "providers/typecast.json",
+      "sha256": "44a56d15b476ae54833ab391c3dd8f029d8110934d49b3a38a1b876c5ba38870"
+    },
+    {
+      "file": "providers/ultrasafe.json",
+      "sha256": "5d89d4242763f846d552b3a3535223afd527eb224672681f686b04ec467d5d8e"
+    },
+    {
+      "file": "providers/unbound.json",
+      "sha256": "07a638128a0d6a13508d31133770c035ea1fb3278d83e73d24b72bffbc96c3d2"
+    },
+    {
+      "file": "providers/uncensoredchat.json",
+      "sha256": "2833b0ab27a0082896b326b7951a220cc06eca972f51dceb939f3128f63c6658"
+    },
+    {
+      "file": "providers/uncloseai.json",
+      "sha256": "6e2d37828b7420abbfa7d93f37a2bbd28f7013f9e0b91bef55b5ec98dc506aa7"
+    },
+    {
+      "file": "providers/uniapi.json",
+      "sha256": "baecb74f967f6a97827185dea2584b039d8a60403cc41d95cd9420496e87ce8d"
+    },
+    {
+      "file": "providers/unrealspeech.json",
+      "sha256": "c146c8b9e51b6b1f0432d661541cf58a4b14cebca3e1b5231fc606ebaefedb16"
+    },
+    {
+      "file": "providers/upstage.json",
+      "sha256": "b2879b8c9fd5d399cf82285b8cc56094e9b0868527b1e702fda84b47b45bfaa8"
+    },
+    {
+      "file": "providers/uvoiceai.json",
+      "sha256": "70616c9ebd716280f7e6cb90a8d4d0a03a4c8f2f509b2cd88a14c02f31635ee9"
+    },
+    {
+      "file": "providers/valyu.json",
+      "sha256": "aa15dece1f23ee5328fbf21f6c6b183635783ea00ab52871a29a219382424399"
+    },
+    {
+      "file": "providers/vanceai.json",
+      "sha256": "4daa05147b36a17295bfe876fcdb1d482adaed9928f13ca707d086ebdbd40dc8"
+    },
+    {
+      "file": "providers/vapi.json",
+      "sha256": "32d256591cc7a6d56093b10babacc491ac87342b99a8c31591b644d90ed17cc1"
+    },
+    {
+      "file": "providers/venice.json",
+      "sha256": "eb49d5be2f1487c0aa714e91450c6b3cd79fd65c432e4ccaffd8ff42189b60dd"
+    },
+    {
+      "file": "providers/verbatik.json",
+      "sha256": "f8efba0d1c1d21ac722bedc1a7cdd087f023071e08d8d298e7148d5d0bc5d132"
+    },
+    {
+      "file": "providers/vercel.json",
+      "sha256": "ca0f9d8b58f457276e75eeaaa6e507a7b0f40e9cc19675bfb6764b90ae106749"
+    },
+    {
+      "file": "providers/verda.json",
+      "sha256": "5407b448ad0346c900cb76510ea438f03b026514e4bbc98b74becd375c4a655c"
+    },
+    {
+      "file": "providers/viablelab.json",
+      "sha256": "67d55f4b760f5030da9078b72fb302e623c45c8f46bbf146f94d70128ead155f"
+    },
+    {
+      "file": "providers/vibekit.json",
+      "sha256": "5dfae468b1542bd73a6514b212fca0442aa6bd1443307ab727a510c4e4a66391"
+    },
+    {
+      "file": "providers/vidu.json",
+      "sha256": "1e627ac31dd6212c5910fca1337ed55ea9d72671c01d9eabcbf7c55a7b6a05ee"
+    },
+    {
+      "file": "providers/vikasit.json",
+      "sha256": "8f275b70d0918e5923ce206a39fbdb78373168da661f5ac59606b1be974c054d"
+    },
+    {
+      "file": "providers/vivgrid.json",
+      "sha256": "eabf2ad038c342dd9c056933764d79284cb68be404b1b5bd6d9437774d5ecbc9"
+    },
+    {
+      "file": "providers/vlmrun.json",
+      "sha256": "67310cba61a7f087e43ed18fc3ec7a9e645477f3e2efde791dc6588b32d1cfdd"
+    },
+    {
+      "file": "providers/vogent.json",
+      "sha256": "d0f282034706c1ed9141408f1d8728da2d01c00ae20452499f2e7198ea7db287"
+    },
+    {
+      "file": "providers/voiceai.json",
+      "sha256": "96928c6a32ef74375128b0445000d9910f162a18f89bf06001187eb48e0f9ff6"
+    },
+    {
+      "file": "providers/volink.json",
+      "sha256": "eab39856e4c43bdeae4914b22ac2cba0834b7bba0b662ff22874e85b8a7c3037"
+    },
+    {
+      "file": "providers/voyageai.json",
+      "sha256": "6eb2136821226cf6a2d1ca02c295047399002d7f52d9e32fd690fbea8a952359"
+    },
+    {
+      "file": "providers/vultr.json",
+      "sha256": "d4cbc9080645c050655611b9b9cb28a08599de81a2f6b6b846a68d8861584908"
+    },
+    {
+      "file": "providers/wafer.json",
+      "sha256": "44afe3632ff8cc43bbf7621dc976e6d06dfabf2dfe3d71902900685373c95458"
+    },
+    {
+      "file": "providers/wai.json",
+      "sha256": "871567ecfcfc4af4a64fa6febc979235b48b9a015ac091385bdea2ff2c7025e5"
+    },
+    {
+      "file": "providers/waslo.json",
+      "sha256": "152fcc855d26a4b268fb52e4001d389df7252631a4dcf0ea67cc78fda5b46f1f"
+    },
+    {
+      "file": "providers/wavespeed.json",
+      "sha256": "e66cd969d72ee31ce585081d21fb5bf1b32c53f5a1001310c098ca8e0d5de623"
+    },
+    {
+      "file": "providers/wayscloud.json",
+      "sha256": "cd2f1d93da06396fa1f1ed82136af997a86955a69e9e33932a8417dc00b17084"
+    },
+    {
+      "file": "providers/webcrawlerapi.json",
+      "sha256": "ea591bedff4b64799befc7e85cf28b4c0fe6254e7d80cb1b1bbecfd82ffcc502"
+    },
+    {
+      "file": "providers/websearchapi.json",
+      "sha256": "008eb4de5a2345291bd1c62f6847ef70b0276f25c5bf37d5e1082e8bfe9e3a6c"
+    },
+    {
+      "file": "providers/wellsaid.json",
+      "sha256": "2cfb3513450443e01f939db62786b98035e76b140043d0ef5c7de1f1fe826bdc"
+    },
+    {
+      "file": "providers/wiro.json",
+      "sha256": "952a6261ffca651367534b496d589492a75608649064a01b95e34e2fd02303e1"
+    },
+    {
+      "file": "providers/wiserouter.json",
+      "sha256": "1170d58e5fb5b37499cbfff7ff9a6a5ee07873fb6496e32569ce6ddbe1eeb555"
+    },
+    {
+      "file": "providers/writer.json",
+      "sha256": "8d3bc571e41f5398b32b5c494650ef4c88706ddb67cf540eaf9b438257a0081b"
+    },
+    {
+      "file": "providers/xiaomimimo.json",
+      "sha256": "2c3c667201f28ef98350ab39410c946b445bb13ca25949964a5034d3eda5900c"
+    },
+    {
+      "file": "providers/xpectrum.json",
+      "sha256": "7eba6905de9e66d1d714de8fb3dfb251414c062571390fef51b563801abf8ed7"
+    },
+    {
+      "file": "providers/xpersona.json",
+      "sha256": "7f9a15ef7e6197a67df9b09622e5444f908a5f6faa3ec61392d4a44cace12054"
+    },
+    {
+      "file": "providers/xvoice.json",
+      "sha256": "cd5c80a26ab69d14c5df819751e53581e801d0288c92f8fbb16dcb6821d26d55"
+    },
+    {
+      "file": "providers/yandex.json",
+      "sha256": "0494783976ba0c49ac61667c8cda2d5dc1168079f03f35828e8fd190732c1722"
+    },
+    {
+      "file": "providers/yollomi.json",
+      "sha256": "96adcb086fb47970084af5ad68c29c33c8e6af106b0f2e2fbb7a5f2be6fb6d93"
+    },
+    {
+      "file": "providers/youcom.json",
+      "sha256": "fa59a2382841da222a4cedbb65d8894ca7954c69651673670ff30adb478fda4a"
+    },
+    {
+      "file": "providers/yourvoic.json",
+      "sha256": "c4ba59f3bb21b7f1879093700f0806da875467493d0d9bc29e0c6d0428387d2a"
+    },
+    {
+      "file": "providers/yutori.json",
+      "sha256": "32c5f36001137afb19af69a6e8743f35e6f64b01d5e006eeb59003fbfc2764f9"
+    },
+    {
+      "file": "providers/zai.json",
+      "sha256": "e6f8b1cda6911a1d83fe3fe6e1f8b098735901503bd8e364364d2ba3e2e4f81e"
+    },
+    {
+      "file": "providers/zeabur.json",
+      "sha256": "de45852857d7cfd03404ef90a0fbea0eb43b9d72ab58cad4c70465fedff000b5"
+    },
+    {
+      "file": "providers/zebracat.json",
+      "sha256": "dd63b63081307a420bd4d0ce7a0fad9ea012670edc22ba3047459cdc9aa75dac"
+    },
+    {
+      "file": "providers/zenlayer.json",
+      "sha256": "a0ea8b045814226701b69be7c4b3f3e680dcc9bda271df009bd2dee44e792e48"
+    },
+    {
+      "file": "providers/zenmux.json",
+      "sha256": "54300212580ad16ff3f98a65cae3a2be3dbbc16dfb84d0bf87e1de3d23e35379"
+    },
+    {
+      "file": "providers/zeroentropy.json",
+      "sha256": "8171c9e0718537d204881b3ebe670ebff1aa619e7ecdf5a3df6c18dbbb8ea231"
+    },
+    {
+      "file": "providers/zoom.json",
+      "sha256": "d1eeb63d9d4b99a493c2d5d9f505da31107b7bb3a6cb0cc336d0e5bf010e4692"
+    },
+    {
+      "file": "providers/zyloapi.json",
+      "sha256": "b97ec74491c6c6e2d6b4c26cc39df04ca3ee6e8b932c367811583a4e23729271"
+    },
+    {
+      "file": "providers/zyphra.json",
+      "sha256": "73c19689c388fafe658af3c23452217d3d94da1c4a66183755d0db0823e043e8"
+    }
+  ]
+}

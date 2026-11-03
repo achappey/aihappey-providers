@@ -34,5 +34,20 @@
     <ProjectReference Include="../../../aihappey-unified/AIHappey.Unified.csproj" />
     <ProjectReference Include="../../../aihappey-vercel/AIHappey.Vercel.csproj" />
     <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <Content Include="../../metadata/models/**/*.json">
+      <Link>Catalog/Models/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Pack>true</Pack>
+      <PackagePath>catalog/Models/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <Content Include="../../metadata/pricing/**/*.json">
+      <Link>Catalog/Pricing/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Pack>true</Pack>
+      <PackagePath>catalog/Pricing/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <None Include="buildTransitive/AIHappey.Providers.targets" Pack="true" PackagePath="buildTransitive/" />
   </ItemGroup>
 </Project>

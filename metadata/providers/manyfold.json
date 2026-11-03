@@ -1,0 +1,17 @@
+{
+  "name": "Manyfold",
+  "description": "Run Claude Code, Codex, Gemini CLI and more in one AI agent workspace: hosted sandboxes, persistent sessions, chat, files, terminal and team channels.",
+  "urls": {
+    "homepage": "https://manyfold.ai",
+    "docs": "https://docs.manyfold.ai",
+    "pricing": "https://manyfold.ai/#pricing",
+    "privacyPolicy": "https://docs.manyfold.ai/privacy/",
+    "termsOfService": "https://docs.manyfold.ai/terms/",
+    "console": "https://app.manyfold.ai"
+  },
+  "providerCountry": "GB",
+  "category": "app_tools",
+  "inferenceRegions": [
+    "World"
+  ]
+}

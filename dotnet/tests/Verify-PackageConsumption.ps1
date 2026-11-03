@@ -52,4 +52,29 @@ foreach ($library in $assets.libraries.PSObject.Properties) {
 }
 dotnet run --project $project -c Release --no-restore "-p:ProvidersPackageVersion=$version" "-p:RestorePackagesPath=$packages"
 if ($LASTEXITCODE -ne 0) { throw 'Isolated provider package consumer failed.' }
+# A package-only intermediary proves buildTransitive behavior, not just direct
+# content copying. No gateway or repository project is referenced by this bridge.
+$bridge = Join-Path $work 'bridge'
+New-Item -ItemType Directory -Force $bridge | Out-Null
+$bridgeProject = Join-Path $bridge 'ProvidersCatalogBridge.csproj'
+@"
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net11.0</TargetFramework></PropertyGroup>
+  <ItemGroup><PackageReference Include="AIHappey.Providers" Version="$version" /></ItemGroup>
+</Project>
+"@ | Set-Content $bridgeProject -Encoding utf8
+dotnet pack $bridgeProject -c Release -o $feed "-p:Version=$version" "-p:RestoreConfigFile=$config" "-p:RestorePackagesPath=$packages" -v quiet
+if ($LASTEXITCODE -ne 0) { throw 'Transitive package fixture failed to pack.' }
+$consumerProject = [IO.File]::ReadAllText($project).Replace('Include="AIHappey.Providers"', 'Include="ProvidersCatalogBridge"')
+[IO.File]::WriteAllText($project, $consumerProject)
+dotnet restore $project --configfile $config --packages $packages "-p:ProvidersPackageVersion=$version" -v quiet
+if ($LASTEXITCODE -ne 0) { throw 'Transitive package-only restore failed.' }
+dotnet run --project $project -c Release --no-restore "-p:ProvidersPackageVersion=$version" "-p:RestorePackagesPath=$packages"
+if ($LASTEXITCODE -ne 0) { throw 'Transitive provider package consumer failed.' }
+# Publishing must carry the complete package-owned catalog as well as build output.
+$published = Join-Path $work 'published'
+dotnet publish $project -c Release --no-restore -o $published "-p:ProvidersPackageVersion=$version" "-p:RestorePackagesPath=$packages" -v quiet
+if ($LASTEXITCODE -ne 0) { throw 'Isolated provider package publish failed.' }
+dotnet (Join-Path $published 'PackageConsumer.dll')
+if ($LASTEXITCODE -ne 0) { throw 'Published package consumer failed.' }
 Write-Output "Verified provider package-only consumer with private dependency cache in $work"

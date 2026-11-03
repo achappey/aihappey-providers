@@ -1,0 +1,17 @@
+{
+  "name": "ARKLabs",
+  "description": "Smart AI Infrastructure. No Headaches. Affordable, flexible cloud + on-prem options for teams who want control without chaos.",
+  "urls": {
+    "homepage": "https://ark-labs.cloud",
+    "docs": "https://ark-labs.cloud/developers/docs",
+    "console": "https://shop.ark-labs.cloud",
+    "pricing": "https://ark-labs.cloud/pricing",
+    "privacyPolicy": "https://ark-labs.cloud/company/legal/privacy",
+    "termsOfService": "https://ark-labs.cloud/company/legal/terms"
+  },
+  "providerCountry": "PL",
+  "category": "inference_compute",
+  "inferenceRegions": [
+    "Europe"
+  ]
+}

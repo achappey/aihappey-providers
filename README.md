@@ -5,7 +5,7 @@ Reusable provider implementations, native API clients, outbound transports, prov
 ## Repository boundaries
 
 - [C# implementation](dotnet/AIHappey.Providers/AIHappey.Providers.csproj) and [tests](dotnet/tests/AIHappey.Providers.Tests/AIHappey.Providers.Tests.csproj).
-- [Language-neutral JSON metadata area](metadata/README.md), reserved for a separate migration. Chat metadata remains in the chat repository for now.
+- [Language-neutral JSON metadata](metadata/README.md): the canonical provider display catalog, model catalogs, and pricing catalogs, shared by .NET, chat, Windows, and other clients.
 - Gateway authentication, inbound HTTP handling, storage, aggregate model resolution, refresh workers, and telemetry implementations remain host concerns.
 
 Existing namespaces and wire contracts are preserved. The existing media contracts still require the ASP.NET shared framework; consuming this package does not require a web server. This first combined package retains vendor SDK dependencies rather than introducing a separate package for every vendor.
@@ -30,15 +30,17 @@ The [cache helper](dotnet/AIHappey.Providers/Common/AsyncCacheHelper.cs) is disa
 
 The restricted [Cursor repository endpoint](dotnet/AIHappey.Providers/Providers/Cursor/CursorApiClient.cs) requires an explicit [caller-owned limiter](dotnet/AIHappey.Providers/Providers/Cursor/ICursorRepositoryRateLimiter.cs), enforcing at most one request per minute and thirty per hour per credential. It refuses to send without that policy; no process-global credential map is retained by the package.
 
-## Model and pricing data are separate
+## Model and pricing data
 
-Implement the small [read-only source contract](dotnet/AIHappey.Providers/Catalog/IProviderCatalogSource.cs) for caller-owned JSON data, using a stable partition that distinguishes its tenant/revision. Pass it to the direct client, or open an explicit [async-operation catalog scope](dotnet/AIHappey.Providers/Catalog/ProviderCatalogScope.cs) around a low-level call and its entire stream enumeration. This scope carries only operation-local read-only input, not a global configurable service or retained catalog cache. Nested scopes restore their parent; concurrent async operations do not share the selected source.
+Canonical JSON is maintained under [models](metadata/models) and [pricing](metadata/pricing), independently of C# code. Project references and the NuGet package copy the same files to the existing runtime catalog directory on build and publish, including through transitive references. The [package targets](dotnet/AIHappey.Providers/buildTransitive/AIHappey.Providers.targets) require no source checkout, gateway, or runtime download.
 
-The direct client defaults to an [empty source](dotnet/AIHappey.Providers/Catalog/EmptyProviderCatalogSource.cs), with no filesystem dependency. Existing low-level helpers retain a [read-only compatibility reader](dotnet/AIHappey.Providers/Catalog/FileProviderCatalogSource.cs) for the host's existing output catalog directory when no explicit scope is selected. No datasets are packaged, downloaded, or migrated here. The reader also accepts an explicit catalog directory.
+Catalog-source semantics are unchanged. The direct client defaults to an [empty source](dotnet/AIHappey.Providers/Catalog/EmptyProviderCatalogSource.cs), with no filesystem reads. To opt into the shipped data, supply the [file reader](dotnet/AIHappey.Providers/Catalog/FileProviderCatalogSource.cs) for the runtime catalog directory as the direct client's catalog input. Existing low-level helpers use that directory automatically when no explicit scope is selected. The reader also accepts caller-owned catalog directories.
+
+Implement the [read-only source contract](dotnet/AIHappey.Providers/Catalog/IProviderCatalogSource.cs) for other caller-owned JSON data, using a stable partition that distinguishes its tenant/revision. Pass it to the direct client, or open an explicit [async-operation catalog scope](dotnet/AIHappey.Providers/Catalog/ProviderCatalogScope.cs) around a low-level call and its entire stream enumeration. Nested scopes restore their parent; concurrent async operations do not share the selected source. An explicit empty/custom source never falls back to bundled data.
 
 Some provider paths require model metadata for discovery, routing, or model-specific validation; supplying a model ID alone does not make every adapter catalog-independent. Missing catalog input must not broaden provider support. For example, Replicate still rejects unlisted models, but evaluates the caller's current data rather than a process-wide startup snapshot. Pricing-tier readers likewise use the current source rather than global lazy caches.
 
-The [JSON metadata area](metadata/README.md) concerns provider identity/display metadata, not these model/pricing datasets. Chat remains its source of truth until the later migration.
+Non-.NET consumers use the same [metadata manifest and raw JSON](metadata/README.md). Chat and Windows generate local snapshots at build time and remain offline for metadata at runtime. Chat request-configuration types, defaults, UI, and executable cost/usage handlers remain in chat; they are not data files in this repository.
 
 ## Build and verification
 
