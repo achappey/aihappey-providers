@@ -13,13 +13,27 @@ public sealed class PicsartImageTests
     [Fact]
     public async Task Logo_generation_forwards_documented_options_and_reference_image()
     {
-        var requests = new List<(string Method, string Path, string? Body)>();
+        var requests = new List<(string Method, string Path)>();
+        var submitParts = new Dictionary<string, (byte[] Data, string? FileName, string? MediaType)>();
+        var referenceImageBytes = Encoding.UTF8.GetBytes("reference image");
         using var client = CreateClient(async request =>
         {
-            var body = request.Content is null
-                ? null
-                : await request.Content.ReadAsStringAsync();
-            requests.Add((request.Method.Method, request.RequestUri!.AbsolutePath, body));
+            requests.Add((request.Method.Method, request.RequestUri!.AbsolutePath));
+            if (request.RequestUri.AbsolutePath == "/v1/logo")
+            {
+                var form = Assert.IsType<MultipartFormDataContent>(request.Content);
+                foreach (var part in form)
+                {
+                    var disposition = part.Headers.ContentDisposition;
+                    Assert.NotNull(disposition);
+                    Assert.Equal("form-data", disposition.DispositionType);
+                    Assert.NotNull(disposition.Name);
+                    submitParts.Add(disposition.Name.Trim('"'), (
+                        await part.ReadAsByteArrayAsync(),
+                        disposition.FileName?.Trim('"'),
+                        part.Headers.ContentType?.MediaType));
+                }
+            }
 
             return request.RequestUri.AbsolutePath switch
             {
@@ -48,7 +62,7 @@ public sealed class PicsartImageTests
             [
                 new ImageFile
                 {
-                    Data = "data:image/png;base64," + Convert.ToBase64String(Encoding.UTF8.GetBytes("reference image")),
+                    Data = "data:image/png;base64," + Convert.ToBase64String(referenceImageBytes),
                     MediaType = "image/png"
                 }
             ],
@@ -66,19 +80,16 @@ public sealed class PicsartImageTests
         var submit = requests[0];
         Assert.Equal("POST", submit.Method);
         Assert.Equal("/v1/logo", submit.Path);
-        Assert.Contains("name=\"brand_name\"", submit.Body);
-        Assert.Contains("Acme", submit.Body);
-        Assert.Contains("name=\"business_description\"", submit.Body);
-        Assert.Contains("Outdoor gear", submit.Body);
-        Assert.Contains("name=\"logo_description\"", submit.Body);
-        Assert.Contains("A simple mountain emblem", submit.Body);
-        Assert.Contains("name=\"color_tone\"", submit.Body);
-        Assert.Contains("Blue", submit.Body);
-        Assert.Contains("name=\"reference_image\"", submit.Body);
-        Assert.Contains("reference image", submit.Body);
-        Assert.Contains("name=\"count\"", submit.Body);
-        Assert.Equal(1, response.Images.Count);
-        Assert.EndsWith(Convert.ToBase64String([1, 2, 3]), response.Images[0]);
+        Assert.Equal("Acme", Encoding.UTF8.GetString(submitParts["brand_name"].Data));
+        Assert.Equal("Outdoor gear", Encoding.UTF8.GetString(submitParts["business_description"].Data));
+        Assert.Equal("A simple mountain emblem", Encoding.UTF8.GetString(submitParts["logo_description"].Data));
+        Assert.Equal("Blue", Encoding.UTF8.GetString(submitParts["color_tone"].Data));
+        Assert.Equal("2", Encoding.UTF8.GetString(submitParts["count"].Data));
+        Assert.Equal("urn:air:fluxai:model:fluxai:flux-2-pro@1", Encoding.UTF8.GetString(submitParts["model"].Data));
+        var referenceImage = submitParts["reference_image"];
+        Assert.Equal(referenceImageBytes, referenceImage.Data);
+        Assert.Equal("reference-image", referenceImage.FileName);
+        Assert.Equal("image/png", referenceImage.MediaType);
         Assert.Equal(requestBefore, JsonSerializer.Serialize(request));
     }
 

@@ -55,7 +55,7 @@ public partial class PicsartProvider
             if (request.Files?.Any() == true && !string.IsNullOrWhiteSpace(referenceImageUrl))
                 throw new ArgumentException("Picsart logo generation accepts only one reference image source.", nameof(request));
 
-            if (request.Files?.Count > 1)
+            if (request.Files?.Count() > 1)
                 warnings.Add(new { type = "unsupported", feature = "files", details = "Picsart logo generation accepts one reference image; only files[0] is used." });
         }
 
