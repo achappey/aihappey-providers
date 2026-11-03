@@ -21,8 +21,6 @@ public partial class ResembleAIProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 var staticModels = GetIdentifier()
                     .GetModels()
                     .WithPricing(GetIdentifier())
@@ -53,7 +51,9 @@ public partial class ResembleAIProvider
         while (page <= numPages)
         {
             var path = $"api/v2/voices?page_size={pageSize}&page={page}";
-            using var resp = await _client.GetAsync(path, cancellationToken);
+            using var request = new HttpRequestMessage(HttpMethod.Get, path);
+            ApplyAuthHeader(request);
+            using var resp = await _client.SendAsync(request, cancellationToken);
             var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
             if (!resp.IsSuccessStatusCode)
@@ -253,4 +253,3 @@ public partial class ResembleAIProvider
         public bool SyncSupported { get; set; }
     }
 }
-

@@ -22,6 +22,7 @@ public sealed class ResembleAISpeechMetadataPassthroughTests
         JsonElement payload = default;
         using var client = CreateClient(request =>
         {
+            Assert.Equal("Bearer test-key", request.Headers.Authorization?.ToString());
             if (request.Method == HttpMethod.Post)
             {
                 Assert.Equal("https://f.cluster.resemble.ai/synthesize", request.RequestUri!.ToString());
@@ -84,6 +85,7 @@ public sealed class ResembleAISpeechMetadataPassthroughTests
         Assert.False(payload.TryGetProperty("resembleai", out _));
         Assert.False(payload.TryGetProperty("other-provider", out _));
         Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions["resembleai"]));
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
     [Fact]
@@ -93,6 +95,7 @@ public sealed class ResembleAISpeechMetadataPassthroughTests
         JsonElement payload = default;
         using var client = CreateClient(request =>
         {
+            Assert.Equal("Bearer test-key", request.Headers.Authorization?.ToString());
             if (request.Method == HttpMethod.Post)
             {
                 payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
@@ -121,6 +124,7 @@ public sealed class ResembleAISpeechMetadataPassthroughTests
         Assert.False(payload.TryGetProperty("sample_rate", out _));
         Assert.False(payload.TryGetProperty("use_hd", out _));
         Assert.False(payload.TryGetProperty("apply_custom_pronunciations", out _));
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
     [Fact]
