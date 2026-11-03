@@ -15,8 +15,6 @@ public partial class ResembleAIProvider
         TranscriptionRequest request,
         CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
 
         if (string.IsNullOrWhiteSpace(request.MediaType))
@@ -100,7 +98,12 @@ public partial class ResembleAIProvider
             }
         }
 
-        using var resp = await _client.PostAsync("api/v2/speech-to-text", form, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/v2/speech-to-text")
+        {
+            Content = form
+        };
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)
@@ -162,7 +165,11 @@ public partial class ResembleAIProvider
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var resp = await _client.GetAsync($"api/v2/speech-to-text/{Uri.EscapeDataString(uuid)}", cancellationToken);
+            using var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"api/v2/speech-to-text/{Uri.EscapeDataString(uuid)}");
+            ApplyAuthHeader(request);
+            using var resp = await _client.SendAsync(request, cancellationToken);
             var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
             if (!resp.IsSuccessStatusCode)

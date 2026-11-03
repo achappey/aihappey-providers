@@ -22,8 +22,6 @@ public partial class ResembleAIProvider
         SpeechRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Text))
             throw new ArgumentException("Text is required.", nameof(request));
@@ -114,6 +112,7 @@ public partial class ResembleAIProvider
             Content = new StringContent(JsonSerializer.Serialize(payload, SpeechJson), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
+        ApplyAuthHeader(httpRequest);
         using var resp = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
