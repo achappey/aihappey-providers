@@ -61,25 +61,25 @@ public sealed partial class DeepgramProvider
                 if (message is null)
                     break;
 
-                if (message.Value.Type == WebSocketMessageType.Binary)
+                if (message.Type == WebSocketMessageType.Binary)
                 {
-                    if (message.Value.Payload.Length == 0)
+                    if (message.Payload.Length == 0)
                         continue;
                     receivedAudio = true;
                     if (request.IncludeRawChunks == true)
                         yield return new SpeechRawPart
                         {
-                            RawValue = Convert.ToBase64String(message.Value.Payload)
+                            RawValue = Convert.ToBase64String(message.Payload)
                         };
                     yield return new SpeechAudioPart
                     {
-                        Audio = Convert.ToBase64String(message.Value.Payload),
+                        Audio = Convert.ToBase64String(message.Payload),
                         AudioFormat = new() { Type = plan.MimeType, Rate = plan.SampleRate }
                     };
                     continue;
                 }
 
-                using var document = JsonDocument.Parse(message.Value.Payload);
+                using var document = JsonDocument.Parse(message.Payload);
                 var root = document.RootElement;
                 if (root.ValueKind != JsonValueKind.Object
                     || !root.TryGetProperty("type", out var typeElement)

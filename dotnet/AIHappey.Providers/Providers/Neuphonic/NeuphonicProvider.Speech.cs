@@ -151,7 +151,9 @@ public sealed partial class NeuphonicProvider
                 ProviderOptions = new() { [GetIdentifier()] = JsonSerializer.SerializeToElement(options) }
             });
             if (request.OutputFormat?.Rate is { } rate)
-                current.Payload = SetSampleRate(current.Payload, rate);
+                current.Payload = SetSampleRate(
+                    current.Payload,
+                    checked((int)rate));
 
             if (configuration is not null && !JsonElement.DeepEquals(configuration.Value, current.Payload))
                 throw new NotSupportedException("Neuphonic SSE speech requires one effective voice and provider-options configuration across text parts.");
