@@ -37,9 +37,8 @@ public partial class ElevenLabsProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var request = BuildElevenLabsOpenAISpeechRequest(options, streaming: true);
-        ApplyAuthHeader();
-
         using var httpRequest = CreateElevenLabsOpenAISpeechHttpRequest(request);
+        ApplyAuthHeader(httpRequest);
         using var response = await _client.SendAsync(
             httpRequest,
             HttpCompletionOption.ResponseHeadersRead,

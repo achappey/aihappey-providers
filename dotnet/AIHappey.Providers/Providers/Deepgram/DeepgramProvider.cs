@@ -201,6 +201,6 @@ public sealed partial class DeepgramProvider
 
     public IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(StreamingSpeechRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return StreamSpeechAsync(request, cancellationToken);
     }
 }
