@@ -11,8 +11,6 @@ public partial class DeepLProvider
         ChatRequest chatRequest,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(chatRequest);
 
         // Translate each incoming text part from the last user message.

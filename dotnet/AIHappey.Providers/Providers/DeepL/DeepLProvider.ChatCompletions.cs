@@ -10,7 +10,6 @@ public partial class DeepLProvider
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(options);
 
         var modelId = options.Model;
@@ -46,7 +45,6 @@ public partial class DeepLProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(options);
 
         var modelId = options.Model;

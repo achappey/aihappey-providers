@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using AIHappey.Vercel.Models;
 using System.Net.Http.Headers;
+using AIHappey.Vercel.Models;
 using AIHappey.Core.Contracts;
 using AIHappey.Messages;
 using AIHappey.Core.Models;
@@ -24,17 +24,22 @@ public partial class DeepLProvider : IModelProvider
         _keyResolver = keyResolver;
         _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
-        _client.BaseAddress = new Uri("https://api-free.deepl.com/");
     }
 
-    private void ApplyAuthHeader()
+    private HttpRequestMessage CreateApiRequest(HttpMethod method, string path)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(DeepL)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("DeepL-Auth-Key", key.Trim());
+        var trimmedKey = key.Trim();
+        var baseAddress = trimmedKey.EndsWith(":fx", StringComparison.OrdinalIgnoreCase)
+            ? "https://api-free.deepl.com/"
+            : "https://api.deepl.com/";
+        var request = new HttpRequestMessage(method, new Uri(new Uri(baseAddress), path));
+        request.Headers.Authorization = new AuthenticationHeaderValue("DeepL-Auth-Key", trimmedKey);
+        return request;
     }
 
 
@@ -106,10 +111,8 @@ public partial class DeepLProvider : IModelProvider
             ["target_lang"] = targetLanguage
         };
 
-        using var req = new HttpRequestMessage(HttpMethod.Post, "v2/translate")
-        {
-            Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions.Web), Encoding.UTF8, "application/json")
-        };
+        using var req = CreateApiRequest(HttpMethod.Post, "v2/translate");
+        req.Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions.Web), Encoding.UTF8, "application/json");
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
