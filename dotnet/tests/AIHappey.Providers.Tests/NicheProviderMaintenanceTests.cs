@@ -108,6 +108,7 @@ public sealed class NicheProviderMaintenanceTests
         await provider.ExecuteUnifiedAsync(new AIRequest
         {
             Model = "tavily/auto",
+            ProviderId = "tavily",
             Input = new AIInput { Text = "question" }
         });
 
