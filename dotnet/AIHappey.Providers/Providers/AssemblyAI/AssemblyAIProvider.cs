@@ -55,11 +55,6 @@ public partial class AssemblyAIProvider : IModelProvider
 
     public string GetIdentifier() => nameof(AssemblyAI).ToLowerInvariant();
 
-    public Task<SpeechResponse> SpeechRequest(SpeechRequest imageRequest, CancellationToken cancellationToken = default)
-    {
-        throw new NotSupportedException();
-    }
-
     public Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
 
@@ -242,10 +237,4 @@ public partial class AssemblyAIProvider : IModelProvider
         throw new NotImplementedException();
     }
 
-    public IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(StreamingSpeechRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }
-
-
