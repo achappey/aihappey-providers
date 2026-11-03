@@ -103,7 +103,7 @@ public sealed class ProviderStreamingSpeechTests
             """);
         var request = new StreamingSpeechRequest
         {
-            Model = "cartesia/tts/sonic-3.6/voice-1",
+            Model = "tts/sonic-3.6/voice-1",
             Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
             ProviderOptions = new() { ["cartesia"] = metadata },
             OutputFormat = new() { Type = "raw", Rate = 24000 },
@@ -126,6 +126,8 @@ public sealed class ProviderStreamingSpeechTests
         Assert.False(payload.TryGetProperty("apiVersion", out _));
         Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["cartesia"]));
 
+        var responseMetadata = Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Equal("cartesia/tts/sonic-3.6/voice-1", responseMetadata.ModelId);
         var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
         Assert.Equal("AQI=", audio.Audio);
         Assert.Equal("audio/pcm", audio.AudioFormat.Type);
@@ -142,7 +144,7 @@ public sealed class ProviderStreamingSpeechTests
         using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
         var request = new StreamingSpeechRequest
         {
-            Model = "cartesia/tts/sonic-3.6/voice-1",
+            Model = "tts/sonic-3.6/voice-1",
             Text = [new() { Text = "Hello" }],
             OutputFormat = new() { Type = "wav" }
         };
