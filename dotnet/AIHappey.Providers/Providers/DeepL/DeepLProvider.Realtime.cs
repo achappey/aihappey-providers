@@ -19,14 +19,10 @@ public partial class DeepLProvider
     {
         ArgumentNullException.ThrowIfNull(realtimeRequest);
 
-        ApplyAuthHeader();
-
         var payload = BuildRealtimePayload(realtimeRequest);
 
-        using var req = new HttpRequestMessage(HttpMethod.Post, DeepLRealtimeRelativeUrl)
-        {
-            Content = new StringContent(payload.GetRawText(), Encoding.UTF8, "application/json")
-        };
+        using var req = CreateApiRequest(HttpMethod.Post, DeepLRealtimeRelativeUrl);
+        req.Content = new StringContent(payload.GetRawText(), Encoding.UTF8, "application/json");
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);

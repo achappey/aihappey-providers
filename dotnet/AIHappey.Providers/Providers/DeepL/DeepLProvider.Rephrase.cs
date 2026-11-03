@@ -37,10 +37,8 @@ public partial class DeepLProvider
             ["text"] = texts
         };
 
-        using var req = new HttpRequestMessage(HttpMethod.Post, "v2/write/rephrase")
-        {
-            Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions.Web), Encoding.UTF8, "application/json")
-        };
+        using var req = CreateApiRequest(HttpMethod.Post, "v2/write/rephrase");
+        req.Content = new StringContent(JsonSerializer.Serialize(payload, JsonSerializerOptions.Web), Encoding.UTF8, "application/json");
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);

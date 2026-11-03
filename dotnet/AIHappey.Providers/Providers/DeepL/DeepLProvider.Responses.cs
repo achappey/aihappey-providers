@@ -8,7 +8,6 @@ public partial class DeepLProvider
 {
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(options);
 
         return await TranslateResponsesAsync(options, cancellationToken);
@@ -18,7 +17,6 @@ public partial class DeepLProvider
         ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(options);
 
         var modelId = options.Model;

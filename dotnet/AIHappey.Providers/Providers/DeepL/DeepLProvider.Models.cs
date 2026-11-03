@@ -20,9 +20,8 @@ public partial class DeepLProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
-                using var resp = await _client.GetAsync("v2/languages?type=target", cancellationToken);
+                using var req = CreateApiRequest(HttpMethod.Get, "v2/languages?type=target");
+                using var resp = await _client.SendAsync(req, cancellationToken);
                 var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
                 if (!resp.IsSuccessStatusCode)
