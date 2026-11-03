@@ -1,9 +1,14 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.FishAudio;
 using AIHappey.Core.Providers.MurfAI;
+using AIHappey.Core.Providers.Tavily;
+using AIHappey.Core.Providers.ZeroEntropy;
+using AIHappey.Core.Models;
+using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 
 namespace AIHappey.Tests;
@@ -65,6 +70,49 @@ public sealed class NicheProviderMaintenanceTests
         Assert.Equal(10, payload.GetProperty("rate").GetInt32());
         Assert.Equal("Hello", payload.GetProperty("text").GetString());
         Assert.Equal(Convert.ToBase64String([1, 2, 3]), response.Audio.Base64);
+    }
+
+    [Fact]
+    public async Task Zeroentropy_embedding_authentication_is_attached_to_the_request_not_the_shared_client()
+    {
+        using var client = CreateClient(_ =>
+        {
+            Assert.Equal("Bearer test-api-key", _.Headers.Authorization?.ToString());
+            return Task.FromResult(JsonResponse("""{"results":[{"embedding":[0.1,0.2]}],"usage":{"total_tokens":1}}"""));
+        });
+        var provider = new ZeroEntropyProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        using var input = JsonDocument.Parse("""["hello"]""");
+
+        await provider.OpenAIEmbeddingRequestAsync(new OpenAIEmbeddingRequest
+        {
+            Model = "test-model",
+            Input = input.RootElement.Clone()
+        });
+
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Tavily_research_authentication_is_attached_to_each_request_not_the_shared_client()
+    {
+        var requestCount = 0;
+        using var client = CreateClient(_ =>
+        {
+            Assert.Equal("Bearer test-api-key", _.Headers.Authorization?.ToString());
+            return Task.FromResult(Interlocked.Increment(ref requestCount) == 1
+                ? JsonResponse("""{"request_id":"research-1"}""")
+                : JsonResponse("""{"status":"completed","content":"answer","sources":[]}"""));
+        });
+        var provider = new TavilyProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        await provider.ExecuteUnifiedAsync(new AIRequest
+        {
+            Model = "tavily/auto",
+            Input = new AIInput { Text = "question" }
+        });
+
+        Assert.Equal(2, requestCount);
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)
