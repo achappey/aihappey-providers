@@ -26,35 +26,49 @@ public partial class PicsartProvider
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
-        if (string.IsNullOrWhiteSpace(request.Prompt))
-            throw new ArgumentException("Prompt is required.", nameof(request));
 
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
 
         var model = request.Model.Trim();
         var (endpoint, inferenceEndpoint, modelName) = ResolveEndpoints(model);
+        var providerOptions = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var isLogoModel = endpoint.Equals("v1/logo", StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(request.Prompt)
+            && (!isLogoModel
+                || string.IsNullOrWhiteSpace(ReadMetadataString(providerOptions, "brand_name"))
+                || string.IsNullOrWhiteSpace(ReadMetadataString(providerOptions, "business_description"))))
+        {
+            throw new ArgumentException("Prompt is required unless logo metadata provides both brand_name and business_description.", nameof(request));
+        }
 
         var (width, height) = ResolveDimensions(request, warnings);
         var count = request.N;
 
-        if (model.StartsWith("picsart/logo/", StringComparison.OrdinalIgnoreCase))
+        if (isLogoModel)
         {
             warnings.Add(new { type = "unsupported", feature = "prompt" });
             warnings.Add(new { type = "unsupported", feature = "size" });
             warnings.Add(new { type = "unsupported", feature = "aspectRatio" });
+
+            var referenceImageUrl = ReadMetadataString(providerOptions, "reference_image_url");
+            if (request.Files?.Any() == true && !string.IsNullOrWhiteSpace(referenceImageUrl))
+                throw new ArgumentException("Picsart logo generation accepts only one reference image source.", nameof(request));
+
+            if (request.Files?.Count > 1)
+                warnings.Add(new { type = "unsupported", feature = "files", details = "Picsart logo generation accepts one reference image; only files[0] is used." });
         }
 
         if (request.Mask is not null)
             warnings.Add(new { type = "unsupported", feature = "mask" });
 
-        if (request.Files?.Any() == true)
+        if (!isLogoModel && request.Files?.Any() == true)
             warnings.Add(new { type = "unsupported", feature = "files" });
 
         if (request.Seed is not null)
             warnings.Add(new { type = "unsupported", feature = "seed" });
 
-        using var submitRequest = BuildSubmitRequest(endpoint, modelName, request, width, height, count);
+        using var submitRequest = BuildSubmitRequest(endpoint, modelName, request, width, height, count, providerOptions);
         using var submitResponse = await _client.SendAsync(submitRequest, cancellationToken);
         var submitRaw = await submitResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!submitResponse.IsSuccessStatusCode)
@@ -148,20 +162,48 @@ public partial class PicsartProvider
         ImageRequest request,
         int? width,
         int? height,
-        int? count)
+        int? count,
+        JsonElement providerOptions)
     {
         if (endpoint.Equals("v1/logo", StringComparison.OrdinalIgnoreCase))
         {
-            var form = new MultipartFormDataContent
-            {
-                "brand_name".NamedField(request.Prompt),
-                "business_description".NamedField(request.Prompt)
-            };
+            var form = new MultipartFormDataContent();
+            var brandName = ReadMetadataString(providerOptions, "brand_name");
+            var businessDescription = ReadMetadataString(providerOptions, "business_description");
+            form.Add("brand_name".NamedField(string.IsNullOrWhiteSpace(brandName) ? request.Prompt! : brandName));
+            form.Add("business_description".NamedField(string.IsNullOrWhiteSpace(businessDescription) ? request.Prompt! : businessDescription));
+            AddOptionalLogoField(form, providerOptions, "logo_description");
+            AddOptionalLogoField(form, providerOptions, "color_tone");
 
             if (count is not null)
                 form.Add("count".NamedField(count.Value.ToString(CultureInfo.InvariantCulture)));
 
             form.Add("model".NamedField(modelName));
+
+            var referenceImage = request.Files?.FirstOrDefault();
+            if (referenceImage is not null)
+            {
+                var data = referenceImage.Data;
+                if (string.IsNullOrWhiteSpace(data))
+                    throw new ArgumentException("Picsart logo reference images must include inline image data.", nameof(request));
+
+                if (Uri.TryCreate(data, UriKind.Absolute, out var imageUri)
+                    && (imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps))
+                {
+                    form.Add("reference_image_url".NamedField(imageUri.ToString()));
+                }
+                else
+                {
+                    var content = new ByteArrayContent(Convert.FromBase64String(data.RemoveDataUrlPrefix()));
+                    if (!string.IsNullOrWhiteSpace(referenceImage.MediaType))
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(referenceImage.MediaType);
+                    form.Add(content, "reference_image", "reference-image");
+                }
+            }
+            else
+            {
+                AddOptionalLogoField(form, providerOptions, "reference_image_url");
+            }
 
             return new HttpRequestMessage(HttpMethod.Post, endpoint)
             {
@@ -184,6 +226,20 @@ public partial class PicsartProvider
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
     }
+
+    private static void AddOptionalLogoField(MultipartFormDataContent form, JsonElement providerOptions, string propertyName)
+    {
+        var value = ReadMetadataString(providerOptions, propertyName);
+        if (!string.IsNullOrWhiteSpace(value))
+            form.Add(propertyName.NamedField(value));
+    }
+
+    private static string? ReadMetadataString(JsonElement providerOptions, string propertyName)
+        => providerOptions.ValueKind == JsonValueKind.Object
+            && providerOptions.TryGetProperty(propertyName, out var value)
+            && value.ValueKind == JsonValueKind.String
+                ? value.GetString()
+                : null;
 
 
     private static string? ReadInferenceId(JsonElement root)
