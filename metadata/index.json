@@ -243,7 +243,7 @@
     },
     {
       "file": "models/providers/fishaudio.json",
-      "sha256": "1b6da87f6e3cda0ba8932f7279803bf7a4b0b1155c729f58f187e48060f4eb68"
+      "sha256": "40914b375370388e75bb575d34d780a5aeea042e8ab2a67a4ad0cb10f37f5fe1"
     },
     {
       "file": "models/providers/fred.json",
@@ -499,7 +499,7 @@
     },
     {
       "file": "models/providers/murfai.json",
-      "sha256": "df3ab0ad8e9d3bce09017c712c34bf8050a2d0a84fec263dddd98cf3e367f060"
+      "sha256": "f66fee7e825266abad5734799d0eb87f9f306f45ff3bf7f16e54424b5996d9f3"
     },
     {
       "file": "models/providers/naceai.json",

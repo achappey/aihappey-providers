@@ -72,8 +72,8 @@ public sealed partial class MurfAIProvider
             }
         }
 
-        // Murf defaults to GEN2; catalogue model identifiers additionally select GEN2 or Falcon 2.
-        var modelVersion = (modelVersionFromModel ?? metadataModelVersion ?? "GEN2").Trim();
+        // Murf defaults to GEN2; Falcon 2.1 is available through the streaming endpoint.
+        var modelVersion = NormalizeMurfModelVersion(modelVersionFromModel ?? metadataModelVersion ?? "GEN2");
 
         // Output format: default WAV (Murf default).
         var format = NormalizeMurfFormat(request.OutputFormat ?? metadataFormat) ?? "wav";
@@ -95,6 +95,56 @@ public sealed partial class MurfAIProvider
             rate = Math.Clamp(rate.Value, -50, 50);
         }
 
+        var pronunciationDictionary = GetOption<JsonElement>(metadata, "pronunciationDictionary");
+        if (pronunciationDictionary.ValueKind is not JsonValueKind.Undefined and not JsonValueKind.Null)
+            _ = pronunciationDictionary.Deserialize<Dictionary<string, JsonElement>>(MurfJson);
+
+        if (modelVersion.Equals("falcon-2.1", StringComparison.OrdinalIgnoreCase))
+        {
+            var falconPayload = BuildFalconSpeechPayload(
+                request.Text,
+                voiceId,
+                multiNativeLocale,
+                format,
+                rate,
+                pronunciationDictionary);
+            using var falconRequest = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://global.api.murf.ai/v1/speech/stream")
+            {
+                Content = new StringContent(JsonSerializer.Serialize(falconPayload, MurfJson), Encoding.UTF8, MediaTypeNames.Application.Json)
+            };
+            using var falconResponse = await _client.SendAsync(
+                falconRequest,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken);
+            if (!falconResponse.IsSuccessStatusCode)
+            {
+                var error = await falconResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new InvalidOperationException($"MurfAI TTS failed ({(int)falconResponse.StatusCode}): {error}");
+            }
+
+            var audio = await falconResponse.Content.ReadAsByteArrayAsync(cancellationToken);
+            return new SpeechResponse
+            {
+                Audio = new()
+                {
+                    Base64 = Convert.ToBase64String(audio),
+                    MimeType = falconResponse.Content.Headers.ContentType?.MediaType ?? MapMurfFormatToMimeType(format),
+                    Format = format
+                },
+                Warnings = warnings,
+                Request = new() { Body = falconPayload },
+                ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(),
+                Response = new ResponseData
+                {
+                    Timestamp = now,
+                    Headers = falconResponse.GetHeaders(),
+                    ModelId = request.Model.ToModelId(GetIdentifier())
+                }
+            };
+        }
+
         SetOption(payload, "text", request.Text);
         SetOption(payload, "voiceId", voiceId);
         SetOption(payload, "modelVersion", modelVersion);
@@ -110,9 +160,6 @@ public sealed partial class MurfAIProvider
         SetOption(payload, "variation", variation is null ? null : Math.Clamp(variation.Value, 0, 5));
         SetOption(payload, "wordDurationsAsOriginalText", wordDurationsAsOriginalText);
 
-        var pronunciationDictionary = GetOption<JsonElement>(metadata, "pronunciationDictionary");
-        if (pronunciationDictionary.ValueKind is not JsonValueKind.Undefined and not JsonValueKind.Null)
-            _ = pronunciationDictionary.Deserialize<Dictionary<string, JsonElement>>(MurfJson);
         SetOption(payload, "pronunciationDictionary",
             pronunciationDictionary.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined
                 ? null
@@ -220,6 +267,30 @@ public sealed partial class MurfAIProvider
         };
     }
 
+    private static Dictionary<string, object?> BuildFalconSpeechPayload(
+        string text,
+        string voiceId,
+        string? locale,
+        string format,
+        int? rate,
+        JsonElement pronunciationDictionary)
+    {
+        var payload = new Dictionary<string, object?>
+        {
+            ["text"] = text,
+            ["voiceId"] = voiceId,
+            ["model"] = "falcon-2.1",
+            ["format"] = format.ToUpperInvariant()
+        };
+        if (!string.IsNullOrWhiteSpace(locale))
+            payload["locale"] = locale;
+        if (rate is not null)
+            payload["rate"] = rate;
+        if (pronunciationDictionary.ValueKind is not JsonValueKind.Undefined and not JsonValueKind.Null)
+            payload["pronunciationDictionary"] = pronunciationDictionary;
+        return payload;
+    }
+
     private static (string? ModelVersion, string? VoiceId) ParseSpeechModelAndVoice(string model)
     {
         var localModel = model.Trim();
@@ -229,19 +300,25 @@ public sealed partial class MurfAIProvider
 
         var parts = localModel.Split('/', StringSplitOptions.TrimEntries);
         if (parts.Length is < 1 or > 2 || string.IsNullOrWhiteSpace(parts[0]))
-            throw new ArgumentException("MurfAI speech model must be 'gen2', 'falcon-2', 'gen2/{voiceId}', or 'falcon-2/{voiceId}'.", nameof(model));
+            throw new ArgumentException("MurfAI speech model must be 'gen2', 'falcon-2.1', 'gen2/{voiceId}', or 'falcon-2.1/{voiceId}'.", nameof(model));
 
-        if (!MurfSpeechModelVersions.Contains(parts[0], StringComparer.OrdinalIgnoreCase))
+        var modelVersion = NormalizeMurfModelVersion(parts[0]);
+        if (!MurfSpeechModelVersions.Contains(modelVersion, StringComparer.OrdinalIgnoreCase))
             return (null, null);
 
         if (parts.Length == 1)
-            return (parts[0], null);
+            return (modelVersion, null);
 
         if (string.IsNullOrWhiteSpace(parts[1]))
             throw new ArgumentException("MurfAI speech model shortcut must include a voice id after the model version.", nameof(model));
 
-        return (parts[0], parts[1]);
+        return (modelVersion, parts[1]);
     }
+
+    private static string NormalizeMurfModelVersion(string modelVersion)
+        => modelVersion.Equals("falcon-2", StringComparison.OrdinalIgnoreCase)
+            ? "falcon-2.1"
+            : modelVersion;
 
     private static Dictionary<string, object?> CopyProviderOptions(JsonElement metadata)
     {

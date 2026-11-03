@@ -16,6 +16,13 @@
       "type": "transcription"
     },
     {
+      "id": "fishaudio/transcribe-1-pro",
+      "object": "model",
+      "owned_by": "FishAudio",
+      "name": "Fish Audio Transcribe 1 Pro",
+      "type": "transcription"
+    },
+    {
       "id": "fishaudio/s2.1-pro",
       "object": "model",
       "owned_by": "FishAudio",
