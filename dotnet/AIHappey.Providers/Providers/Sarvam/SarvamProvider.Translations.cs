@@ -1,8 +1,11 @@
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AIHappey.Unified.Models;
+
+[assembly: InternalsVisibleTo("AIHappey.Providers.Tests")]
 
 namespace AIHappey.Core.Providers.Sarvam;
 
@@ -10,6 +13,10 @@ public partial class SarvamProvider
 {
     private const string MayuraTranslatePrefix = "mayura:v1/translate-to/";
     private const string SarvamTranslatePrefix = "sarvam-translate:v1/translate/";
+    private const int MayuraMaxInputCharacters = 1000;
+    private const int SarvamTranslateMaxInputCharacters = 2000;
+
+    internal readonly record struct TranslationChunk(string Text, string SeparatorAfter);
 
     private sealed class SarvamTranslateResponse
     {
@@ -47,6 +54,91 @@ public partial class SarvamProvider
         }
 
         throw new ArgumentException($"Unsupported Sarvam translation model '{modelId}'.", nameof(modelId));
+    }
+
+    internal static int GetTranslationCharacterLimit(string modelId)
+        => ParseTranslationModel(modelId).Model == "mayura:v1"
+            ? MayuraMaxInputCharacters
+            : SarvamTranslateMaxInputCharacters;
+
+    internal static List<TranslationChunk> SplitTranslationText(string text, string modelId)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        var limit = GetTranslationCharacterLimit(modelId);
+        if (text.Length <= limit)
+            return [new TranslationChunk(text, string.Empty)];
+
+        var textElementStarts = StringInfo.ParseCombiningCharacters(text);
+        var chunks = new List<TranslationChunk>();
+        var start = 0;
+
+        while (start < text.Length)
+        {
+            var maximumEnd = Math.Min(start + limit, text.Length);
+            if (maximumEnd == text.Length)
+            {
+                chunks.Add(new TranslationChunk(text[start..], string.Empty));
+                break;
+            }
+
+            var end = FindTextElementBoundary(textElementStarts, maximumEnd);
+            if (end <= start)
+                throw new ArgumentException("A text element exceeds Sarvam's maximum translation input length.", nameof(text));
+
+            var sentenceSearchStart = Math.Max(start, end - limit / 4);
+            var splitAt = FindSentenceBoundary(text, textElementStarts, sentenceSearchStart, end);
+            if (splitAt < 0)
+                splitAt = FindWhitespaceBoundary(text, textElementStarts, start + 1, end);
+
+            if (splitAt < 0)
+            {
+                chunks.Add(new TranslationChunk(text[start..end], string.Empty));
+                start = end;
+                continue;
+            }
+
+            var separatorEnd = splitAt;
+            while (separatorEnd < text.Length && char.IsWhiteSpace(text[separatorEnd]))
+                separatorEnd++;
+
+            chunks.Add(new TranslationChunk(text[start..splitAt], text[splitAt..separatorEnd]));
+            start = separatorEnd;
+        }
+
+        return chunks;
+    }
+
+    private static int FindTextElementBoundary(int[] textElementStarts, int maximumEnd)
+    {
+        var index = Array.BinarySearch(textElementStarts, maximumEnd);
+        if (index >= 0)
+            return maximumEnd;
+
+        index = ~index - 1;
+        return index >= 0 ? textElementStarts[index] : 0;
+    }
+
+    private static int FindSentenceBoundary(string text, int[] textElementStarts, int searchStart, int end)
+    {
+        for (var index = end - 1; index >= searchStart; index--)
+        {
+            if (text[index] is '.' or '!' or '?' or '\u3002' or '\uff01' or '\uff1f'
+                && Array.BinarySearch(textElementStarts, index + 1) >= 0)
+                return index + 1;
+        }
+
+        return -1;
+    }
+
+    private static int FindWhitespaceBoundary(string text, int[] textElementStarts, int searchStart, int end)
+    {
+        for (var index = end - 1; index >= searchStart; index--)
+        {
+            if (char.IsWhiteSpace(text[index]) && Array.BinarySearch(textElementStarts, index) >= 0)
+                return index;
+        }
+
+        return -1;
     }
 
     private static List<string> ExtractTranslationTexts(AIRequest request)
@@ -121,9 +213,17 @@ public partial class SarvamProvider
         SarvamTranslateResponse? lastResponse = null;
         foreach (var text in texts)
         {
-            var result = await TranslateAsync(text, modelId, request.Metadata, cancellationToken);
-            lastResponse = result.Response;
-            translated.Add(result.Text);
+            var chunks = SplitTranslationText(text, modelId);
+            var translatedChunks = new List<string>(chunks.Count);
+            foreach (var chunk in chunks)
+            {
+                var result = await TranslateAsync(chunk.Text, modelId, request.Metadata, cancellationToken);
+                lastResponse = result.Response;
+                translatedChunks.Add(result.Text);
+            }
+
+            translated.Add(string.Concat(chunks.Select((chunk, index) =>
+                translatedChunks[index] + chunk.SeparatorAfter)));
         }
 
         var (_, source, target) = ParseTranslationModel(modelId);
