@@ -128,7 +128,8 @@ public partial class SarvamProvider
         return jobParameters;
     }
 
-    private static T? ReadMetadataValue<T>(JsonElement metadata, string propertyName)
+
+    private static T ReadMetadataValue<T>(JsonElement metadata, string propertyName)
     {
         JsonElement? matchedProperty = null;
         if (metadata.ValueKind == JsonValueKind.Object)
@@ -140,8 +141,11 @@ public partial class SarvamProvider
             }
         }
 
-        return matchedProperty?.Deserialize<T>(JsonSerializerOptions.Web);
+        return matchedProperty.HasValue
+            ? matchedProperty.Value.Deserialize<T>(JsonSerializerOptions.Web)!
+            : default!;
     }
+
 
     private static bool IsMappedMetadataProperty(string propertyName)
         => propertyName.Equals("model", StringComparison.OrdinalIgnoreCase)
