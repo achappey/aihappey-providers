@@ -4,6 +4,7 @@ using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Cartesia;
+using AIHappey.Core.Providers.ElevenLabs;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Neuphonic;
 using AIHappey.Core.Providers.ResembleAI;
@@ -264,6 +265,61 @@ public sealed class ProviderStreamingSpeechTests
         Assert.False(client.DefaultRequestHeaders.Contains("api-key"));
     }
 
+    [Fact]
+    public async Task ElevenLabs_streams_HTTP_audio_chunks_and_preserves_native_speech_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal(
+                "https://api.elevenlabs.io/v1/text-to-speech/voice-1/stream?output_format=mp3_44100_128&optimize_streaming_latency=2",
+                request.RequestUri!.ToString());
+            Assert.Equal("test-key", request.Headers.GetValues("xi-api-key").Single());
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(new ChunkedReadStream([1, 2, 3, 4], 2))
+            };
+        });
+        var metadata = ParseElement("""
+            {
+              "voice_settings":{"stability":0.42},
+              "language_code":"en",
+              "optimize_streaming_latency":2
+            }
+            """);
+        var request = new StreamingSpeechRequest
+        {
+            Model = "eleven_multilingual_v2",
+            Text = [new() { Text = "Hello " }, new() { Text = "world!" }],
+            Voice = "voice-1",
+            OutputFormat = new() { Type = "mp3_44100_128", Rate = 44100 },
+            ProviderOptions = new() { ["elevenlabs"] = metadata },
+            IncludeRawChunks = true
+        };
+        var originalOptions = request.ProviderOptions["elevenlabs"].Clone();
+
+        var parts = await CollectAsync(CreateElevenLabsProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("Hello world!", payload.GetProperty("text").GetString());
+        Assert.Equal("eleven_multilingual_v2", payload.GetProperty("model_id").GetString());
+        Assert.Equal(0.42, payload.GetProperty("voice_settings").GetProperty("stability").GetDouble(), 2);
+        Assert.Equal("en", payload.GetProperty("language_code").GetString());
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["elevenlabs"]));
+        Assert.Equal(2, parts.OfType<SpeechAudioPart>().Count());
+        Assert.All(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.Equal("audio/mpeg", part.AudioFormat.Type);
+            Assert.Equal(44100, part.AudioFormat.Rate);
+        });
+        Assert.Equal(2, parts.OfType<SpeechRawPart>().Count());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.False(client.DefaultRequestHeaders.Contains("xi-api-key"));
+    }
+
     private static async Task<List<StreamingSpeechPart>> CollectAsync(
         IAsyncEnumerable<StreamingSpeechPart> stream)
     {
@@ -291,6 +347,11 @@ public sealed class ProviderStreamingSpeechTests
             new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
             new StaticHttpClientFactory(client));
 
+    private static ElevenLabsProvider CreateElevenLabsProvider(HttpClient client)
+        => new(new StaticApiKeyResolver(),
+            new StaticHttpClientFactory(client),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())));
+
     private static JsonElement ParseElement(string json)
         => JsonDocument.Parse(json).RootElement.Clone();
 
@@ -316,6 +377,15 @@ public sealed class ProviderStreamingSpeechTests
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(responder(request));
+        }
+    }
+
+    private sealed class ChunkedReadStream(byte[] content, int maximumChunkSize) : MemoryStream(content)
+    {
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return base.ReadAsync(buffer[..Math.Min(buffer.Length, maximumChunkSize)], cancellationToken);
         }
     }
 }
