@@ -246,6 +246,148 @@ public sealed class ProviderStreamingSpeechTests
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
+    [Theory]
+    [InlineData("pcm", "pcm_s16le", "audio/pcm")]
+    [InlineData("audio/pcm", "pcm_s16le", "audio/pcm")]
+    [InlineData("audio/l16", "pcm_s16le", "audio/pcm")]
+    [InlineData("pcm_s16le", "pcm_s16le", "audio/pcm")]
+    [InlineData("mulaw", "pcm_mulaw", "audio/basic")]
+    [InlineData("ulaw", "pcm_mulaw", "audio/basic")]
+    [InlineData("audio/basic", "pcm_mulaw", "audio/basic")]
+    [InlineData("pcm_mulaw", "pcm_mulaw", "audio/basic")]
+    [InlineData("alaw", "pcm_alaw", "audio/alaw")]
+    [InlineData("audio/alaw", "pcm_alaw", "audio/alaw")]
+    [InlineData("pcm_alaw", "pcm_alaw", "audio/alaw")]
+    [InlineData(" PCM ", "pcm_s16le", "audio/pcm")]
+    public async Task AssemblyAI_streaming_output_format_overrides_provider_encoding(
+        string outputFormat, string expectedEncoding, string expectedMimeType)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return CreateAssemblyAISpeechEventsResponse();
+        });
+        var metadata = ParseElement("""{"encoding":"mp3","container":"wav","future":{"preserve":true}}""");
+        var request = new StreamingSpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = [new() { Text = "Hello world!" }],
+            Voice = "aai-jane",
+            OutputFormat = new() { Type = outputFormat, Rate = 16000 },
+            ProviderOptions = new() { ["assemblyai"] = metadata }
+        };
+        var originalOptions = request.ProviderOptions["assemblyai"].Clone();
+
+        var parts = await CollectAsync(CreateAssemblyAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal(expectedEncoding, payload.GetProperty("encoding").GetString());
+        Assert.Equal(16000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.False(payload.TryGetProperty("container", out _));
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["assemblyai"]));
+        var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal("AQI=", audio.Audio);
+        Assert.Equal(expectedMimeType, audio.AudioFormat.Type);
+        Assert.Equal(16000, audio.AudioFormat.Rate);
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+    }
+
+    [Theory]
+    [InlineData("pcm_s16le", "audio/pcm")]
+    [InlineData("pcm_mulaw", "audio/basic")]
+    [InlineData("pcm_alaw", "audio/alaw")]
+    public async Task AssemblyAI_streaming_provider_encoding_matches_audio_metadata(
+        string encoding, string expectedMimeType)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return CreateAssemblyAISpeechEventsResponse();
+        });
+        var metadata = JsonSerializer.SerializeToElement(new
+        {
+            encoding,
+            sample_rate = 16000,
+            container = "wav",
+            future = new { preserve = true }
+        });
+        var request = new StreamingSpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = [new() { Text = "Hello world!" }],
+            Voice = "aai-jane",
+            ProviderOptions = new() { ["assemblyai"] = metadata }
+        };
+        var originalOptions = request.ProviderOptions["assemblyai"].Clone();
+
+        var parts = await CollectAsync(CreateAssemblyAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal(encoding, payload.GetProperty("encoding").GetString());
+        Assert.Equal(16000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.False(payload.TryGetProperty("container", out _));
+        Assert.True(JsonElement.DeepEquals(metadata.GetProperty("future"), payload.GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["assemblyai"]));
+        var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal(expectedMimeType, audio.AudioFormat.Type);
+        Assert.Equal(16000, audio.AudioFormat.Rate);
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+    }
+
+    [Fact]
+    public async Task AssemblyAI_streaming_defaults_to_PCM_when_no_encoding_is_supplied()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return CreateAssemblyAISpeechEventsResponse();
+        });
+        var request = new StreamingSpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = [new() { Text = "Hello world!" }],
+            Voice = "aai-jane"
+        };
+
+        var parts = await CollectAsync(CreateAssemblyAIProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("pcm_s16le", payload.GetProperty("encoding").GetString());
+        Assert.Equal(24000, payload.GetProperty("sample_rate").GetInt32());
+        var audio = Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal("audio/pcm", audio.AudioFormat.Type);
+        Assert.Equal(24000, audio.AudioFormat.Rate);
+        Assert.Single(parts.OfType<SpeechFinishPart>());
+    }
+
+    [Theory]
+    [InlineData("mp3")]
+    [InlineData("wav")]
+    [InlineData("unsupported")]
+    public async Task AssemblyAI_streaming_rejects_unsupported_provider_encoding_before_HTTP(string encoding)
+    {
+        var httpCalls = 0;
+        using var client = CreateClient(_ =>
+        {
+            httpCalls++;
+            return CreateAssemblyAISpeechEventsResponse();
+        });
+        var request = new StreamingSpeechRequest
+        {
+            Model = "assemblyai/assemblyai-tts-1",
+            Text = [new() { Text = "Hello world!" }],
+            Voice = "aai-jane",
+            ProviderOptions = new() { ["assemblyai"] = JsonSerializer.SerializeToElement(new { encoding }) }
+        };
+
+        var error = await Assert.ThrowsAsync<NotSupportedException>(async () =>
+            await CollectAsync(CreateAssemblyAIProvider(client).SpeechStreamingAsync(request)));
+
+        Assert.Contains($"do not support encoding '{encoding}'", error.Message);
+        Assert.Equal(0, httpCalls);
+    }
+
     [Fact]
     public async Task AssemblyAI_generates_speech_from_its_native_audio_endpoint()
     {
@@ -639,6 +781,17 @@ public sealed class ProviderStreamingSpeechTests
         => new(new StaticApiKeyResolver(),
             new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
             new StaticHttpClientFactory(client));
+
+    private static HttpResponseMessage CreateAssemblyAISpeechEventsResponse()
+        => new(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                "data: {\"type\":\"Audio\",\"audio\":\"AQI=\",\"flush_id\":0}\n\n" +
+                "data: {\"type\":\"FlushDone\",\"flush_id\":0}\n\n" +
+                "data: {\"type\":\"Termination\"}\n\n",
+                Encoding.UTF8,
+                "text/event-stream")
+        };
 
     private static JsonElement ParseElement(string json)
         => JsonDocument.Parse(json).RootElement.Clone();

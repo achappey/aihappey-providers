@@ -236,7 +236,12 @@ public partial class AssemblyAIProvider
         if (!string.IsNullOrWhiteSpace(language))
             SetAssemblyAIOption(payload, "language", language);
 
-        var encoding = ReadAssemblyAIOption(payload, "encoding") as string ?? "pcm_s16le";
+        var encoding = ReadAssemblyAIOption(payload, "encoding") switch
+        {
+            JsonElement element when element.ValueKind == JsonValueKind.String => element.GetString()!,
+            string value => value,
+            _ => "pcm_s16le"
+        };
         var format = outputFormat?.Trim().ToLowerInvariant();
         if (format is not null)
         {
@@ -284,6 +289,9 @@ public partial class AssemblyAIProvider
                 throw new NotSupportedException($"AssemblyAI speech events do not support encoding '{encoding}'.");
             RemoveAssemblyAIOption(payload, "container");
         }
+
+        if (streaming)
+            SetAssemblyAIOption(payload, "encoding", encoding);
 
         var rate = ProviderNumericConversions.ToInt32Exact(sampleRate, "outputFormat.rate")
                    ?? ReadAssemblyAISampleRate(payload)
