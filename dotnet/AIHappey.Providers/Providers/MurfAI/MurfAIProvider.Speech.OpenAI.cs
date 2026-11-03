@@ -27,7 +27,9 @@ public sealed partial class MurfAIProvider
         ApplyAuthHeader();
 
         var payload = BuildOpenAISpeechStreamingPayload(options);
-        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/speech/stream")
+        using var httpRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            "https://global.api.murf.ai/v1/speech/stream")
         {
             Content = new StringContent(
                 JsonSerializer.Serialize(payload, MurfJson),
@@ -87,7 +89,9 @@ public sealed partial class MurfAIProvider
                 nameof(options));
         }
 
-        var model = (modelVersionFromModel ?? "gen2").Trim();
+        var model = (modelVersionFromModel ?? "falcon-2.1").Trim();
+        if (!model.Equals("falcon-2.1", StringComparison.OrdinalIgnoreCase))
+            throw new NotSupportedException("MurfAI streaming speech supports Falcon 2.1 only.");
         var format = NormalizeMurfFormat(options.ResponseFormat) ?? "mp3";
         var payload = new Dictionary<string, object?>
         {
@@ -108,4 +112,3 @@ public sealed partial class MurfAIProvider
         return payload;
     }
 }
-

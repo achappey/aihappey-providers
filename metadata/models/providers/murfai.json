@@ -2,10 +2,10 @@
     "object": "list",
     "data": [
         {
-            "id": "murfai/falcon-2",
+            "id": "murfai/falcon-2.1",
             "object": "model",
             "owned_by": "MurfAI",
-            "name": "falcon-2",
+            "name": "falcon-2.1",
             "type": "speech",
             "description": "An ultra-fast streaming model, optimized for conversational AI and real-time voice agents. It delivers natural speech with time-to-first-audio under 100ms."
         },
