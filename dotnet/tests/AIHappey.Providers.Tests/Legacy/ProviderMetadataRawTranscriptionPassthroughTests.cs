@@ -5,6 +5,7 @@ using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.RelaxAI;
 using AIHappey.Core.Providers.Zai;
+using AIHappey.Core.Providers.Novita;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -214,6 +215,114 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
         Assert.Equal("Z.AI STT failed (400): upstream failure", error.Message);
     }
 
+    [Fact]
+    public async Task Novita_transcription_keeps_provider_key_and_forwards_unknown_json_at_root()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal("/v3/glm-asr", request.RequestUri!.AbsolutePath);
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"text":"transcribed"}""");
+        });
+
+        var metadata = ParseElement(
+            """
+            {
+              "prompt": "context",
+              "hotwords": ["speaker-a", "speaker-b"],
+              "future_object": {"nested": [{"value": 1}, [true, null, "text"]]},
+              "future_array": [1, {"more": [false, 2.5]}, []],
+              "future_string": "unchanged",
+              "future_number": 12345678901234567890.123456789,
+              "future_boolean": false,
+              "future_null": null,
+              "file": "metadata-file"
+            }
+            """);
+        var audio = Convert.ToBase64String(Encoding.UTF8.GetBytes("audio"));
+        var request = new TranscriptionRequest
+        {
+            Model = "glm-asr",
+            Audio = audio,
+            ProviderOptions = new Dictionary<string, JsonElement>
+            {
+                ["novita"] = metadata,
+                ["another-provider"] = ParseElement("""{"must_not_leak":true}""")
+            }
+        };
+        var clientBoundary = JsonSerializer.SerializeToElement(request, JsonSerializerOptions.Web);
+
+        Assert.True(JsonElement.DeepEquals(
+            metadata,
+            clientBoundary.GetProperty("providerOptions").GetProperty("novita")));
+
+        var response = await CreateNovitaProvider(client).TranscriptionRequest(request);
+
+        Assert.Equal("transcribed", response.Text);
+        Assert.Equal(audio, payload.GetProperty("file").GetString());
+        Assert.Equal("context", payload.GetProperty("prompt").GetString());
+        Assert.Equal(2, payload.GetProperty("hotwords").GetArrayLength());
+        Assert.Equal("speaker-a", payload.GetProperty("hotwords")[0].GetString());
+        Assert.Equal("speaker-b", payload.GetProperty("hotwords")[1].GetString());
+        foreach (var name in new[]
+                 {
+                     "future_object", "future_array", "future_string", "future_number", "future_boolean", "future_null"
+                 })
+        {
+            Assert.True(JsonElement.DeepEquals(metadata.GetProperty(name), payload.GetProperty(name)), name);
+        }
+
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+        Assert.False(payload.TryGetProperty("providerOptions", out _));
+        Assert.False(payload.TryGetProperty("novita", out _));
+        Assert.False(payload.TryGetProperty("another-provider", out _));
+        Assert.False(payload.TryGetProperty("must_not_leak", out _));
+        Assert.Equal(9, payload.EnumerateObject().Count());
+    }
+
+    [Fact]
+    public async Task Novita_transcription_keeps_omissions_validation_and_upstream_errors()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"text":"transcribed"}""");
+        });
+        var provider = CreateNovitaProvider(client);
+        var request = CreateNovitaRequest(ParseElement("""{"prompt":null,"hotwords":null,"future_null":null}"""));
+
+        await provider.TranscriptionRequest(request);
+
+        Assert.False(payload.TryGetProperty("prompt", out _));
+        Assert.False(payload.TryGetProperty("hotwords", out _));
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+        Assert.Equal(2, payload.EnumerateObject().Count());
+
+        await provider.TranscriptionRequest(CreateNovitaRequest(default));
+        Assert.False(payload.TryGetProperty("prompt", out _));
+        Assert.False(payload.TryGetProperty("hotwords", out _));
+        Assert.Equal(1, payload.EnumerateObject().Count());
+
+        var requestsSent = 0;
+        using var unusedClient = CreateClient(_ =>
+        {
+            requestsSent++;
+            throw new InvalidOperationException("Request should not be sent.");
+        });
+        request = CreateNovitaRequest(ParseElement("""{"prompt":42}"""));
+        await Assert.ThrowsAsync<JsonException>(() => CreateNovitaProvider(unusedClient).TranscriptionRequest(request));
+        request = CreateNovitaRequest(ParseElement("""["invalid metadata root"]"""));
+        await Assert.ThrowsAsync<JsonException>(() => CreateNovitaProvider(unusedClient).TranscriptionRequest(request));
+        Assert.Equal(0, requestsSent);
+
+        using var failedClient = CreateClient(_ => JsonResponse("upstream failure", HttpStatusCode.BadRequest));
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            CreateNovitaProvider(failedClient).TranscriptionRequest(CreateNovitaRequest(default)));
+        Assert.Equal("Novita STT failed (400): upstream failure", error.Message);
+    }
+
     private static TranscriptionRequest CreateRequest(string model, JsonElement metadata, string provider)
         => new()
         {
@@ -229,6 +338,16 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
                 }
         };
 
+    private static TranscriptionRequest CreateNovitaRequest(JsonElement metadata)
+        => new()
+        {
+            Model = "glm-asr",
+            Audio = Convert.ToBase64String(Encoding.UTF8.GetBytes("audio")),
+            ProviderOptions = metadata.ValueKind == JsonValueKind.Undefined
+                ? null
+                : new Dictionary<string, JsonElement> { ["novita"] = metadata }
+        };
+
     private static RelaxAIProvider CreateRelaxAIProvider(HttpClient client)
         => new(
             new StaticApiKeyResolver(),
@@ -237,6 +356,12 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
 
     private static ZaiProvider CreateZaiProvider(HttpClient client)
         => new(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
+
+    private static NovitaProvider CreateNovitaProvider(HttpClient client)
+        => new(
+            new StaticApiKeyResolver(),
+            new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
+            new StaticHttpClientFactory(client));
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, HttpResponseMessage> responder)
         => new(new DelegateHandler(responder));

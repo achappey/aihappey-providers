@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.Novita;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.Extensions;
@@ -29,23 +28,50 @@ public partial class NovitaProvider
     {
         ApplyAuthHeader();
 
-        var metadata = request.GetProviderMetadata<NovitaTranscriptionProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
 
         // Novita expects:
         // - file: base64 string OR URL
         // - application/json (not multipart)
 
-        var payload = new Dictionary<string, object?>
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            _ = metadata.Deserialize<Dictionary<string, JsonElement>>(JsonSerializerOptions.Web);
+
+        var payload = new Dictionary<string, object?>();
+
+        if (metadata.ValueKind == JsonValueKind.Object)
         {
-            ["file"] = request.Audio?.ToString()
-                ?? throw new InvalidOperationException("Audio is required"),
-        };
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (IsMappedTranscriptionOption(property.Name))
+                    continue;
 
-        if (!string.IsNullOrWhiteSpace(metadata?.Prompt))
-            payload["prompt"] = metadata.Prompt;
+                payload[property.Name] = property.Value.Clone();
+            }
 
-        if (metadata?.Hotwords?.Any() == true)
-            payload["hotwords"] = metadata.Hotwords.ToArray();
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (string.Equals(property.Name, "prompt", StringComparison.OrdinalIgnoreCase))
+                {
+                    var prompt = property.Value.Deserialize<string>(JsonSerializerOptions.Web);
+                    if (string.IsNullOrWhiteSpace(prompt))
+                        payload.Remove("prompt");
+                    else
+                        payload["prompt"] = prompt;
+                }
+                else if (string.Equals(property.Name, "hotwords", StringComparison.OrdinalIgnoreCase))
+                {
+                    var hotwords = property.Value.Deserialize<IEnumerable<string>>(JsonSerializerOptions.Web);
+                    if (hotwords?.Any() != true)
+                        payload.Remove("hotwords");
+                    else
+                        payload["hotwords"] = hotwords.ToArray();
+                }
+            }
+        }
+
+        payload["file"] = request.Audio?.ToString()
+            ?? throw new InvalidOperationException("Audio is required");
 
         var requestBody = JsonSerializer.Serialize(payload);
 
@@ -72,6 +98,10 @@ public partial class NovitaProvider
         return ConvertNovitaResponse(root, requestBody,
             GetIdentifier(), request.Model, resp.GetHeaders());
     }
+
+    private static bool IsMappedTranscriptionOption(string name)
+        => string.Equals(name, "prompt", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "hotwords", StringComparison.OrdinalIgnoreCase);
 
     private static TranscriptionResponse ConvertNovitaResponse(JsonElement root,
         string requestBody, string providerId, string model, IDictionary<string, string>? headers = null)
