@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AIHappey.Core.AI;
 using AIHappey.Unified.Models;
 
 [assembly: InternalsVisibleTo("AIHappey.Providers.Tests")]
@@ -155,34 +156,31 @@ public partial class SarvamProvider
             .ToList() ?? [];
     }
 
-    private static void CopyTranslationOption(
-        Dictionary<string, object?> payload,
-        Dictionary<string, object?>? metadata,
-        string key)
-    {
-        if (metadata is not null && metadata.TryGetValue(key, out var value) && value is not null)
-            payload[key] = value;
-    }
-
     private async Task<(SarvamTranslateResponse Response, string Text)> TranslateAsync(
         string text,
         string modelId,
-        Dictionary<string, object?>? metadata,
+        JsonElement metadata,
         CancellationToken cancellationToken)
     {
         var (model, sourceLanguage, targetLanguage) = ParseTranslationModel(modelId);
-        var payload = new Dictionary<string, object?>
-        {
-            ["input"] = text,
-            ["source_language_code"] = sourceLanguage,
-            ["target_language_code"] = targetLanguage,
-            ["model"] = model
-        };
 
-        CopyTranslationOption(payload, metadata, "speaker_gender");
-        CopyTranslationOption(payload, metadata, "mode");
-        CopyTranslationOption(payload, metadata, "output_script");
-        CopyTranslationOption(payload, metadata, "numerals_format");
+        var payload = new Dictionary<string, object?>();
+        if (metadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var option in metadata.EnumerateObject())
+            {
+                if (option.Value.ValueKind == JsonValueKind.Null
+                    && option.Name is "speaker_gender" or "mode" or "output_script" or "numerals_format")
+                    continue;
+
+                payload[option.Name] = option.Value.Clone();
+            }
+        }
+
+        payload["input"] = text;
+        payload["source_language_code"] = sourceLanguage;
+        payload["target_language_code"] = targetLanguage;
+        payload["model"] = model;
 
         ApplyAuthHeader();
         using var request = new HttpRequestMessage(HttpMethod.Post, "translate")
@@ -205,6 +203,7 @@ public partial class SarvamProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         var modelId = request.Model ?? throw new ArgumentException("Model is required.", nameof(request));
+        var metadata = request.Metadata.GetProviderMetadata<JsonElement>(GetIdentifier());
         var texts = ExtractTranslationTexts(request);
         if (texts.Count == 0)
             throw new ArgumentException("Translation requires text in the latest user message.", nameof(request));
@@ -217,7 +216,7 @@ public partial class SarvamProvider
             var translatedChunks = new List<string>(chunks.Count);
             foreach (var chunk in chunks)
             {
-                var result = await TranslateAsync(chunk.Text, modelId, request.Metadata, cancellationToken);
+                var result = await TranslateAsync(chunk.Text, modelId, metadata, cancellationToken);
                 lastResponse = result.Response;
                 translatedChunks.Add(result.Text);
             }
