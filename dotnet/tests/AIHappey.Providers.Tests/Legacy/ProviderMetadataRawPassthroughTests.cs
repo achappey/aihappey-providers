@@ -578,6 +578,184 @@ public sealed class ProviderMetadataRawPassthroughTests
     }
 
     [Fact]
+    public async Task Together_image_options_merge_at_root_preserve_unknown_json_and_keep_request_precedence()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            Assert.Equal("/v1/images/generations", message.RequestUri!.AbsolutePath);
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"data":[{"b64_json":"AQID"}]}""")
+            };
+        });
+        var metadata = ParseElement("""
+            {
+              "steps": 28,
+              "negative_prompt": "blurry",
+              "guidance_scale": 4.5,
+              "disable_safety_checker": true,
+              "future_object": {"nested": [{"value": 1}, [true, null, "text"]]},
+              "future_array": [1, {"more": [false, 2.5]}, []],
+              "future_string": "unchanged",
+              "future_number": 12345678901234567890.123456789,
+              "future_boolean": false,
+              "future_null": null,
+              "model": "metadata-model",
+              "prompt": "metadata-prompt",
+              "n": 99,
+              "height": 1,
+              "width": 2,
+              "seed": 99,
+              "response_format": "url",
+              "output_format": "webp"
+            }
+            """);
+        var request = new ImageRequest
+        {
+            Model = "together/image-model",
+            Prompt = "A landscape",
+            N = 1,
+            Size = "512x768",
+            Seed = 34,
+            ProviderOptions = new()
+            {
+                ["together"] = metadata,
+                ["another-provider"] = ParseElement("""{"secret":"not-forwarded"}""")
+            }
+        };
+        var before = JsonSerializer.Serialize(request);
+        var clientRequest = JsonSerializer.SerializeToElement(request, JsonSerializerOptions.Web);
+        Assert.True(JsonElement.DeepEquals(
+            metadata,
+            clientRequest.GetProperty("providerOptions").GetProperty("together")));
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(request);
+
+        Assert.Equal("together/image-model", payload.GetProperty("model").GetString());
+        Assert.Equal("A landscape", payload.GetProperty("prompt").GetString());
+        Assert.Equal(1, payload.GetProperty("n").GetInt32());
+        Assert.Equal(28, payload.GetProperty("steps").GetInt32());
+        Assert.Equal(4.5f, payload.GetProperty("guidance_scale").GetSingle());
+        Assert.Equal("blurry", payload.GetProperty("negative_prompt").GetString());
+        Assert.True(payload.GetProperty("disable_safety_checker").GetBoolean());
+        Assert.Equal(512, payload.GetProperty("width").GetInt32());
+        Assert.Equal(768, payload.GetProperty("height").GetInt32());
+        Assert.Equal(34, payload.GetProperty("seed").GetInt32());
+        Assert.Equal("base64", payload.GetProperty("response_format").GetString());
+        Assert.Equal("png", payload.GetProperty("output_format").GetString());
+        foreach (var name in new[]
+                 {
+                     "future_object", "future_array", "future_string", "future_number", "future_boolean", "future_null"
+                 })
+        {
+            Assert.True(JsonElement.DeepEquals(metadata.GetProperty(name), payload.GetProperty(name)), name);
+        }
+
+        Assert.False(payload.TryGetProperty("providerOptions", out _));
+        Assert.False(payload.TryGetProperty("together", out _));
+        Assert.False(payload.TryGetProperty("another-provider", out _));
+        Assert.False(payload.TryGetProperty("secret", out _));
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Fact]
+    public async Task Together_image_options_preserve_nulls_omit_null_known_fields_and_default_dimensions()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"data":[{"b64_json":"AQID"}]}""")
+            };
+        });
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(new ImageRequest
+            {
+                Model = "together/image-model",
+                Prompt = "A landscape",
+                ProviderOptions = new()
+                {
+                    ["together"] = ParseElement(
+                        """{"steps":null,"guidance_scale":null,"negative_prompt":null,"disable_safety_checker":null,"future_null":null}""")
+                }
+            });
+
+        Assert.Equal(1024, payload.GetProperty("width").GetInt32());
+        Assert.Equal(1024, payload.GetProperty("height").GetInt32());
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+        foreach (var name in new[] { "steps", "guidance_scale", "negative_prompt", "disable_safety_checker" })
+            Assert.False(payload.TryGetProperty(name, out _), name);
+        Assert.Equal(
+            new[] { "model", "prompt", "height", "width", "response_format", "output_format", "future_null" }.Order(),
+            payload.EnumerateObject().Select(property => property.Name).Order());
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("\"invalid\"")]
+    [InlineData("42")]
+    [InlineData("true")]
+    public async Task Together_image_options_reject_non_object_metadata(string json)
+    {
+        using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
+        var error = await Assert.ThrowsAsync<JsonException>(() => new TogetherProvider(
+                new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(new ImageRequest
+            {
+                Model = "together/image-model",
+                Prompt = "A landscape",
+                ProviderOptions = new() { ["together"] = ParseElement(json) }
+            }));
+
+        Assert.Equal("Provider options for 'together' must be an object.", error.Message);
+    }
+
+    [Fact]
+    public async Task Together_image_options_keep_known_field_type_validation()
+    {
+        using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
+        await Assert.ThrowsAsync<JsonException>(() => new TogetherProvider(
+                new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(new ImageRequest
+            {
+                Model = "together/image-model",
+                Prompt = "A landscape",
+                ProviderOptions = new()
+                {
+                    ["together"] = ParseElement("""{"steps":"upstream-validated"}""")
+                }
+            }));
+    }
+
+    [Fact]
+    public async Task Together_image_options_preserve_upstream_errors()
+    {
+        using var failedClient = CreateClient(_ => new(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent("upstream failure", Encoding.UTF8, "text/plain")
+        });
+        var error = await Assert.ThrowsAsync<Exception>(() =>
+            new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(failedClient))
+                .ImageRequest(new ImageRequest
+                {
+                    Model = "together/image-model",
+                    Prompt = "A landscape",
+                    ProviderOptions = new()
+                    {
+                        ["together"] = ParseElement("""{"steps":28,"future":true}""")
+                    }
+                }));
+
+        Assert.Equal("BadRequest: upstream failure", error.Message);
+    }
+
+    [Fact]
     public async Task Together_video_options_merge_at_root_and_preserve_unknown_json()
     {
         JsonElement payload = default;
