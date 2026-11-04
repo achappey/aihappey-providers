@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.YourVoic;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.MCP.Media;
@@ -39,7 +38,18 @@ public partial class YourVoicProvider
             audioString = parsedBase64;
 
         var bytes = Convert.FromBase64String(audioString);
-        var metadata = request.GetProviderMetadata<YourVoicTranscriptionProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            throw new JsonException("YourVoic provider options must be a JSON object.");
+
+        var language = GetStringOption(metadata, "language");
+        var responseFormat = GetStringOption(metadata, "response_format");
+        var prompt = GetStringOption(metadata, "prompt");
+        var timestampGranularities = GetStringOption(metadata, "timestamp_granularities");
+        var diarize = GetBooleanOption(metadata, "diarize");
+        var smartFormat = GetBooleanOption(metadata, "smart_format");
+        var punctuate = GetBooleanOption(metadata, "punctuate");
+        var keywords = GetStringOption(metadata, "keywords");
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
 
@@ -54,76 +64,78 @@ public partial class YourVoicProvider
         form.Add(file, "file", fileName);
         form.Add(new StringContent(model), "model");
 
-        if (!string.IsNullOrWhiteSpace(metadata?.Language))
-            form.Add(new StringContent(metadata.Language), "language");
+        if (!string.IsNullOrWhiteSpace(language))
+            form.Add(new StringContent(language), "language");
 
         var isCipher = model.StartsWith("cipher-", StringComparison.OrdinalIgnoreCase);
         var isLucid = model.StartsWith("lucid-", StringComparison.OrdinalIgnoreCase);
 
         if (isCipher)
         {
-            if (!string.IsNullOrWhiteSpace(metadata?.ResponseFormat))
-                form.Add(new StringContent(metadata.ResponseFormat), "response_format");
+            if (!string.IsNullOrWhiteSpace(responseFormat))
+                form.Add(new StringContent(responseFormat), "response_format");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.Prompt))
-                form.Add(new StringContent(metadata.Prompt), "prompt");
+            if (!string.IsNullOrWhiteSpace(prompt))
+                form.Add(new StringContent(prompt), "prompt");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.TimestampGranularities))
-                form.Add(new StringContent(metadata.TimestampGranularities), "timestamp_granularities");
+            if (!string.IsNullOrWhiteSpace(timestampGranularities))
+                form.Add(new StringContent(timestampGranularities), "timestamp_granularities");
 
-            if (metadata?.Diarize is not null)
+            if (diarize is not null)
                 warnings.Add(new { type = "ignored", feature = "diarize", reason = "Only supported for lucid-* models." });
-            if (metadata?.SmartFormat is not null)
+            if (smartFormat is not null)
                 warnings.Add(new { type = "ignored", feature = "smart_format", reason = "Only supported for lucid-* models." });
-            if (metadata?.Punctuate is not null)
+            if (punctuate is not null)
                 warnings.Add(new { type = "ignored", feature = "punctuate", reason = "Only supported for lucid-* models." });
-            if (!string.IsNullOrWhiteSpace(metadata?.Keywords))
+            if (!string.IsNullOrWhiteSpace(keywords))
                 warnings.Add(new { type = "ignored", feature = "keywords", reason = "Only supported for lucid-* models." });
         }
         else if (isLucid)
         {
-            if (metadata?.Diarize is not null)
-                form.Add(new StringContent(metadata.Diarize.Value.ToString().ToLowerInvariant()), "diarize");
+            if (diarize is not null)
+                form.Add(new StringContent(diarize.Value.ToString().ToLowerInvariant()), "diarize");
 
-            if (metadata?.SmartFormat is not null)
-                form.Add(new StringContent(metadata.SmartFormat.Value.ToString().ToLowerInvariant()), "smart_format");
+            if (smartFormat is not null)
+                form.Add(new StringContent(smartFormat.Value.ToString().ToLowerInvariant()), "smart_format");
 
-            if (metadata?.Punctuate is not null)
-                form.Add(new StringContent(metadata.Punctuate.Value.ToString().ToLowerInvariant()), "punctuate");
+            if (punctuate is not null)
+                form.Add(new StringContent(punctuate.Value.ToString().ToLowerInvariant()), "punctuate");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.Keywords))
-                form.Add(new StringContent(metadata.Keywords), "keywords");
+            if (!string.IsNullOrWhiteSpace(keywords))
+                form.Add(new StringContent(keywords), "keywords");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.ResponseFormat))
+            if (!string.IsNullOrWhiteSpace(responseFormat))
                 warnings.Add(new { type = "ignored", feature = "response_format", reason = "Only supported for cipher-* models." });
-            if (!string.IsNullOrWhiteSpace(metadata?.Prompt))
+            if (!string.IsNullOrWhiteSpace(prompt))
                 warnings.Add(new { type = "ignored", feature = "prompt", reason = "Only supported for cipher-* models." });
-            if (!string.IsNullOrWhiteSpace(metadata?.TimestampGranularities))
+            if (!string.IsNullOrWhiteSpace(timestampGranularities))
                 warnings.Add(new { type = "ignored", feature = "timestamp_granularities", reason = "Only supported for cipher-* models." });
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(metadata?.ResponseFormat))
-                form.Add(new StringContent(metadata.ResponseFormat), "response_format");
+            if (!string.IsNullOrWhiteSpace(responseFormat))
+                form.Add(new StringContent(responseFormat), "response_format");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.Prompt))
-                form.Add(new StringContent(metadata.Prompt), "prompt");
+            if (!string.IsNullOrWhiteSpace(prompt))
+                form.Add(new StringContent(prompt), "prompt");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.TimestampGranularities))
-                form.Add(new StringContent(metadata.TimestampGranularities), "timestamp_granularities");
+            if (!string.IsNullOrWhiteSpace(timestampGranularities))
+                form.Add(new StringContent(timestampGranularities), "timestamp_granularities");
 
-            if (metadata?.Diarize is not null)
-                form.Add(new StringContent(metadata.Diarize.Value.ToString().ToLowerInvariant()), "diarize");
+            if (diarize is not null)
+                form.Add(new StringContent(diarize.Value.ToString().ToLowerInvariant()), "diarize");
 
-            if (metadata?.SmartFormat is not null)
-                form.Add(new StringContent(metadata.SmartFormat.Value.ToString().ToLowerInvariant()), "smart_format");
+            if (smartFormat is not null)
+                form.Add(new StringContent(smartFormat.Value.ToString().ToLowerInvariant()), "smart_format");
 
-            if (metadata?.Punctuate is not null)
-                form.Add(new StringContent(metadata.Punctuate.Value.ToString().ToLowerInvariant()), "punctuate");
+            if (punctuate is not null)
+                form.Add(new StringContent(punctuate.Value.ToString().ToLowerInvariant()), "punctuate");
 
-            if (!string.IsNullOrWhiteSpace(metadata?.Keywords))
-                form.Add(new StringContent(metadata.Keywords), "keywords");
+            if (!string.IsNullOrWhiteSpace(keywords))
+                form.Add(new StringContent(keywords), "keywords");
         }
+
+        AddUnknownOptions(form, metadata);
 
         var endpoint = isCipher
             ? "stt/cipher/transcribe"
@@ -141,6 +153,61 @@ public partial class YourVoicProvider
         return ConvertTranscriptionResponse(responseText, GetIdentifier(), resp.GetHeaders(),
             request.Model, now, warnings);
     }
+
+    private static string? GetStringOption(JsonElement metadata, string name)
+        => GetOption(metadata, name) is { } value && value.ValueKind != JsonValueKind.Null
+            ? value.Deserialize<string?>()
+            : null;
+
+    private static bool? GetBooleanOption(JsonElement metadata, string name)
+        => GetOption(metadata, name) is { } value && value.ValueKind != JsonValueKind.Null
+            ? value.Deserialize<bool?>()
+            : null;
+
+    private static JsonElement? GetOption(JsonElement metadata, string name)
+    {
+        JsonElement? result = null;
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return result;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                result = property.Value;
+        }
+
+        return result;
+    }
+
+    private static void AddUnknownOptions(MultipartFormDataContent form, JsonElement metadata)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (property.Name.Equals("file", StringComparison.OrdinalIgnoreCase)
+                || property.Name.Equals("model", StringComparison.OrdinalIgnoreCase)
+                || IsMappedOption(property.Name)
+                || property.Value.ValueKind == JsonValueKind.Null)
+                continue;
+
+            var value = property.Value.ValueKind == JsonValueKind.String
+                ? property.Value.GetString()!
+                : property.Value.GetRawText();
+            form.Add(new StringContent(value), property.Name);
+        }
+    }
+
+    private static bool IsMappedOption(string name)
+        => name.Equals("language", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("response_format", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("prompt", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("timestamp_granularities", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("diarize", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("smart_format", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("punctuate", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("keywords", StringComparison.OrdinalIgnoreCase);
 
     private static TranscriptionResponse ConvertTranscriptionResponse(
         string responseBody,
@@ -281,4 +348,3 @@ public partial class YourVoicProvider
 
     }
 }
-
