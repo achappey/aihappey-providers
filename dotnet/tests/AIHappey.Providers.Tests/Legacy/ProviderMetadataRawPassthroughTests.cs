@@ -697,6 +697,75 @@ public sealed class ProviderMetadataRawPassthroughTests
     }
 
     [Theory]
+    [InlineData(null)]
+    [InlineData("null")]
+    [InlineData("{}")]
+    [InlineData("""{"n":99,"seed":99}""")]
+    public async Task Together_image_options_omit_unset_optional_fields(string? metadataJson)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"data":[{"b64_json":"AQID"}]}""")
+            };
+        });
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(new ImageRequest
+            {
+                Model = "together/image-model",
+                Prompt = "A landscape",
+                ProviderOptions = metadataJson is null
+                    ? null
+                    : new() { ["together"] = ParseElement(metadataJson) }
+            });
+
+        Assert.Equal(1024, payload.GetProperty("width").GetInt32());
+        Assert.Equal(1024, payload.GetProperty("height").GetInt32());
+        Assert.Equal(
+            new[] { "model", "prompt", "height", "width", "response_format", "output_format" }.Order(),
+            payload.EnumerateObject().Select(property => property.Name).Order());
+    }
+
+    [Fact]
+    public async Task Together_image_options_preserve_zero_false_and_empty_string_values()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""{"data":[{"b64_json":"AQID"}]}""")
+            };
+        });
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .ImageRequest(new ImageRequest
+            {
+                Model = "together/image-model",
+                Prompt = "A landscape",
+                N = 1,
+                Seed = 0,
+                ProviderOptions = new()
+                {
+                    ["together"] = ParseElement(
+                        """{"steps":0,"guidance_scale":0,"negative_prompt":"","disable_safety_checker":false}""")
+                }
+            });
+
+        Assert.Equal(1, payload.GetProperty("n").GetInt32());
+        Assert.Equal(0, payload.GetProperty("seed").GetInt32());
+        Assert.Equal(0, payload.GetProperty("steps").GetInt32());
+        Assert.Equal(0f, payload.GetProperty("guidance_scale").GetSingle());
+        Assert.Equal("", payload.GetProperty("negative_prompt").GetString());
+        Assert.False(payload.GetProperty("disable_safety_checker").GetBoolean());
+    }
+
+    [Theory]
     [InlineData("[]")]
     [InlineData("\"invalid\"")]
     [InlineData("42")]

@@ -45,6 +45,11 @@ public partial class TogetherProvider
         payload["response_format"] = "base64";
         payload["output_format"] = "png";
 
+        // Null-ignore settings do not apply to dictionary entries. Remove CLR nulls
+        // from optional known fields, but preserve raw JsonElement null metadata.
+        foreach (var key in payload.Where(entry => entry.Value is null).Select(entry => entry.Key).ToArray())
+            payload.Remove(key);
+
         var jsonBody = JsonSerializer.Serialize(payload, imageSettings);
 
         using var request = new HttpRequestMessage(
