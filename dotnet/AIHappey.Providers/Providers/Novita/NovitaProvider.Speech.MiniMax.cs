@@ -14,8 +14,6 @@ public partial class NovitaProvider
         SpeechRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var metadata =
             request.GetProviderMetadata<NovitaSpeechProviderMetadata>(GetIdentifier());
 
@@ -77,7 +75,12 @@ public partial class NovitaProvider
         );
 
         var url = $"https://api.novita.ai/v3/{modelPath}"; // e.g. /v3/minimax-speech-02-turbo :contentReference[oaicite:13]{index=13}
-        using var resp = await _client.PostAsync(url, content, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = content
+        };
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var respBytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)

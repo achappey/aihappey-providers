@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
@@ -33,13 +32,16 @@ public sealed partial class GWDGProvider(
 
     public string GetIdentifier() => "gwdg";
 
-    private void ApplyAuthHeader()
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
     {
         var key = keyResolver.Resolve(GetIdentifier());
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException("No GWDG API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return new Dictionary<string, string>
+        {
+            ["Authorization"] = $"Bearer {key}"
+        };
     }
 
     public Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
@@ -49,18 +51,18 @@ public sealed partial class GWDGProvider(
         ChatCompletionOptions options,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         return await this.GetChatCompletion(
-            _client, options, relativeUrl: "v1/chat/completions", cancellationToken: cancellationToken);
+            _client, options, requestHeaders: GetAuthHeaders(),
+            relativeUrl: "v1/chat/completions", cancellationToken: cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(
         ChatCompletionOptions options,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         return this.GetChatCompletions(
-            _client, options, relativeUrl: "v1/chat/completions", cancellationToken: cancellationToken);
+            _client, options, requestHeaders: GetAuthHeaders(),
+            relativeUrl: "v1/chat/completions", cancellationToken: cancellationToken);
     }
 
     public async Task<MessagesResponse> MessagesAsync(

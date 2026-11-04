@@ -26,8 +26,6 @@ public partial class NovitaProvider
            TranscriptionRequest request,
            CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
 
         // Novita expects:
@@ -81,11 +79,14 @@ public partial class NovitaProvider
             "application/json"
         );
 
-        using var resp = await _client.PostAsync(
-            "https://api.novita.ai/v3/glm-asr",
-            content,
-            cancellationToken
-        );
+        using var httpRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            "https://api.novita.ai/v3/glm-asr")
+        {
+            Content = content
+        };
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
 
         var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 

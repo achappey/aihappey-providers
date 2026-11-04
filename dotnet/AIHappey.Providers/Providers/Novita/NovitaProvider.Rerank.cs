@@ -15,8 +15,6 @@ public partial class NovitaProvider
     {
         var url = "v1/rerank";
 
-        ApplyAuthHeader();
-
         var now = DateTime.UtcNow;
 
         var payload = new Dictionary<string, object?>
@@ -37,6 +35,7 @@ public partial class NovitaProvider
             Content = new StringContent(JsonSerializer.Serialize(payload, JsonOpts),
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var errText = await resp.Content.ReadAsStringAsync(cancellationToken);
