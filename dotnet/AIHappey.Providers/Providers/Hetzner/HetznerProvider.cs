@@ -29,7 +29,7 @@ public partial class HetznerProvider : IModelProvider
         _keyResolver = keyResolver;
         _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
-        _client.BaseAddress = new Uri("https://inference.hetzner.com/api/");
+        _client.BaseAddress = new Uri("https://inference.hetzner.com/");
     }
 
     private void ApplyAuthHeader()
