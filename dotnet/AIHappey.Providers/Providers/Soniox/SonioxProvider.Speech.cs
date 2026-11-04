@@ -46,7 +46,7 @@ public partial class SonioxProvider
         payload["speed"] = request.Speed;
         payload.TryAdd("reduce_silence", null);
 
-        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "tts")
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://tts-rt.soniox.com/tts")
         {
             Content = new StringContent(JsonSerializer.Serialize(payload, SonioxJsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };

@@ -31,14 +31,14 @@ public partial class SpeechmaticsProvider : IModelProvider
         _client = httpClientFactory.CreateClient();
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Speechmatics)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", $"{key}");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
