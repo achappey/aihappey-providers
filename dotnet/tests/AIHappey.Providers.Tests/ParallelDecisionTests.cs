@@ -24,6 +24,7 @@ public sealed class ParallelDecisionTests
                   "mode": "fast",
                   "answers": {
                     "likely": { "type": "noul", "noul": 0.8 },
+                    "specified": { "type": "noul", "noul": 0.65 },
                     "category": {
                       "type": "choice",
                       "choice": "alpha",
@@ -52,6 +53,15 @@ public sealed class ParallelDecisionTests
             Questions = new Dictionary<string, DecisionQuestion>
             {
                 ["likely"] = new DecisionBooleanQuestion { Instructions = Input("Is this likely?") },
+                ["specified"] = new DecisionBooleanQuestion
+                {
+                    Instructions = Input("Does this meet the criteria?"),
+                    Criteria = new DecisionBooleanCriteria
+                    {
+                        True = Input("It meets the positive criteria."),
+                        False = Input("It meets the negative criteria.")
+                    }
+                },
                 ["category"] = new DecisionChoiceQuestion
                 {
                     Instructions = Input("Choose a category."),
@@ -86,10 +96,15 @@ public sealed class ParallelDecisionTests
         Assert.Equal("US", sent.GetProperty("advanced_settings").GetProperty("location").GetString());
         Assert.True(sent.GetProperty("advanced_settings").GetProperty("include_excerpts").GetBoolean());
         Assert.Equal("noul", sent.GetProperty("questions").GetProperty("likely").GetProperty("type").GetString());
+        var specified = sent.GetProperty("questions").GetProperty("specified");
+        Assert.Equal("noul", specified.GetProperty("type").GetString());
+        Assert.Equal("It meets the positive criteria.", specified.GetProperty("criteria").GetProperty("true").GetString());
+        Assert.Equal("It meets the negative criteria.", specified.GetProperty("criteria").GetProperty("false").GetString());
         Assert.Equal("First category", sent.GetProperty("questions").GetProperty("category").GetProperty("criteria").GetProperty("alpha").GetString());
         Assert.Equal(3, sent.GetProperty("questions").GetProperty("quality").GetProperty("criteria").GetArrayLength());
 
         Assert.Equal(0.8, Assert.IsType<DecisionBooleanAnswer>(result.Answers["likely"]).Probability);
+        Assert.Equal(0.65, Assert.IsType<DecisionBooleanAnswer>(result.Answers["specified"]).Probability);
         var choice = Assert.IsType<DecisionChoiceAnswer>(result.Answers["category"]);
         Assert.Equal("alpha", choice.Choice);
         Assert.Equal(0.75, choice.Probabilities!["alpha"]);

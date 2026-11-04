@@ -41,7 +41,7 @@ public partial class ParallelProvider
             ["mode"] = mode
         };
         if (advancedSettings is not null)
-            payload["advanced_settings"] = JsonNode.Parse(advancedSettings.GetRawText());
+            payload["advanced_settings"] = JsonNode.Parse(advancedSettings.Value.GetRawText());
 
         var key = _keyResolver.Resolve(GetIdentifier());
         if (string.IsNullOrWhiteSpace(key))
@@ -147,12 +147,7 @@ public partial class ParallelProvider
         var instructions = RenderDecisionInput(question.Instructions!);
         var mapped = new JsonObject
         {
-            ["type"] = question switch
-            {
-                DecisionBooleanQuestion { Criteria: null } => "noul",
-                DecisionBooleanQuestion => "choice",
-                _ => question.Type
-            },
+            ["type"] = question is DecisionBooleanQuestion ? "noul" : question.Type,
             ["instructions"] = instructions
         };
 
@@ -226,24 +221,10 @@ public partial class ParallelProvider
 
             switch (question, type)
             {
-                case (DecisionBooleanQuestion { Criteria: null }, "noul"):
+                case (DecisionBooleanQuestion, "noul"):
                     answers[id] = new DecisionBooleanAnswer
                     {
                         Probability = ReadProbability(answer.GetProperty("noul"))
-                    };
-                    break;
-                case (DecisionBooleanQuestion { Criteria: not null }, "choice"):
-                    var selectedBoolean = answer.GetProperty("choice").GetString();
-                    if (selectedBoolean is not ("true" or "false"))
-                        throw new JsonException("Boolean decision choice must be 'true' or 'false'.");
-                    var booleanProbabilities = ReadProbabilityMap(
-                        answer.GetProperty("probabilities"),
-                        ["true", "false"]);
-                    if (!booleanProbabilities.ContainsKey(selectedBoolean))
-                        throw new JsonException("Selected boolean choice is missing from its probability map.");
-                    answers[id] = new DecisionBooleanAnswer
-                    {
-                        Probability = booleanProbabilities["true"]
                     };
                     break;
                 case (DecisionChoiceQuestion choice, "choice"):
