@@ -19,8 +19,6 @@ public partial class SpeechmaticsProvider
 
     public async Task<SpeechResponse> SpeechRequest(SpeechRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Text))
             throw new ArgumentException("Text is required.", nameof(request));
@@ -62,6 +60,7 @@ public partial class SpeechmaticsProvider
                 MediaTypeNames.Application.Json)
         };
 
+        ApplyAuthHeader(httpRequest);
         using var resp = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken);
 
@@ -116,4 +115,3 @@ public partial class SpeechmaticsProvider
     }
 
 }
-

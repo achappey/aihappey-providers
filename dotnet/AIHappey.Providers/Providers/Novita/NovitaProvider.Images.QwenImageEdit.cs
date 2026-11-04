@@ -15,7 +15,6 @@ public partial class NovitaProvider
         ImageRequest request,
         CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
 
         if (string.IsNullOrWhiteSpace(request.Prompt))
@@ -61,6 +60,7 @@ public partial class NovitaProvider
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(submitRequest);
 
         using var submitResponse = await _client.SendAsync(submitRequest, cancellationToken);
         var submitRaw = await submitResponse.Content.ReadAsStringAsync(cancellationToken);

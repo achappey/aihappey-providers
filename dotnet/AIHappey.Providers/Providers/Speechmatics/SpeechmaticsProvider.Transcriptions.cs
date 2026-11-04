@@ -16,8 +16,6 @@ public partial class SpeechmaticsProvider
     public async Task<TranscriptionResponse> TranscriptionRequest(TranscriptionRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -51,7 +49,12 @@ public partial class SpeechmaticsProvider
         var config = BuildConfigJson(request.Model, metadata);
         form.Add(new StringContent(config), "config");
 
-        using var resp = await _client.PostAsync($"{BatchBaseUrl}/v2/jobs", form, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{BatchBaseUrl}/v2/jobs")
+        {
+            Content = form
+        };
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)
@@ -118,7 +121,9 @@ public partial class SpeechmaticsProvider
     {
         for (var attempt = 0; attempt < MaxPollAttempts; attempt++)
         {
-            using var resp = await _client.GetAsync($"{BatchBaseUrl}/v2/jobs/{jobId}", cancellationToken);
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"{BatchBaseUrl}/v2/jobs/{jobId}");
+            ApplyAuthHeader(httpRequest);
+            using var resp = await _client.SendAsync(httpRequest, cancellationToken);
             var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
             if (!resp.IsSuccessStatusCode)
@@ -139,7 +144,11 @@ public partial class SpeechmaticsProvider
 
     private async Task<string> GetTranscriptAsync(string jobId, CancellationToken cancellationToken)
     {
-        using var resp = await _client.GetAsync($"{BatchBaseUrl}/v2/jobs/{jobId}/transcript?format=json-v2", cancellationToken);
+        using var httpRequest = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"{BatchBaseUrl}/v2/jobs/{jobId}/transcript?format=json-v2");
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var json = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)

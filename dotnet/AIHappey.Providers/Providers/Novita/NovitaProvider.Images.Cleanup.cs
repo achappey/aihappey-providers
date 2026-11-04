@@ -22,8 +22,6 @@ public partial class NovitaProvider
         ImageRequest request,
         CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -111,6 +109,7 @@ public partial class NovitaProvider
         {
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(httpRequest);
 
         using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var raw = await resp.Content.ReadAsStringAsync(cancellationToken);

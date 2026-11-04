@@ -14,8 +14,6 @@ public partial class NovitaProvider
         SpeechRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var now = DateTime.UtcNow;
         List<object> warnings = [];
 
@@ -24,9 +22,6 @@ public partial class NovitaProvider
             request.OutputFormat
             //  ?? metadata?.Text2Speech?.
             ?? "mp3";
-
-        _client.DefaultRequestHeaders.Remove("model");
-        _client.DefaultRequestHeaders.Add("model", request.Model);
 
         var submitPayload = new Dictionary<string, object?>
         {
@@ -40,11 +35,13 @@ public partial class NovitaProvider
             "application/json"
         );
 
-        using var submitResp = await _client.PostAsync(
-            V4BaseUrl,
-            submitContent,
-            cancellationToken
-        );
+        using var submitRequest = new HttpRequestMessage(HttpMethod.Post, V4BaseUrl)
+        {
+            Content = submitContent
+        };
+        ApplyAuthHeader(submitRequest);
+        submitRequest.Headers.TryAddWithoutValidation("model", request.Model);
+        using var submitResp = await _client.SendAsync(submitRequest, cancellationToken);
 
         var bytes = await submitResp.Content.ReadAsByteArrayAsync(cancellationToken);
 
