@@ -364,6 +364,7 @@ public sealed class SonioxTests
         using var client = CreateClient(_ =>
         {
             Assert.Equal("Bearer", _.Headers.Authorization?.Scheme);
+            Assert.Equal("tts-rt.soniox.com", _.RequestUri!.Host);
             Assert.Equal("/tts", _.RequestUri!.AbsolutePath);
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) });
         });
