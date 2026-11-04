@@ -45,7 +45,7 @@ public partial class OpenAIProvider
         }
 
         var hasExplicitContainer = explicitContainerIds.Count == 1;
-        var metadataContainerId = ConsumeMetadataContainerId(request.Metadata, GetIdentifier());
+        var metadataContainerId = ConsumeMetadataContainerId(request.GetNativeProviderOptions(GetIdentifier()), GetIdentifier());
         var containerId = hasExplicitContainer
             ? explicitContainerIds[0]
             : metadataContainerId;

@@ -115,7 +115,6 @@ public partial class WaveSpeedProvider : IModelProvider
         CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         return await this.GetMessage(_client, request, headers: headers, cancellationToken: cancellationToken);
     }
 
@@ -125,7 +124,6 @@ public partial class WaveSpeedProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         await foreach (var part in this.GetMessages(
                            _client,
                            request,

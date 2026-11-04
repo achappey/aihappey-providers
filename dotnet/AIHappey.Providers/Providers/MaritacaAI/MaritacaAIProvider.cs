@@ -75,7 +75,7 @@ public partial class MaritacaAIProvider : IModelProvider
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        var headers = this.SetDefaultResponseProperties(options);
+        var headers = options.Headers;
         NormalizeMaritacaIntegratedTools(options);
 
         var response = await _client.GetResponses(
@@ -92,7 +92,7 @@ public partial class MaritacaAIProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        var headers = this.SetDefaultResponseProperties(options);
+        var headers = options.Headers;
         NormalizeMaritacaIntegratedTools(options);
 
         await foreach (var update in _client.GetResponsesUpdates(

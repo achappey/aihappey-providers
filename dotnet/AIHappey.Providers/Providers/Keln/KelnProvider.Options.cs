@@ -13,25 +13,23 @@ public sealed partial class KelnProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         request.Model = NativeModel(request.Model);
+        request.Stream = stream;
         request.Headers = SafeHeaders(request.Headers);
         ValidateChatOptions(request.AdditionalProperties);
-        var metadata = request.GetProviderMetadata();
-        ValidateChatOptions(ProviderOptions(metadata));
-        request.SetProviderMetadata(NormalizeTransportOptions(metadata, request.AdditionalProperties, request.Model, stream));
+        if (request.NumberOfChoices is < 1 or > 8)
+            throw new ArgumentOutOfRangeException(nameof(request), "Keln chat n must be between 1 and 8.");
+        ValidateTier(request.ServiceTier);
     }
 
     private void PrepareResponses(ResponseRequest request, bool stream)
     {
         ArgumentNullException.ThrowIfNull(request);
         request.Model = NativeModel(request.Model);
+        request.Stream = stream;
         request.Headers = SafeHeaders(request.Headers);
         ValidateResponsesOptions(JsonSerializer.SerializeToElement(request));
-        if (ProviderOptions(request.Metadata) is { } options)
-            ValidateResponsesOptions(JsonSerializer.SerializeToElement(options));
-        if (string.Equals(request.ServiceTier, "standard_only", StringComparison.Ordinal))
-            request.ServiceTier = "standard";
+        if (request.ServiceTier == "standard_only") request.ServiceTier = "standard";
         ValidateTier(request.ServiceTier);
-        request.Metadata = NormalizeTransportOptions(request.Metadata, request.AdditionalProperties, request.Model, stream);
     }
 
     private static void ValidateResponsesOptions(JsonElement value)
@@ -57,56 +55,11 @@ public sealed partial class KelnProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         request.Model = NativeModel(request.Model);
-        var headers = request.Headers;
-        JsonElement? providerOptions = null;
-        if (request.Metadata?.AdditionalProperties?.TryGetValue(GetIdentifier(), out var options) == true)
-        {
-            if (options.ValueKind != JsonValueKind.Object)
-                throw new ArgumentException("Keln provider options must be an object.");
-            providerOptions = options.Clone();
-        }
-        this.SetDefaultMessagesProperties(request);
-        if (providerOptions is { } patch)
-        {
-            if (patch.TryGetProperty("headers", out var extraHeaders))
-            {
-                if (extraHeaders.ValueKind != JsonValueKind.Object)
-                    throw new ArgumentException("Keln provider headers must be an object.");
-                headers = new Dictionary<string, string>(headers ?? [], StringComparer.OrdinalIgnoreCase);
-                foreach (var header in extraHeaders.EnumerateObject())
-                    if (IsSafeTransportHeader(header.Name) && header.Value.ValueKind == JsonValueKind.String)
-                        headers[header.Name] = header.Value.GetString()!;
-            }
-            var body = JsonSerializer.SerializeToNode(request)!.AsObject();
-            foreach (var property in patch.EnumerateObject())
-                if (property.Name is not ("headers" or "tools" or "model" or "stream" or "metadata" or "providerMetadata"))
-                    body[property.Name] = JsonNode.Parse(property.Value.GetRawText());
-            request = body.Deserialize<MessagesRequest>()!;
-            request.Headers = headers;
-        }
-        if (string.Equals(request.ServiceTier, "standard_only", StringComparison.Ordinal))
-            request.ServiceTier = "standard";
+        request.Headers = SafeHeaders(request.Headers);
+        if (request.ServiceTier == "standard_only") request.ServiceTier = "standard";
         ValidateTier(request.ServiceTier);
         ValidateTier(request.AdditionalProperties);
-        request.AdditionalProperties?.Remove("model");
-        request.AdditionalProperties?.Remove("stream");
         return request;
-    }
-
-    private Dictionary<string, object?>? NormalizeTransportOptions(Dictionary<string, object?>? metadata,
-        Dictionary<string, JsonElement>? additional, string model, bool stream)
-    {
-        additional?.Remove("model");
-        additional?.Remove("stream");
-        var options = ProviderOptions(metadata);
-        if (options is null)
-            return metadata;
-        options["model"] = JsonSerializer.SerializeToElement(model);
-        options["stream"] = JsonSerializer.SerializeToElement(stream);
-        if (options.TryGetValue("headers", out var headers) && headers.ValueKind == JsonValueKind.Object)
-            options["headers"] = JsonSerializer.SerializeToElement(headers.EnumerateObject()
-                .Where(p => IsSafeTransportHeader(p.Name)).ToDictionary(p => p.Name, p => p.Value.Clone()));
-        return new Dictionary<string, object?>(metadata!) { [GetIdentifier()] = JsonSerializer.SerializeToElement(options) };
     }
 
     private static bool IsSafeTransportHeader(string name)
@@ -119,16 +72,6 @@ public sealed partial class KelnProvider
     private static Dictionary<string, string>? SafeHeaders(Dictionary<string, string>? headers)
         => headers?.Where(p => IsSafeTransportHeader(p.Key))
             .ToDictionary(p => p.Key, p => p.Value, StringComparer.OrdinalIgnoreCase);
-
-    private Dictionary<string, JsonElement>? ProviderOptions(Dictionary<string, object?>? metadata)
-    {
-        if (metadata?.TryGetValue(GetIdentifier(), out var value) != true)
-            return null;
-        var json = value is JsonElement element ? element : JsonSerializer.SerializeToElement(value);
-        if (json.ValueKind != JsonValueKind.Object)
-            throw new ArgumentException("Keln provider options must be an object.");
-        return json.EnumerateObject().ToDictionary(p => p.Name, p => p.Value.Clone());
-    }
 
     private static void ValidateChatOptions(Dictionary<string, JsonElement>? properties)
     {

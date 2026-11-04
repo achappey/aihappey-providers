@@ -13,27 +13,9 @@ public sealed partial class SferenceProvider
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
     };
 
-    private static JsonObject EffectiveRequest(object request, Dictionary<string, object?>? metadata)
+    private static JsonObject EffectiveRequest(object request)
     {
         var body = JsonSerializer.SerializeToNode(request, Json)!.AsObject();
-        if (metadata?.TryGetValue("sference", out var options) == true && options is not null)
-        {
-            var properties = JsonSerializer.SerializeToElement(options, Json);
-            if (properties.ValueKind != JsonValueKind.Object)
-                throw new ArgumentException("Sference provider options must be an object.");
-            metadata["sference"] = properties;
-            foreach (var property in properties.EnumerateObject())
-            {
-                if (property.Name is "headers" or "tools")
-                    continue;
-                if (property.Name is "model" or "input" or "messages" or "stream")
-                    throw new ArgumentException($"Sference provider options cannot override '{property.Name}'.");
-                body[property.Name] = JsonNode.Parse(property.Value.GetRawText());
-            }
-            if (properties.TryGetProperty("tools", out var tools))
-                foreach (var tool in tools.EnumerateArray())
-                    ValidateTool(tool);
-        }
         return body;
     }
 
@@ -59,7 +41,7 @@ public sealed partial class SferenceProvider
         ArgumentNullException.ThrowIfNull(options);
         options.Model = NativeModel(options.Model);
         options.Stream = stream;
-        var body = EffectiveRequest(options, options.GetProviderMetadata());
+        var body = EffectiveRequest(options);
         ValidateCommon(body);
         if (body["background"]?.GetValue<bool>() == true)
             throw Unsupported("background Chat Completions; use Responses instead");
@@ -75,7 +57,7 @@ public sealed partial class SferenceProvider
         ArgumentNullException.ThrowIfNull(options);
         options.Model = NativeModel(options.Model);
         options.Stream = stream;
-        var body = EffectiveRequest(options, options.Metadata);
+        var body = EffectiveRequest(options);
         ValidateCommon(body);
         if (body["previous_response_id"] is not null || body["conversation"] is not null)
             throw Unsupported("server-side conversation state; send the full conversation in input");
@@ -93,14 +75,7 @@ public sealed partial class SferenceProvider
         foreach (var tool in options.Tools ?? [])
             if (tool.Type != "function")
                 throw Unsupported("server-side tools");
-        // Shared Responses transport strips gateway metadata. Restore native scheduling,
-        // stream and webhook metadata without forwarding internal provider options.
-        if (body["metadata"] is not JsonObject nativeMetadata)
-            return null;
-        nativeMetadata.Remove("sference");
-        nativeMetadata.Remove("providerMetadata");
-        return nativeMetadata.Count == 0 ? null
-            : JsonSerializer.SerializeToElement(new JsonObject { ["metadata"] = nativeMetadata.DeepClone() }, Json);
+        return null;
     }
 
     private static void PrepareMessages(MessagesRequest request, bool stream)

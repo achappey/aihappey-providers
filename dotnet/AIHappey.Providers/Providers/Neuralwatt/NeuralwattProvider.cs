@@ -64,7 +64,7 @@ public partial class NeuralwattProvider : IModelProvider
             options,
             GetIdentifier(),
             headers: NeuralwattExtensions.MergeRequestHeaders(
-                this.SetDefaultChatCompletionProperties(options),
+                null,
                 options.Headers),
             ct: cancellationToken))
         {

@@ -145,7 +145,7 @@ public sealed partial class ZoomProvider : IModelProvider
     {
         ArgumentNullException.ThrowIfNull(options);
         if (options.PreviousResponseId is not null
-            || options.AdditionalProperties?.Count > 0 || options.Reasoning is not null
+            || options.Reasoning is not null
             || options.ContextManagement is not null || options.Background == true || options.Store == true
             || options.Include?.Count > 0 || options.ServiceTier is not null || options.TopLogprobs is not null
             || options.Truncation is not null || options.PromptCacheKey is not null || options.PromptCacheOptions is not null)

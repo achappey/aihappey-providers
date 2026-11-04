@@ -694,7 +694,7 @@ public sealed partial class AI21Provider
 
     private Ai21MaestroCreateRunRequest BuildMaestroRunRequest(ResponseRequest options)
     {
-        var metadata = ReadMaestroMetadata(options.Metadata);
+        var metadata = ReadMaestroMetadata(options.GetNativeProviderOptions(GetIdentifier()));
         var maestroInput = ToMaestroInput(options.Input, options.Instructions, metadata.SystemPrompt);
         var requirements = CombineRequirements(metadata.Requirements, BuildResponseFormatRequirements(options.Text));
         var nativeTools = metadata.Tools ?? NormalizeNativeMaestroTools(options.Tools?.Cast<object>());

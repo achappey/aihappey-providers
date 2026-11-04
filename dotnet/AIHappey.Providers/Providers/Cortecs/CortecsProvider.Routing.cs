@@ -18,9 +18,9 @@ public partial class CortecsProvider
         var preference = GetRouterPreference(options.Model);
         if (preference is not null)
         {
-            var metadata = options.GetProviderMetadata();
+            var metadata = options.GetNativeProviderOptions(GetIdentifier());
             ApplyRouterPreference(metadata, GetIdentifier(), preference);
-            options.SetProviderMetadata(metadata);
+            options.ApplyNativeProviderOptions(metadata);
         }
     }
 
@@ -28,7 +28,10 @@ public partial class CortecsProvider
     {
         var preference = GetRouterPreference(options.Model);
         if (preference is not null)
-            ApplyRouterPreference(options.Metadata ??= [], GetIdentifier(), preference);
+        {
+            (options.AdditionalProperties ??= [])["preference"] = JsonSerializer.SerializeToElement(preference);
+            options.Model = null;
+        }
     }
 
     private static void ApplyRouterPreference(Dictionary<string, object?> metadata, string providerId, string preference)

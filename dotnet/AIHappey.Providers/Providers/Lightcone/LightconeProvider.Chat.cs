@@ -13,7 +13,7 @@ public sealed partial class LightconeProvider
         ChatCompletionOptions options,
         CancellationToken cancellationToken)
     {
-        var providerHeaders = this.SetDefaultChatCompletionProperties(options);
+        var providerHeaders = options.Headers;
         var headers = CreateAuthenticatedHeaders(providerHeaders, options.Headers);
         return _client.GetChatCompletion(
             options,
@@ -27,7 +27,7 @@ public sealed partial class LightconeProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var providerHeaders = this.SetDefaultChatCompletionProperties(options);
+        var providerHeaders = options.Headers;
         var headers = CreateAuthenticatedHeaders(providerHeaders, options.Headers);
 
         await foreach (var update in _client.GetChatCompletionUpdates(

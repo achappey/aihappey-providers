@@ -60,9 +60,6 @@ public sealed partial class Connect0Provider
     {
         if (request.Metadata?.TryGetValue("connect0", out var scoped) == true && scoped is not null
             && Element(scoped) is { ValueKind: JsonValueKind.Object } direct) return direct;
-        // Chat completions keeps the original metadata inside chatcompletions.request.metadata.
-        if (request.Metadata?.TryGetValue("chatcompletions.request.metadata", out var chatMetadata) == true
-            && Property(Element(chatMetadata), "connect0") is { ValueKind: JsonValueKind.Object } chat) return chat;
         return JsonSerializer.SerializeToElement(new { }, Json);
     }
 

@@ -589,10 +589,7 @@ public partial class NinjaChatProvider
 
     private Dictionary<string, object?>? GetRawProviderPassthroughFromResponseRequest(ResponseRequest request)
     {
-        if (request.Metadata is null)
-            return null;
-
-        if (!request.Metadata.TryGetValue(GetIdentifier(), out var providerRaw) || providerRaw is null)
+        if (!request.GetNativeProviderOptions(GetIdentifier()).TryGetValue(GetIdentifier(), out var providerRaw) || providerRaw is null)
             return null;
 
         if (providerRaw is JsonElement element)

@@ -55,9 +55,7 @@ public partial class AmbientProvider : IModelProvider
     {
         ApplyAuthHeader();
 
-        var headers = MergeRequestHeaders(
-            this.SetDefaultChatCompletionProperties(options),
-            options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
         var finishObserved = false;
 
         await foreach (var streamEvent in _client.GetChatCompletionSseEvents(

@@ -351,7 +351,7 @@ public sealed class WatsonXProvider : IModelProvider
         foreach (var property in serializedOptions.EnumerateObject())
             properties[property.Name] = property.Value.Clone();
 
-        if (options.GetProviderMetadata().TryGetValue(GetIdentifier(), out var providerOptions))
+        if (options.GetNativeProviderOptions(GetIdentifier()).TryGetValue(GetIdentifier(), out var providerOptions))
         {
             var providerOptionsElement = providerOptions switch
             {
@@ -377,8 +377,6 @@ public sealed class WatsonXProvider : IModelProvider
         properties.Remove("stream");
         properties.Remove("store");
         properties.Remove("stream_options");
-        properties.Remove("metadata");
-        properties.Remove("providerMetadata");
         properties["model_id"] = JsonSerializer.SerializeToElement(StripProviderPrefix(options.Model), JsonOptions);
 
         return JsonSerializer.SerializeToElement(properties, JsonOptions);
@@ -436,7 +434,7 @@ public sealed class WatsonXProvider : IModelProvider
 
     private IReadOnlyDictionary<string, string>? GetRequestHeaders(ChatCompletionOptions options)
     {
-        var headers = this.SetDefaultChatCompletionProperties(options);
+        var headers = options.Headers;
         if ((headers is null || headers.Count == 0) && (options.Headers is null || options.Headers.Count == 0))
             return null;
 

@@ -519,31 +519,11 @@ public static class ChatCompletionsExtensions
         foreach (var property in payload.EnumerateObject())
             merged[property.Name] = property.Value.Clone();
 
-        // Internal-only request metadata should not leak to providers.
-        merged.Remove("providerMetadata");
-
-        // Metadata now contains native OpenAI string values. Only providerMetadata
-        // is an internal routing/options envelope.
-
         ApplyRootProperties(
             merged,
             extraRootProperties,
             overwriteExisting: false,
             sourceName: "Extra chat-completions root properties");
-
-        var providerOptions = GetProviderOptions(options, providerId);
-
-        ApplyRootProperties(
-            merged,
-            providerOptions,
-            overwriteExisting: true,
-            sourceName: $"Provider metadata for '{providerId}'",
-            excluded:
-            [
-                "headers",
-            "tools",
-            "providerMetadata"
-            ]);
 
         // Method invariant wins last.
         // Streaming reader must get SSE, non-stream reader must get JSON.
@@ -551,24 +531,6 @@ public static class ChatCompletionsExtensions
             merged["stream"] = JsonSerializer.SerializeToElement(stream.Value, Json);
 
         return JsonSerializer.SerializeToElement(merged, Json);
-    }
-
-    private static JsonElement? GetProviderOptions(
-        ChatCompletionOptions options,
-        string? providerId)
-    {
-        if (string.IsNullOrWhiteSpace(providerId))
-            return null;
-
-        if (!options.GetProviderMetadata().TryGetValue(providerId, out var obj))
-            return null;
-
-        return obj switch
-        {
-            null => null,
-            JsonElement json => json,
-            _ => JsonSerializer.SerializeToElement(obj, Json)
-        };
     }
 
     private static void ApplyRootProperties(

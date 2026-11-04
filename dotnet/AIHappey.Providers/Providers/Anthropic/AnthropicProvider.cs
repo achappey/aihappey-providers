@@ -123,10 +123,9 @@ public partial class AnthropicProvider : IModelProvider
     {
         ApplyAuthHeader();
 
-        var anthropicbeta = request.Metadata?.GetProviderOption<string?>(GetIdentifier(), betaKey);
+        var anthropicbeta = request.GetNativeProviderOptions(GetIdentifier()).GetProviderOption<string?>(GetIdentifier(), betaKey);
         headers.AppendOrAddHeader(betaKey, anthropicbeta);
 
-        this.SetDefaultMessagesProperties(request);
 
         await PrepareAnthropicCodeExecutionFileUploadsAsync(request, headers, cancellationToken);
 
@@ -149,10 +148,9 @@ public partial class AnthropicProvider : IModelProvider
     {
         ApplyAuthHeader();
 
-        var anthropicbeta = options.Metadata?.GetProviderOption<string?>(GetIdentifier(), betaKey);
+        var anthropicbeta = options.GetNativeProviderOptions(GetIdentifier()).GetProviderOption<string?>(GetIdentifier(), betaKey);
         headers.AppendOrAddHeader(betaKey, anthropicbeta);
 
-        this.SetDefaultMessagesProperties(options);
 
         await PrepareAnthropicCodeExecutionFileUploadsAsync(options, headers, cancellationToken);
 

@@ -12,7 +12,7 @@ public partial class LightconeProvider
         CancellationToken cancellationToken)
     {
         NormalizeResponseModel(options);
-        var providerHeaders = this.SetDefaultResponseProperties(options);
+        var providerHeaders = options.Headers;
         var headers = CreateAuthenticatedHeaders(providerHeaders, options.Headers);
         options.Headers = null;
 
@@ -29,7 +29,7 @@ public partial class LightconeProvider
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
         NormalizeResponseModel(options);
-        var providerHeaders = this.SetDefaultResponseProperties(options);
+        var providerHeaders = options.Headers;
         var headers = CreateAuthenticatedHeaders(providerHeaders, options.Headers);
         options.Headers = null;
 

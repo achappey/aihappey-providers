@@ -20,7 +20,7 @@ public static class ModelProviderChatCompletionUnifiedExtensions
          JsonElement? extraRootProperties = null,
          CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
 
         return await client.GetChatCompletion(options,
             modelProvider.GetIdentifier(),
@@ -39,7 +39,7 @@ public static class ModelProviderChatCompletionUnifiedExtensions
          JsonElement? extraRootProperties = null,
          CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
         headers = MergeRequestHeaders(headers, requestHeaders);
 
         return await client.GetChatCompletion(options,
@@ -58,7 +58,7 @@ public static class ModelProviderChatCompletionUnifiedExtensions
         JsonElement? extraRootProperties = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
 
         await foreach (var update in client.GetChatCompletionUpdates(options,
             relativeUrl: relativeUrl,
@@ -78,7 +78,7 @@ public static class ModelProviderChatCompletionUnifiedExtensions
         JsonElement? extraRootProperties = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
         headers = MergeRequestHeaders(headers, requestHeaders);
 
         await foreach (var update in client.GetChatCompletionUpdates(options,

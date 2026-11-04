@@ -142,7 +142,7 @@ public sealed partial class XpectrumProvider
             User = string.IsNullOrWhiteSpace(endUser) ? null : endUser,
             Headers = request.Headers
         };
-        options.SetProviderMetadata(new() { [GetIdentifier()] = raw });
+        options.ApplyNativeProviderOptions(new() { [GetIdentifier()] = raw });
         return options;
     }
 
@@ -227,7 +227,7 @@ public sealed partial class XpectrumProvider
     {
         var scoped = native.TryGetProperty("providerMetadata", out var provider) && provider.TryGetProperty(GetIdentifier(), out var value)
             ? value : default;
-        var raw = options.GetProviderMetadata().TryGetValue(GetIdentifier(), out var request) ? ToElement(request) : default;
+        var raw = options.GetNativeProviderOptions(GetIdentifier()).TryGetValue(GetIdentifier(), out var request) ? ToElement(request) : default;
         return JsonSerializer.SerializeToElement(new Dictionary<string, object?>
         {
             ["agent_id"] = NativeModel(Str(native, "model") ?? options.Model),

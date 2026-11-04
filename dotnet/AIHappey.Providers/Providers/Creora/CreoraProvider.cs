@@ -84,13 +84,12 @@ public sealed partial class CreoraProvider(
 
     private JsonElement ChatPayload(ChatCompletionOptions options, bool stream)
     {
-        var metadata = options.GetProviderMetadata();
+        var metadata = options.GetNativeProviderOptions(GetIdentifier());
         var payload = metadata.TryGetValue(GetIdentifier(), out var raw)
             ? CopyObject(raw is JsonElement json ? json : JsonSerializer.SerializeToElement(raw))
             : new(StringComparer.Ordinal);
         foreach (var property in options.AdditionalProperties ?? [])
-            if (property.Key != "providerMetadata")
-                payload[property.Key] = property.Value.Clone();
+            payload[property.Key] = property.Value.Clone();
         var hasRawTools = payload.TryGetValue("tools", out var rawTools);
         ApplyStandardValues(payload, options);
         if (options.Tools?.Any() != true)
@@ -196,7 +195,7 @@ public sealed partial class CreoraProvider(
         if (request.ToolChoice is null)
             options.ToolChoiceOption = null;
         if (request.Metadata?.TryGetValue(GetIdentifier(), out var raw) == true)
-            options.SetProviderMetadata(new() { [GetIdentifier()] = raw });
+            options.ApplyNativeProviderOptions(new() { [GetIdentifier()] = raw });
         return options;
     }
 

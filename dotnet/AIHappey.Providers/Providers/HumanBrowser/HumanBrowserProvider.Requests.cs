@@ -115,12 +115,6 @@ public partial class HumanBrowserProvider
     {
         var metadata = JsonSerializer.SerializeToNode(request.Metadata, Json) as JsonObject;
         if (metadata?["humanbrowser"] is JsonObject direct) return (JsonObject)direct.DeepClone();
-        foreach (var key in new[] { "chatcompletions.request.raw", "messages.request.raw" })
-            if (metadata?[key] is JsonObject raw)
-            {
-                foreach (var container in new[] { "providerMetadata", "provider_metadata", "metadata" })
-                    if (raw[container]?["humanbrowser"] is JsonObject scope) return (JsonObject)scope.DeepClone();
-            }
         return new JsonObject();
     }
 

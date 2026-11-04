@@ -15,7 +15,6 @@ public partial class OpenAIProvider
 
         options.ParallelToolCalls ??= true;
 
-        this.SetDefaultChatCompletionProperties(options);
 
         await foreach (var update in this.GetChatCompletions(
             _client,
@@ -33,7 +32,6 @@ public partial class OpenAIProvider
 
         chatRequest.ParallelToolCalls ??= true;
 
-        this.SetDefaultChatCompletionProperties(chatRequest);
 
         return await this.GetChatCompletion(_client,
            chatRequest, cancellationToken: cancellationToken);

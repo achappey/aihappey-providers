@@ -96,7 +96,6 @@ public sealed partial class RespanProvider(
         CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         return _client.PostMessages(
             request,
             GetIdentifier(),
@@ -111,7 +110,6 @@ public sealed partial class RespanProvider(
         CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         return _client.PostMessagesStreaming(
             request,
             GetIdentifier(),

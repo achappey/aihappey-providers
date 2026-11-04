@@ -81,26 +81,22 @@ internal static class ChatCompletionContractAdapters
         return choice;
     }
 
-    internal static void SetProviderMetadata(this ChatCompletionOptions options, Dictionary<string, object?>? metadata)
+    internal static void ApplyNativeProviderOptions(this ChatCompletionOptions options, Dictionary<string, object?>? executionOptions)
     {
-        if (metadata is not null)
-            (options.AdditionalProperties ??= [])["providerMetadata"] = JsonSerializer.SerializeToElement(metadata, JsonSerializerOptions.Web);
+        if (executionOptions is null)
+            return;
+        foreach (var value in executionOptions.Values)
+        {
+            var root = JsonSerializer.SerializeToElement(value, JsonSerializerOptions.Web);
+            if (root.ValueKind != JsonValueKind.Object)
+                continue;
+            foreach (var property in root.EnumerateObject())
+                (options.AdditionalProperties ??= [])[property.Name] = property.Value.Clone();
+        }
     }
 
-    internal static Dictionary<string, object?> GetProviderMetadata(this ChatCompletionOptions options)
+    internal static Dictionary<string, object?> GetNativeProviderOptions(this ChatCompletionOptions options, string providerId)
     {
-        var metadata = new Dictionary<string, object?>();
-        if (options.AdditionalProperties is not { } additional)
-            return metadata;
-
-        foreach (var (key, value) in additional)
-            if (key != "providerMetadata")
-                metadata[key] = value;
-
-        if (additional.TryGetValue("providerMetadata", out var providers) && providers.ValueKind == JsonValueKind.Object)
-            foreach (var property in providers.EnumerateObject())
-                metadata[property.Name] = property.Value;
-
-        return metadata;
+        return new() { [providerId] = AIHappey.Responses.NativeResponseRequestOptions.NativeRoot(options) };
     }
 }

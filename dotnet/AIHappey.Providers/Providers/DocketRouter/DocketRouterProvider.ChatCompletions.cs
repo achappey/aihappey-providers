@@ -8,20 +8,10 @@ public sealed partial class DocketRouterProvider
 {
     private static ChatCompletionOptions PrepareOptions(ChatCompletionOptions options, bool stream)
     {
-        // Apply the same provider-scoped root options as the shared transport, before
-        // validating the endpoint's narrower schema. Never mutate the caller's request.
+        // Validate native root fields without interpreting application metadata.
+        // Never mutate the caller's request.
         var payload = JsonSerializer.SerializeToElement(options, JsonSerializerOptions.Web)
             .EnumerateObject().ToDictionary(p => p.Name, p => p.Value.Clone());
-        if (options.Metadata?.TryGetValue("docketrouter", out var scoped) == true && scoped is not null)
-        {
-            var providerOptions = JsonSerializer.SerializeToElement(scoped, JsonSerializerOptions.Web);
-            foreach (var property in providerOptions.EnumerateObject())
-                if (property.Name is not ("headers" or "providerMetadata"))
-                    payload[property.Name] = property.Value.Clone();
-        }
-
-        payload.Remove("metadata");
-        payload.Remove("providerMetadata");
         payload["stream"] = JsonSerializer.SerializeToElement(stream);
         var model = payload["model"].GetString() ?? "";
         payload["model"] = JsonSerializer.SerializeToElement(model.StartsWith("docketrouter/", StringComparison.OrdinalIgnoreCase) ? model[13..] : model);

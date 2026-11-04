@@ -180,7 +180,6 @@ public partial class PerplexityProvider
         var model = options.Model;
         var usePreset = UsesResponsesPreset(options.Model);
 
-        this.SetDefaultResponseProperties(options);
 
         if (usePreset)
         {

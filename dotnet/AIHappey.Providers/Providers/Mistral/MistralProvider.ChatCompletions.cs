@@ -18,7 +18,6 @@ public partial class MistralProvider : IModelProvider
 
         ApplyAuthHeader();
 
-        this.SetDefaultChatCompletionProperties(options);
 
         return await this.GetChatCompletion(_client,
              options, cancellationToken: cancellationToken);
@@ -37,7 +36,6 @@ public partial class MistralProvider : IModelProvider
 
         ApplyAuthHeader();
 
-        this.SetDefaultChatCompletionProperties(options);
 
         await foreach (var item in this.GetChatCompletions(_client, options, cancellationToken: cancellationToken))
             yield return item;

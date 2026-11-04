@@ -19,7 +19,7 @@ public partial class ChainGPTProvider
         if (string.IsNullOrWhiteSpace(prompt))
             throw new ArgumentException("No prompt provided.", nameof(options));
 
-        var metadata = TryExtractProviderMetadata(options.Metadata);
+        var metadata = TryExtractProviderMetadata(options.GetNativeProviderOptions(GetIdentifier()));
         var answer = await CompleteQuestionBufferedAsync(modelId, prompt, metadata, cancellationToken);
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
@@ -68,7 +68,7 @@ public partial class ChainGPTProvider
         if (string.IsNullOrWhiteSpace(prompt))
             throw new ArgumentException("No prompt provided.", nameof(options));
 
-        var metadata = TryExtractProviderMetadata(options.Metadata);
+        var metadata = TryExtractProviderMetadata(options.GetNativeProviderOptions(GetIdentifier()));
         var responseId = Guid.NewGuid().ToString("n");
         var itemId = Guid.NewGuid().ToString("n");
         var created = DateTimeOffset.UtcNow.ToUnixTimeSeconds();

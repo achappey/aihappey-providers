@@ -16,7 +16,7 @@ public partial class JassieAIProvider
         var completionOptions = BuildChatOptionsFromResponseRequest(options, stream: false);
         var payload = BuildNativeRequest(completionOptions, stream: false);
         payload.MaxTokens = options.MaxOutputTokens;
-        payload.Web ??= ExtractWebMode(options.Metadata);
+        payload.Web ??= ExtractWebMode(options.GetNativeProviderOptions(GetIdentifier()));
 
         var native = await SendNativeAsync(payload, ResolveEndpoint(payload.Model), cancellationToken);
         var text = native.Content ?? string.Empty;
@@ -76,7 +76,7 @@ public partial class JassieAIProvider
         var completionOptions = BuildChatOptionsFromResponseRequest(options, stream: true);
         var payload = BuildNativeRequest(completionOptions, stream: true);
         payload.MaxTokens = options.MaxOutputTokens;
-        payload.Web ??= ExtractWebMode(options.Metadata);
+        payload.Web ??= ExtractWebMode(options.GetNativeProviderOptions(GetIdentifier()));
 
         var responseId = Guid.NewGuid().ToString("N");
         var itemId = $"msg_{responseId}";

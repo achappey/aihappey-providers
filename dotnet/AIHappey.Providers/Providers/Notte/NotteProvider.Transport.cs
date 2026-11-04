@@ -79,12 +79,6 @@ public partial class NotteProvider
     private static JsonObject Options(AIRequest request)
     {
         if (request.Metadata?.TryGetValue("notte", out var direct) == true) return Object(direct);
-        foreach (var key in new[] { "chatcompletions.request.metadata", "chatcompletions.request.provider_metadata", "messages.request.metadata", "messages.request.provider_metadata" })
-            if (request.Metadata?.TryGetValue(key, out var value) == true && value is not null)
-            {
-                var raw = JsonSerializer.SerializeToElement(value, Json);
-                if (Property(raw, "notte") is { } scoped) return Object(scoped);
-            }
         return new();
     }
 

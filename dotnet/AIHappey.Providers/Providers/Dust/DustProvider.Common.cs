@@ -56,9 +56,6 @@ public partial class DustProvider
         foreach (var key in new[] { "dust", "chatcompletions.request.dust", "messages.request.dust" })
             if (request.Metadata?.TryGetValue(key, out var value) == true && Node(value) is JsonObject options)
                 return options;
-        foreach (var key in new[] { "chatcompletions.request.metadata", "messages.request.metadata" })
-            if (request.Metadata?.TryGetValue(key, out var value) == true && Node(value)?["dust"] is JsonObject options)
-                return (JsonObject)options.DeepClone();
         return new();
     }
 

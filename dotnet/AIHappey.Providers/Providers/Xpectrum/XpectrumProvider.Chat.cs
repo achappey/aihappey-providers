@@ -57,13 +57,12 @@ public sealed partial class XpectrumProvider
 
     private Dictionary<string, object?> RawPayload(ChatCompletionOptions options)
     {
-        var metadata = options.GetProviderMetadata();
+        var metadata = options.GetNativeProviderOptions(GetIdentifier());
         var payload = metadata.TryGetValue(GetIdentifier(), out var raw)
             ? CopyObject(ToElement(raw))
             : new(StringComparer.Ordinal);
         foreach (var property in options.AdditionalProperties ?? [])
-            if (property.Key != "providerMetadata")
-                payload[property.Key] = property.Value.Clone();
+            payload[property.Key] = property.Value.Clone();
         if (!string.IsNullOrWhiteSpace(options.User))
             payload["user"] = options.User;
         return payload;

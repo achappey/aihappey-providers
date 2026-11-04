@@ -72,9 +72,6 @@ public sealed partial class MindsHubProvider(
     private IReadOnlyDictionary<string, string> GetChatHeaders(ChatCompletionOptions options)
     {
         var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var (name, value) in this.SetDefaultChatCompletionProperties(options)
-         ?? new Dictionary<string, string>())
-            headers[name] = value;
         foreach (var (name, value) in options.Headers ?? [])
             headers[name] = value;
 
@@ -88,9 +85,7 @@ public sealed partial class MindsHubProvider(
         ApplyAuthHeader();
         var request = CopyResponseRequest(options);
         request.Stream = false;
-        var headers = MergeResponseHeaders(
-            this.SetDefaultResponseProperties(request),
-            request.Headers);
+        var headers = MergeResponseHeaders(null, request.Headers);
         return await _client.GetResponses(
             request,
             GetIdentifier(),
@@ -105,9 +100,7 @@ public sealed partial class MindsHubProvider(
         ApplyAuthHeader();
         var request = CopyResponseRequest(options);
         request.Stream = true;
-        var headers = MergeResponseHeaders(
-            this.SetDefaultResponseProperties(request),
-            request.Headers);
+        var headers = MergeResponseHeaders(null, request.Headers);
         await foreach (var part in _client.GetResponsesUpdates(
             request,
             GetIdentifier(),
@@ -198,7 +191,6 @@ public sealed partial class MindsHubProvider(
     {
         ApplyAuthHeader();
         request.Stream = false;
-        this.SetDefaultMessagesProperties(request);
         return _client.PostMessages(
             request,
             GetIdentifier(),
@@ -213,7 +205,6 @@ public sealed partial class MindsHubProvider(
     {
         ApplyAuthHeader();
         request.Stream = true;
-        this.SetDefaultMessagesProperties(request);
         await foreach (var part in _client.PostMessagesStreaming(
             request,
             GetIdentifier(),

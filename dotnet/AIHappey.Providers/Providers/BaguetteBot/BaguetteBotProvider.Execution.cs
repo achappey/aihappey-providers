@@ -122,14 +122,6 @@ public sealed partial class BaguetteBotProvider
     {
         if (request.Metadata?.TryGetValue("baguettebot", out var options) == true && options is not null)
             return options is JsonElement element ? element.Clone() : JsonSerializer.SerializeToElement(options, Json);
-        foreach (var key in new[] { "messages.request.raw", "chatcompletions.request.raw" })
-        {
-            if (request.Metadata?.TryGetValue(key, out var raw) != true || raw is not JsonElement json)
-                continue;
-            foreach (var envelope in new[] { "providerMetadata", "provider_metadata", "metadata" })
-                if (Property(Property(json, envelope) ?? default, "baguettebot") is { } scoped)
-                    return scoped.Clone();
-        }
         return JsonSerializer.SerializeToElement(new { }, Json);
     }
 

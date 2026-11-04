@@ -133,7 +133,6 @@ public sealed partial class MunitoProvider : IModelProvider
         }
 
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         return await this.GetMessage(_client, request, relativeUrl: MessagesPath,
             headers: GetMessagesHeaders(headers), cancellationToken: cancellationToken);
     }
@@ -153,7 +152,6 @@ public sealed partial class MunitoProvider : IModelProvider
         }
 
         ApplyAuthHeader();
-        this.SetDefaultMessagesProperties(request);
         await foreach (var part in this.GetMessages(_client, request, relativeUrl: MessagesPath,
                            headers: GetMessagesHeaders(headers), cancellationToken: cancellationToken)
                            .WithCancellation(cancellationToken))

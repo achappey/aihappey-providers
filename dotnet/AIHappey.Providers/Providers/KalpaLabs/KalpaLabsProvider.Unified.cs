@@ -253,16 +253,6 @@ public partial class KalpaLabsProvider
         var root = JsonSerializer.SerializeToElement(metadata, Json);
         if (root.TryGetProperty(ProviderId, out var direct))
             return new() { [ProviderId] = direct };
-        foreach (var key in new[] { "providerOptions", "chatcompletions.request.unmapped", "chatcompletions.request.metadata",
-            "messages.request.metadata", "messages.request.unmapped" })
-        {
-            if (!root.TryGetProperty(key, out var candidate) || candidate.ValueKind != JsonValueKind.Object)
-                continue;
-            if (candidate.TryGetProperty(ProviderId, out var options))
-                return new() { [ProviderId] = options };
-            if (candidate.TryGetProperty("providerOptions", out var wrapped))
-                return wrapped.Deserialize<Dictionary<string, JsonElement>>(Json);
-        }
         return null;
     }
 

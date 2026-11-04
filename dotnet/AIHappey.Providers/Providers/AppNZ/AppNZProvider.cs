@@ -61,19 +61,7 @@ public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
         if (metadata is null)
             return [];
 
-        // Chat Completions preserves native metadata in its protocol envelope.
-        // Explicit unified provider options take precedence; the two are not merged.
-        if (!metadata.TryGetValue("appnz", out var value)
-            && metadata.TryGetValue("chatcompletions.request.metadata", out var original)
-            && original is not null)
-        {
-            var nativeMetadata = JsonSerializer.SerializeToElement(original, Json);
-            if (nativeMetadata.ValueKind == JsonValueKind.Object
-                && nativeMetadata.TryGetProperty("appnz", out var scoped))
-                value = scoped.Clone();
-        }
-
-        if (value is null)
+        if (!metadata.TryGetValue("appnz", out var value) || value is null)
             return [];
 
         var element = JsonSerializer.SerializeToElement(value, Json);
@@ -135,7 +123,7 @@ public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
 
     private Dictionary<string, string> PrepareChatHeaders(ChatCompletionOptions options)
     {
-        var headers = this.SetDefaultChatCompletionProperties(options) ?? new Dictionary<string, string>();
+        var headers = options.Headers ?? new Dictionary<string, string>();
         var merged = new Dictionary<string, string>(headers, StringComparer.OrdinalIgnoreCase);
         foreach (var header in options.Headers ?? [])
             merged[header.Key] = header.Value;
@@ -164,7 +152,6 @@ public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
             return (await ExecuteAgentAsync(ToAgentMessagesRequest(request), cancellationToken)).ToMessagesResponse();
 
         using var client = CreateClient();
-        PrepareMessages(request);
         return await client.PostMessages(request, GetIdentifier(), FilterMessagesHeaders(headers), ct: cancellationToken);
     }
 
@@ -180,47 +167,13 @@ public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
         }
 
         using var client = CreateClient();
-        PrepareMessages(request);
         await foreach (var part in client.PostMessagesStreaming(request, GetIdentifier(), FilterMessagesHeaders(headers), ct: cancellationToken))
             yield return part;
     }
 
-    private void PrepareMessages(MessagesRequest request)
-    {
-        var options = GetMessagesOptions(request);
-        if (request.Metadata is not null)
-        {
-            var native = request.Metadata.AdditionalProperties?
-                .Where(p => p.Key != GetIdentifier()).ToDictionary(p => p.Key, p => p.Value.Clone());
-            request.Metadata = request.Metadata.UserId is null && (native?.Count ?? 0) == 0
-                ? null : new MessagesRequestMetadata { UserId = request.Metadata.UserId, AdditionalProperties = native };
-        }
-        request.AdditionalProperties ??= [];
-        request.AdditionalProperties.Remove(GetIdentifier());
-        request.AdditionalProperties.Remove("providerMetadata");
-        foreach (var (name, value) in options)
-            if (name is not "headers")
-                request.AdditionalProperties[name] = JsonSerializer.SerializeToElement(value, Json);
-    }
-
-    private Dictionary<string, object?> GetMessagesOptions(MessagesRequest request)
-    {
-        if (request.Metadata?.AdditionalProperties?.TryGetValue(GetIdentifier(), out var scoped) == true)
-            return Options(new() { [GetIdentifier()] = scoped });
-        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out scoped) == true)
-            return Options(new() { [GetIdentifier()] = scoped });
-        if (request.AdditionalProperties?.TryGetValue("providerMetadata", out var providerMetadata) == true
-            && providerMetadata.ValueKind == JsonValueKind.Object
-            && providerMetadata.TryGetProperty(GetIdentifier(), out scoped))
-            return Options(new() { [GetIdentifier()] = scoped });
-        return [];
-    }
-
     private AIRequest ToAgentMessagesRequest(MessagesRequest request)
     {
-        var unified = request.ToUnifiedRequest(GetIdentifier());
-        unified.Metadata![GetIdentifier()] = GetMessagesOptions(request);
-        return unified;
+        return request.ToUnifiedRequest(GetIdentifier());
     }
 
     private static Dictionary<string, string> FilterMessagesHeaders(Dictionary<string, string> headers)

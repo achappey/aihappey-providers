@@ -17,7 +17,7 @@ public static class ModelProviderResponsesUnifiedExtensions
           System.Text.Json.JsonElement? extraRootProperties = null,
           CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultResponseProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
 
         return await client.GetResponses(options,
             modelProvider.GetIdentifier(),
@@ -36,7 +36,7 @@ public static class ModelProviderResponsesUnifiedExtensions
         System.Text.Json.JsonElement? extraRootProperties = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var headers = MergeRequestHeaders(modelProvider.SetDefaultResponseProperties(options), options.Headers);
+        var headers = MergeRequestHeaders(null, options.Headers);
 
         await foreach (var update in client.GetResponsesUpdates(options,
             relativeUrl: relativeUrl,

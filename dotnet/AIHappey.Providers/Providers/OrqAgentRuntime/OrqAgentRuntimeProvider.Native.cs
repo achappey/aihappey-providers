@@ -204,7 +204,7 @@ public partial class OrqAgentRuntimeProvider
 
     private OrqInvokeRequest BuildInvokeRequest(ResponseRequest options, bool stream)
     {
-        var (nativeMetadata, requestMetadata) = ExtractResponseRequestMetadata(options.Metadata);
+        var (nativeMetadata, requestMetadata) = ExtractResponseRequestMetadata(options);
 
         var extraParams = nativeMetadata?.ExtraParams is null
             ? []
@@ -300,7 +300,7 @@ public partial class OrqAgentRuntimeProvider
         var completedAt = ParseUnixTime(response.Finalized, DateTimeOffset.UtcNow.ToUnixTimeSeconds());
         var output = BuildResponseOutput(response, fallbackText);
         var status = DetermineResponseStatus(response, failureMessage, output.Count > 0);
-        var (nativeMetadata, requestMetadata) = ExtractResponseRequestMetadata(options.Metadata);
+        var (nativeMetadata, requestMetadata) = ExtractResponseRequestMetadata(options);
 
         return new ResponseResult
         {
@@ -326,7 +326,7 @@ public partial class OrqAgentRuntimeProvider
 
     private ResponseResult CreateInProgressResponse(ResponseRequest options, string responseId, long createdAt)
     {
-        var (_, requestMetadata) = ExtractResponseRequestMetadata(options.Metadata);
+        var (_, requestMetadata) = ExtractResponseRequestMetadata(options);
 
         return new ResponseResult
         {
@@ -355,7 +355,7 @@ public partial class OrqAgentRuntimeProvider
         object? usage,
         string? failureMessage)
     {
-        var (_, requestMetadata) = ExtractResponseRequestMetadata(options.Metadata);
+        var (_, requestMetadata) = ExtractResponseRequestMetadata(options);
         var status = string.IsNullOrWhiteSpace(failureMessage) ? "completed" : "failed";
 
         return new ResponseResult
@@ -894,29 +894,10 @@ public partial class OrqAgentRuntimeProvider
         };
     }
 
-    private (OrqAgentsRequestMetadata? NativeMetadata, Dictionary<string, object?>? RequestMetadata) ExtractResponseRequestMetadata(Dictionary<string, object?>? metadata)
+    private (OrqAgentsRequestMetadata? NativeMetadata, Dictionary<string, object?>? RequestMetadata) ExtractResponseRequestMetadata(ResponseRequest request)
     {
-        if (metadata is null || metadata.Count == 0)
-            return (null, null);
-
-        var requestMetadata = new Dictionary<string, object?>(metadata, StringComparer.OrdinalIgnoreCase);
-        OrqAgentsRequestMetadata? nativeMetadata = null;
-
-        if (requestMetadata.TryGetValue(GetIdentifier(), out var raw) && raw is not null)
-        {
-            try
-            {
-                nativeMetadata = JsonSerializer.SerializeToElement(raw, Json).Deserialize<OrqAgentsRequestMetadata>(Json);
-            }
-            catch
-            {
-                nativeMetadata = null;
-            }
-
-            requestMetadata.Remove(GetIdentifier());
-        }
-
-        return (nativeMetadata, requestMetadata.Count == 0 ? null : requestMetadata);
+        var native = NativeResponseRequestOptions.NativeRoot(request).Deserialize<OrqAgentsRequestMetadata>(Json);
+        return (native, request.Metadata);
     }
 
     private static object BuildChatCompletionMessage(OrqInvokeMessage? message)

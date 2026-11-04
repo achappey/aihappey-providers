@@ -8,14 +8,12 @@ public sealed partial class DeepSeekProvider
 {
     private void NormalizeResponseOptions(ResponseRequest options)
     {
-        if (options.Metadata?.TryGetValue(GetIdentifier(), out var value) != true || value is null)
+        if (options.AdditionalProperties is not { } additional)
             return;
 
-        var config = JsonSerializer.SerializeToNode(value, JsonSerializerOptions.Web) as JsonObject
-            ?? throw new ArgumentException("DeepSeek provider metadata must be a JSON object.");
+        var config = JsonSerializer.SerializeToNode(additional, JsonSerializerOptions.Web)!.AsObject();
 
-        // Existing saved chat settings used Chat Completions' thinking/reasoning_effort.
-        // Never overwrite an explicitly supplied Responses reasoning configuration.
+        // Translate the provider's root thinking/reasoning controls to Responses.
         if (!config.ContainsKey("reasoning") && options.Reasoning is null)
         {
             var disabled = config["thinking"] is JsonObject thinking
@@ -29,9 +27,9 @@ public sealed partial class DeepSeekProvider
 
         config.Remove("thinking");
         config.Remove("reasoning_effort");
-        options.Metadata = new Dictionary<string, object?>(options.Metadata!)
-        {
-            [GetIdentifier()] = JsonSerializer.SerializeToElement(config)
-        };
+        if (options.Reasoning is null && config["reasoning"] is { } reasoning)
+            options.Reasoning = reasoning.Deserialize<Reasoning>();
+        config.Remove("reasoning");
+        options.AdditionalProperties = config.Deserialize<Dictionary<string, JsonElement>>();
     }
 }

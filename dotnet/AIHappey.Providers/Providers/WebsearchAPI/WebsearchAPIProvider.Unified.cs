@@ -149,16 +149,6 @@ public partial class WebsearchAPIProvider
     {
         if (request.Metadata?.TryGetValue(GetIdentifier(), out var direct) == true)
             return ObjectOptions(direct);
-        // Protocol mappers retain their original metadata under protocol-specific keys.
-        foreach (var key in new[] { "chatcompletions.request.metadata", "messages.request.metadata",
-            "chatcompletions.request.provider_metadata", "messages.request.provider_metadata" })
-        {
-            if (request.Metadata?.TryGetValue(key, out var value) != true || value is null)
-                continue;
-            var raw = JsonSerializer.SerializeToElement(value, JsonSerializerOptions.Web);
-            if (raw.ValueKind == JsonValueKind.Object && raw.TryGetProperty(GetIdentifier(), out var provider))
-                return ObjectOptions(provider);
-        }
         return [];
     }
 

@@ -37,17 +37,7 @@ public static class ModelProviderResponsesChatExtensions
     }
 
 
-    public static IReadOnlyDictionary<string, string>? SetDefaultResponseProperties(
-        this IModelProvider modelProvider, ResponseRequest responseRequest, HashSet<string>? exclude = null)
-    {
-        var headers = responseRequest.Metadata.GetResponseHeaders(modelProvider.GetIdentifier());
 
-        responseRequest.Tools = [.. responseRequest.Tools ?? [],
-            .. responseRequest.Metadata.GetResponseToolDefinitions(modelProvider.GetIdentifier()) ?? []];
-      
-
-        return headers;
-    }
 
     public static void SetDefaultInteractionProperties(
        this IModelProvider modelProvider, InteractionRequest responseRequest, HashSet<string>? exclude = null)
@@ -62,43 +52,8 @@ public static class ModelProviderResponsesChatExtensions
         responseRequest.Metadata = null;
     }
 
-    public static IReadOnlyDictionary<string, string>? SetDefaultChatCompletionProperties(
-        this IModelProvider modelProvider, ChatCompletionOptions chatCompletionOptions, HashSet<string>? exclude = null)
-    {
-        var providerMetadata = chatCompletionOptions.GetProviderMetadata();
-        var headers = providerMetadata.GetResponseHeaders(modelProvider.GetIdentifier());
 
-        if (chatCompletionOptions.Tools == null)
-        {
-            chatCompletionOptions.Tools = [.. chatCompletionOptions.Tools ?? [],
-            .. providerMetadata.GetChatCompletionToolDefinitions(modelProvider.GetIdentifier()) ?? []];
 
-            chatCompletionOptions.Tools = chatCompletionOptions.Tools.Any() ? chatCompletionOptions.Tools : null!;
-        }
-        else
-            chatCompletionOptions.Tools = [.. chatCompletionOptions.Tools ?? [],
-            .. providerMetadata.GetChatCompletionToolDefinitions(modelProvider.GetIdentifier()) ?? []];
 
-        return headers;
-    }
-
-    public static void SetDefaultMessagesProperties(
-       this IModelProvider modelProvider, MessagesRequest messagesRequest)
-    {
-        messagesRequest.Tools = [.. messagesRequest.Tools ?? [],
-            .. messagesRequest.Metadata?.GetMessageToolDefinitions(modelProvider.GetIdentifier())?
-            .Where(p => messagesRequest.Tools?.Any(e => e.Type == p.Type) != true) ?? []];
-
-        messagesRequest.Thinking ??= messagesRequest.Metadata?
-            .GetProviderOption<MessagesThinkingConfig>(modelProvider.GetIdentifier(), "thinking");
-
-        messagesRequest.ContextManagement ??= messagesRequest.Metadata?
-            .GetProviderOption<MessagesContextManagementConfig>(modelProvider.GetIdentifier(), "context_management");
-
-        //  modelProvider.ApplyProviderOptions(messagesRequest.Metadata, messagesRequest.AdditionalProperties ??=
-        //              [], ["tools", "anthorpic-beta"]);
-
-        messagesRequest.Metadata?.AdditionalProperties = null;
-    }
 
 }

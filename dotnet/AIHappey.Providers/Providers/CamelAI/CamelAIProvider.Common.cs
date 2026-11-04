@@ -29,14 +29,11 @@ public sealed partial class CamelAIProvider
     }
     private static string AgentPath(string id) => $"v1/agents/{Uri.EscapeDataString(id)}";
 
-    // Endpoint mappers retain metadata differently. Read only the caller's provider namespace.
+    // Unified execution options are separate from native application metadata.
     private static JsonObject Options(AIRequest request)
     {
         if (request.Metadata?.TryGetValue("camelai", out var direct) == true)
             return Object(direct, "CamelAI options");
-        foreach (var key in new[] { "chatcompletions.request.metadata", "messages.request.metadata" })
-            if (request.Metadata?.TryGetValue(key, out var raw) == true && Property(Serialize(raw), "camelai") is { } scoped)
-                return Object(scoped, "CamelAI options");
         return [];
     }
     private static JsonObject Object(object? value, string name) => JsonNode.Parse(Serialize(value).GetRawText()) as JsonObject

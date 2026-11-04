@@ -12,7 +12,7 @@ public sealed partial class GigaChatProvider
         ChatCompletionOptions options,
         bool streaming)
     {
-        var defaultHeaders = this.SetDefaultChatCompletionProperties(options);
+        var defaultHeaders = options.Headers;
         var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         if (defaultHeaders is not null)
             foreach (var (name, value) in defaultHeaders)
@@ -26,9 +26,7 @@ public sealed partial class GigaChatProvider
         foreach (var property in serialized.EnumerateObject())
             properties[property.Name] = property.Value.Clone();
 
-        properties.Remove("metadata");
-        properties.Remove("providerMetadata");
-        if (options.GetProviderMetadata().TryGetValue(GetIdentifier(), out var providerOptions) &&
+        if (options.GetNativeProviderOptions(GetIdentifier()).TryGetValue(GetIdentifier(), out var providerOptions) &&
             providerOptions is not null)
         {
             var providerJson = providerOptions is JsonElement json
@@ -38,7 +36,7 @@ public sealed partial class GigaChatProvider
             {
                 foreach (var property in providerJson.EnumerateObject())
                 {
-                    if (property.Name is "headers" or "tools" or "providerMetadata")
+                    if (property.Name is "headers" or "tools")
                         continue;
                     properties[property.Name] = property.Value.Clone();
                 }

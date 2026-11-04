@@ -295,15 +295,6 @@ public partial class TemboProvider
     {
         if (request.Metadata?.TryGetValue("tembo", out var direct) == true && direct is not null)
             return JsonSerializer.SerializeToElement(direct, TemboJson);
-        // Some conversational mappers preserve request metadata in protocol-specific envelopes.
-        foreach (var name in new[] { "chatcompletions.request.metadata", "messages.request.metadata" })
-        {
-            if (request.Metadata?.TryGetValue(name, out var raw) == true && raw is not null)
-            {
-                var metadata = JsonSerializer.SerializeToElement(raw, TemboJson);
-                if (Property(metadata, "tembo") is { } options) return options.Clone();
-            }
-        }
         return JsonSerializer.SerializeToElement(new { }, TemboJson);
     }
 

@@ -57,7 +57,7 @@ public partial class ZaiProvider
         if (!TryResolveAgentId(options.Model, out var agentId))
             throw new NotSupportedException($"Unsupported Z.AI agent model '{options.Model}'.");
 
-        var headers = this.SetDefaultChatCompletionProperties(options, ["tools"]);
+        var headers = options.Headers;
         var payload = BuildAgentPayload(options, agentId, stream: false);
         using var req = CreateAgentHttpRequest(payload, accept: MediaTypeNames.Application.Json, headers);
 
@@ -83,7 +83,7 @@ public partial class ZaiProvider
         if (agentId == ViduTemplateAgentId)
             throw new NotSupportedException("Z.AI vidu_template_agent creates asynchronous video tasks and is not supported on streaming chat completions.");
 
-        var headers = this.SetDefaultChatCompletionProperties(options, ["tools"]);
+        var headers = options.Headers;
         var payload = BuildAgentPayload(options, agentId, stream: true);
         using var req = CreateAgentHttpRequest(payload, accept: "text/event-stream", headers);
         req.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };

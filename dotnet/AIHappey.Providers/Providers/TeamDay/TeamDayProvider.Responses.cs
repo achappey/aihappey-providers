@@ -12,7 +12,7 @@ public partial class TeamDayProvider
         ArgumentNullException.ThrowIfNull(options);
 
         var model = NormalizeAgentModelId(options.Model);
-        var metadata = ReadResponseMetadata(options.Metadata);
+        var metadata = ReadResponseMetadata(options.GetNativeProviderOptions(GetIdentifier()));
         var prompt = ApplyStructuredOutputInstructions(BuildPromptFromResponseRequest(options), options.Text);
         var result = await ExecuteAgentAsync(model, prompt, metadata, stream: false, cancellationToken);
         var createdAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -45,7 +45,7 @@ public partial class TeamDayProvider
         ArgumentNullException.ThrowIfNull(options);
 
         var model = NormalizeAgentModelId(options.Model);
-        var metadata = ReadResponseMetadata(options.Metadata);
+        var metadata = ReadResponseMetadata(options.GetNativeProviderOptions(GetIdentifier()));
         var prompt = ApplyStructuredOutputInstructions(BuildPromptFromResponseRequest(options), options.Text);
 
         var responseId = Guid.NewGuid().ToString("n");

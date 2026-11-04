@@ -35,18 +35,7 @@ public partial class IOnetProvider
 
     private static JsonObject AgentOptions(AIRequest request)
     {
-        object? scoped = null;
-        if (request.Metadata?.TryGetValue("ionet", out scoped) != true || scoped is null)
-        {
-            if (request.Metadata?.TryGetValue("chatcompletions.request.metadata", out var chatMetadata) == true
-                && chatMetadata is not null)
-            {
-                var chat = AsJson(chatMetadata);
-                if (chat.ValueKind == JsonValueKind.Object && chat.TryGetProperty("ionet", out var nested))
-                    scoped = nested.Clone();
-            }
-        }
-        if (scoped is null) return [];
+        if (request.Metadata?.TryGetValue("ionet", out var scoped) != true || scoped is null) return [];
         return JsonNode.Parse(AsJson(scoped).GetRawText()) as JsonObject
             ?? throw new ArgumentException("io.net provider metadata must be an object.");
     }

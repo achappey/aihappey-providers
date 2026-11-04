@@ -47,12 +47,12 @@ public sealed partial class TildeProvider(
     }
 
     public Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)
-        => this.ExecuteUnifiedViaChatCompletionsAsync(NormalizeNativeOptions(request), cancellationToken: cancellationToken);
+        => this.ExecuteUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken);
 
     public async IAsyncEnumerable<AIStreamEvent> StreamUnifiedAsync(AIRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in this.StreamUnifiedViaChatCompletionsAsync(NormalizeNativeOptions(request), cancellationToken: cancellationToken))
+        await foreach (var part in this.StreamUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken))
         {
             if (part.Event.Data is not AIFinishEventData finish)
             {
