@@ -1,7 +1,6 @@
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.Freepik;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
@@ -39,32 +38,78 @@ public sealed partial class FreepikProvider
         if (!string.IsNullOrWhiteSpace(request.Language))
             warnings.Add(new { type = "unsupported", feature = "language" });
 
-        var metadata = request.GetProviderMetadata<FreepikSpeechProviderMetadata>(GetIdentifier());
-        var se = metadata?.SoundEffects;
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var soundEffects = default(JsonElement);
+        var hasSoundEffects = metadata.ValueKind == JsonValueKind.Object
+            && TryGetCaseInsensitiveProperty(metadata, "sound_effects", out soundEffects);
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            throw new JsonException("Freepik provider metadata must be a JSON object.");
+        if (hasSoundEffects && soundEffects.ValueKind is not (JsonValueKind.Null or JsonValueKind.Object))
+            throw new JsonException("Freepik sound_effects metadata must be a JSON object.");
 
         // docs: duration_seconds required (0.5 - 22). We accept int seconds in metadata.
-        var durationSeconds = se?.DurationSeconds ?? 5;
+        var durationSeconds = 5;
+        if (hasSoundEffects && soundEffects.ValueKind == JsonValueKind.Object)
+        {
+            durationSeconds = TryGetCaseInsensitiveProperty(soundEffects, "duration_seconds", out var duration)
+                ? duration.Deserialize<int>(JsonSerializerOptions.Web)
+                : 0;
+        }
         if (durationSeconds <= 0)
-            throw new ArgumentOutOfRangeException(nameof(FreepikSpeechProviderMetadata.SoundEffects), "sound_effects.duration_seconds must be > 0.");
+            throw new ArgumentOutOfRangeException("SoundEffects", "sound_effects.duration_seconds must be > 0.");
         if (durationSeconds > 22)
-            throw new ArgumentOutOfRangeException(nameof(FreepikSpeechProviderMetadata.SoundEffects), "sound_effects.duration_seconds must be <= 22.");
+            throw new ArgumentOutOfRangeException("SoundEffects", "sound_effects.duration_seconds must be <= 22.");
 
         var startPayload = new Dictionary<string, object?>
         {
             ["text"] = request.Text,
-            ["duration_seconds"] = durationSeconds
             // webhook_url intentionally omitted (per user instruction: polling)
         };
 
-        if (se?.PromptInfluence is { } pi)
+        if (metadata.ValueKind == JsonValueKind.Object)
         {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (IsPropertyName(property.Name, "sound_effects", "text"))
+                    continue;
+
+                startPayload[property.Name] = property.Value.Clone();
+            }
+        }
+
+        if (!startPayload.ContainsKey("duration_seconds")
+            || (hasSoundEffects && soundEffects.ValueKind == JsonValueKind.Object))
+        {
+            startPayload["duration_seconds"] = durationSeconds;
+        }
+
+        JsonElement? promptInfluence = null;
+        JsonElement? loop = null;
+        if (hasSoundEffects && soundEffects.ValueKind == JsonValueKind.Object)
+        {
+            if (TryGetCaseInsensitiveProperty(soundEffects, "prompt_influence", out var prompt))
+                promptInfluence = prompt;
+            if (TryGetCaseInsensitiveProperty(soundEffects, "loop", out var loopValue))
+                loop = loopValue;
+            foreach (var property in soundEffects.EnumerateObject())
+            {
+                if (IsPropertyName(property.Name, "duration_seconds", "prompt_influence", "loop", "text"))
+                    continue;
+
+                startPayload[property.Name] = property.Value.Clone();
+            }
+        }
+
+        if (promptInfluence is { } promptElement && promptElement.ValueKind != JsonValueKind.Null)
+        {
+            var pi = promptElement.Deserialize<float>(JsonSerializerOptions.Web);
             if (pi < 0 || pi > 1)
-                throw new ArgumentOutOfRangeException(nameof(FreepikSpeechProviderMetadata.SoundEffects), "sound_effects.prompt_influence must be between 0 and 1.");
+                throw new ArgumentOutOfRangeException("SoundEffects", "sound_effects.prompt_influence must be between 0 and 1.");
             startPayload["prompt_influence"] = pi;
         }
 
-        if (se?.Loop is not null)
-            startPayload["loop"] = se.Loop.Value;
+        if (loop is { } loopElement && loopElement.ValueKind != JsonValueKind.Null)
+            startPayload["loop"] = loopElement.Deserialize<bool>(JsonSerializerOptions.Web);
 
         var startJson = JsonSerializer.Serialize(startPayload, JsonOpts);
 
@@ -135,6 +180,25 @@ public sealed partial class FreepikProvider
         };
     }
 
+    private static bool TryGetCaseInsensitiveProperty(JsonElement element, string name, out JsonElement value)
+    {
+        var found = false;
+        value = default;
+        foreach (var property in element.EnumerateObject())
+        {
+            if (!property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            value = property.Value;
+            found = true;
+        }
+
+        return found;
+    }
+
+    private static bool IsPropertyName(string name, params string[] knownNames)
+        => knownNames.Any(knownName => name.Equals(knownName, StringComparison.OrdinalIgnoreCase));
+
     private async Task<FreepikSoundEffectsTaskResult> SoundEffectsPollAsync(string taskId, CancellationToken cancellationToken)
     {
         var url = $"{BaseUrl}{SoundEffectsPath}/{taskId}";
@@ -162,4 +226,3 @@ public sealed partial class FreepikProvider
         return new FreepikSoundEffectsTaskResult(status, generated, raw, returnedTaskId);
     }
 }
-
