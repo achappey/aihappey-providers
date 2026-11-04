@@ -35,6 +35,65 @@ var response = await client.ExecuteAsync(
 Console.WriteLine(JsonSerializer.Serialize(response));
 ```
 
+## Soniox speech-to-text v6
+
+Use `soniox/stt-async-v6` for recordings and `soniox/stt-rt-v6` for realtime
+transcription. Explicit older model IDs and aliases are passed through unchanged;
+model discovery uses Soniox's live catalog rather than a hard-coded version list.
+
+`TranscriptionRequest` still uploads audio, creates and polls an async job, fetches
+the transcript, and deletes the job and uploaded file. Options under
+`providerOptions.soniox` pass through as native JSON, including structured
+`context`, language hints, diarization, language identification, and `translation`.
+The existing text, segments, language, duration, and `response.body` remain
+unchanged. `providerMetadata.soniox.transcription` and `.transcript` additionally
+retain the raw completed job and transcript, including speaker IDs, confidence,
+language and translation token fields, and future response fields.
+
+`GetRealtimeToken` still returns a single-use temporary key in `value` and its
+Unix expiry in `expires_at`. The existing `expires_in_seconds` (default 1800,
+range 1-3600), `max_session_duration_seconds` (1-18000), and
+`client_reference_id` (at most 256 characters) remain supported. Key restrictions
+are sent only to the temporary-key endpoint; the usage type and single-use
+restriction cannot be overridden. Other native options are returned in
+`providerMetadata.soniox.config` for the client's WebSocket start message.
+`config.model` uses the requested model (v6 if omitted), and `audio_format`
+defaults to `auto`. The WebSocket URL is in
+`providerMetadata.soniox.websocket_url`. This configuration is **not bound to the
+key**; the client must send it.
+
+For v6 voice agents, set `providerOptions.soniox.enable_agent_text_input` to
+`true`. Connect a browser using
+`new WebSocket(metadata.websocket_url, ["soniox-api-key", token.value])`, then
+send `JSON.stringify(metadata.config)` on open. Server-side clients can instead
+authenticate the upgrade with `Authorization: Bearer <temporary-key>`.
+Sending `api_key` only in the start message is deprecated and will stop working
+on January 15, 2027; keys are deliberately not copied into returned configuration.
+Continue sending microphone audio as binary frames and send agent text as JSON
+text frames, for example:
+
+```json
+{"type":"agent_text","text":"Would you prefer Porto or Faro?","end_of_segment":true}
+```
+
+Send only text actually played to the user, paced with playback, preserving
+spaces. End every agent turn with `end_of_segment: true`; on interruption, send
+any already-played text and end the segment, not the unplayed remainder.
+Agent text improves recognition context and suppresses residual agent voice
+echo; keep device echo cancellation enabled. It is realtime-only, opt-in, and
+requires a supporting model such as `stt-rt-v6`. There is no separate echo
+cancellation flag. The provider mints credentials and returns configuration; it
+does not proxy WebSocket audio or agent messages, and the OpenAI transcription
+streaming adapter remains a completed-async-result adapter.
+
+Official references (reviewed November 4, 2026):
+[v6 announcement](https://soniox.com/blog/soniox-stt-v6),
+[agent text input](https://docs.soniox.com/stt/rt/agent-text-input),
+[WebSocket API](https://docs.soniox.com/api-reference/stt/websocket-api),
+[WebSocket authentication](https://docs.soniox.com/authentication/websocket-authentication),
+[temporary keys](https://docs.soniox.com/api-reference/auth/create_temporary_api_key),
+and [async creation](https://docs.soniox.com/api-reference/stt/transcriptions/create_transcription).
+
 ## Provider Support Matrix
 
 Below is a capability matrix for all supported providers. 

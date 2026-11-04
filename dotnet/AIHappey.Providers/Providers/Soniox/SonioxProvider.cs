@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.Soniox;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AIHappey.Core.Extensions;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 
@@ -36,14 +37,14 @@ public partial class SonioxProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.soniox.com/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Soniox)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
@@ -101,12 +102,34 @@ public partial class SonioxProvider : IModelProvider
 
     public async Task<RealtimeResponse> GetRealtimeToken(RealtimeRequest realtimeRequest, CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(realtimeRequest);
 
         SonioxRealtimeProviderMetadata? metadata = null;
+        var config = new JsonObject();
         if (realtimeRequest.ProviderOptions?.TryGetValue(GetIdentifier(), out var options) == true)
+        {
+            if (options.ValueKind is not (JsonValueKind.Object or JsonValueKind.Null))
+                throw new JsonException("Soniox realtime provider options must be a JSON object.");
             metadata = options.Deserialize<SonioxRealtimeProviderMetadata>(SonioxJsonOptions);
+            if (options.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var property in options.EnumerateObject())
+                {
+                    if (property.Name.ToLowerInvariant() is
+                        "expires_in_seconds" or "max_session_duration_seconds" or
+                        "usage_type" or "single_use" or "api_key" or "model")
+                        continue;
+
+                    config[property.Name] = JsonNode.Parse(property.Value.GetRawText());
+                }
+            }
+        }
+
+        config["model"] = string.IsNullOrWhiteSpace(realtimeRequest.Model)
+            ? "stt-rt-v6"
+            : NormalizeSonioxModel(realtimeRequest.Model);
+        if (!config.ContainsKey("audio_format"))
+            config["audio_format"] = "auto";
 
         var expiresInSeconds = metadata?.ExpiresInSeconds ?? 1800;
         if (expiresInSeconds is < 1 or > 3600)
@@ -124,7 +147,12 @@ public partial class SonioxProvider : IModelProvider
             ["single_use"] = true,
             ["max_session_duration_seconds"] = metadata?.MaxSessionDurationSeconds
         };
-        using var response = await _client.PostAsJsonAsync("v1/auth/temporary-api-key", payload, SonioxJsonOptions, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/auth/temporary-api-key")
+        {
+            Content = JsonContent.Create(payload, options: SonioxJsonOptions)
+        };
+        ApplyAuthHeader(httpRequest);
+        using var response = await _client.SendAsync(httpRequest, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Soniox temporary API key creation failed ({(int)response.StatusCode}): {body}");
@@ -141,7 +169,11 @@ public partial class SonioxProvider : IModelProvider
         {
             Value = apiKey,
             ExpiresAt = expiry,
-            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata()
+            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(new
+            {
+                websocket_url = "wss://stt-rt.soniox.com/transcribe-websocket",
+                config
+            })
         };
     }
 
