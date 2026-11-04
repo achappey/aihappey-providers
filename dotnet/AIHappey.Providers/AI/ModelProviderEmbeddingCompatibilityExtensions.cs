@@ -32,6 +32,23 @@ public static class ModelProviderEmbeddingCompatibilityExtensions
             options,
             modelProvider.GetIdentifier(),
             endpoint,
+            headers: null,
+            cancellationToken: cancellationToken);
+
+    public static async Task<OpenAICompatibleEmbeddingResult>
+        OpenAICompatibleEmbeddingRequestAsync(
+            this IModelProvider modelProvider,
+            HttpClient httpClient,
+            OpenAIEmbeddingRequest options,
+            IReadOnlyDictionary<string, string> headers,
+            string? endpoint = "v1/embeddings",
+            CancellationToken cancellationToken = default)
+        => await SendOpenAICompatibleEmbeddingRequestAsync(
+            httpClient,
+            options,
+            modelProvider.GetIdentifier(),
+            endpoint,
+            headers,
             cancellationToken);
 
     /// <summary>
@@ -49,13 +66,15 @@ public static class ModelProviderEmbeddingCompatibilityExtensions
             options,
             providerIdentifier: null,
             endpoint,
-            cancellationToken);
+            headers: null,
+            cancellationToken: cancellationToken);
 
     private static async Task<OpenAICompatibleEmbeddingResult> SendOpenAICompatibleEmbeddingRequestAsync(
         HttpClient httpClient,
         OpenAIEmbeddingRequest options,
         string? providerIdentifier,
         string? endpoint,
+        IReadOnlyDictionary<string, string>? headers,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
@@ -68,6 +87,14 @@ public static class ModelProviderEmbeddingCompatibilityExtensions
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        if (headers is not null)
+        {
+            foreach (var (name, value) in headers)
+            {
+                if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(value))
+                    request.Headers.TryAddWithoutValidation(name, value);
+            }
+        }
 
         using var response = await httpClient.SendAsync(
             request,

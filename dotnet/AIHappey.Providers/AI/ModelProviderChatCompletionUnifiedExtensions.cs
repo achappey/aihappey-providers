@@ -30,6 +30,26 @@ public static class ModelProviderChatCompletionUnifiedExtensions
             ct: cancellationToken);
     }
 
+    public static async Task<ChatCompletion> GetChatCompletion(
+         this IModelProvider modelProvider,
+         HttpClient client,
+         ChatCompletionOptions options,
+         IReadOnlyDictionary<string, string> requestHeaders,
+         string relativeUrl = "v1/chat/completions",
+         JsonElement? extraRootProperties = null,
+         CancellationToken cancellationToken = default)
+    {
+        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        headers = MergeRequestHeaders(headers, requestHeaders);
+
+        return await client.GetChatCompletion(options,
+            modelProvider.GetIdentifier(),
+            relativeUrl,
+            extraRootProperties: extraRootProperties,
+            headers: headers,
+            ct: cancellationToken);
+    }
+
     public static async IAsyncEnumerable<ChatCompletionUpdate> GetChatCompletions(
         this IModelProvider modelProvider,
         HttpClient client,
@@ -39,6 +59,27 @@ public static class ModelProviderChatCompletionUnifiedExtensions
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+
+        await foreach (var update in client.GetChatCompletionUpdates(options,
+            relativeUrl: relativeUrl,
+            providerId: modelProvider.GetIdentifier(),
+            extraRootProperties: extraRootProperties,
+            headers: headers,
+            ct: cancellationToken))
+            yield return update;
+    }
+
+    public static async IAsyncEnumerable<ChatCompletionUpdate> GetChatCompletions(
+        this IModelProvider modelProvider,
+        HttpClient client,
+        ChatCompletionOptions options,
+        IReadOnlyDictionary<string, string> requestHeaders,
+        string relativeUrl = "v1/chat/completions",
+        JsonElement? extraRootProperties = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var headers = MergeRequestHeaders(modelProvider.SetDefaultChatCompletionProperties(options), options.Headers);
+        headers = MergeRequestHeaders(headers, requestHeaders);
 
         await foreach (var update in client.GetChatCompletionUpdates(options,
             relativeUrl: relativeUrl,

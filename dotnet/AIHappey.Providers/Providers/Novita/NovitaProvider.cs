@@ -35,15 +35,24 @@ public partial class NovitaProvider : IModelProvider
     }
 
 
-    private void ApplyAuthHeader()
+    private string GetApiKey()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Novita)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return key;
     }
+
+    private void ApplyAuthHeader(HttpRequestMessage request)
+        => request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", GetApiKey());
+
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
+        => new Dictionary<string, string>
+        {
+            ["Authorization"] = $"Bearer {GetApiKey()}"
+        };
 
     public string GetIdentifier() => nameof(Novita).ToLowerInvariant();
 
@@ -136,11 +145,10 @@ public partial class NovitaProvider : IModelProvider
         OpenAIEmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var result = await this.OpenAICompatibleEmbeddingRequestAsync(
             _client,
             request,
+            headers: GetAuthHeaders(),
             cancellationToken: cancellationToken);
 
         return result.Response;
@@ -150,12 +158,11 @@ public partial class NovitaProvider : IModelProvider
         EmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var openAIRequest = request.ToOpenAIEmbeddingRequest(GetIdentifier());
         var result = await this.OpenAICompatibleEmbeddingRequestAsync(
             _client,
             openAIRequest,
+            headers: GetAuthHeaders(),
             cancellationToken: cancellationToken);
 
         return result.ToEmbeddingResponse(GetIdentifier().CreatePrimitiveProviderMetadata());

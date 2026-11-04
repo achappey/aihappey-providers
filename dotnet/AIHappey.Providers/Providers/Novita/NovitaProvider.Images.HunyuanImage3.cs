@@ -20,8 +20,6 @@ public partial class NovitaProvider
           ImageRequest request,
           CancellationToken cancellationToken)
      {
-          ApplyAuthHeader();
-
           ArgumentNullException.ThrowIfNull(request);
           if (string.IsNullOrWhiteSpace(request.Prompt))
                throw new ArgumentException("Prompt is required.", nameof(request));
@@ -119,6 +117,7 @@ public partial class NovitaProvider
           {
                Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
           };
+          ApplyAuthHeader(submitRequest);
 
           using var submitResp = await _client.SendAsync(submitRequest, cancellationToken);
           var submitRaw = await submitResp.Content.ReadAsStringAsync(cancellationToken);

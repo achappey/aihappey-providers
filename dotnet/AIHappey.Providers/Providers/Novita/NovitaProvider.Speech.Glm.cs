@@ -14,8 +14,6 @@ public partial class NovitaProvider
          SpeechRequest request,
          CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         var metadata =
             request.GetProviderMetadata<NovitaSpeechProviderMetadata>(GetIdentifier());
 
@@ -55,7 +53,12 @@ public partial class NovitaProvider
             "application/json"
         );
 
-        using var resp = await _client.PostAsync(BaseUrl + request.Model, content, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, BaseUrl + request.Model)
+        {
+            Content = content
+        };
+        ApplyAuthHeader(httpRequest);
+        using var resp = await _client.SendAsync(httpRequest, cancellationToken);
         var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)

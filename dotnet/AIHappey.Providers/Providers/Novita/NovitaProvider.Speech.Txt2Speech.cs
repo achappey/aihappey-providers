@@ -14,8 +14,6 @@ public partial class NovitaProvider
         SpeechRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var metadata =
             request.GetProviderMetadata<NovitaSpeechProviderMetadata>(GetIdentifier());
 
@@ -71,11 +69,14 @@ public partial class NovitaProvider
             "application/json"
         );
 
-        using var submitResp = await _client.PostAsync(
-            BaseUrl + "async/" + request.Model,
-            submitContent,
-            cancellationToken
-        );
+        using var submitRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            BaseUrl + "async/" + request.Model)
+        {
+            Content = submitContent
+        };
+        ApplyAuthHeader(submitRequest);
+        using var submitResp = await _client.SendAsync(submitRequest, cancellationToken);
 
         var submitJson = await submitResp.Content.ReadAsStringAsync(cancellationToken);
 
@@ -184,10 +185,11 @@ public partial class NovitaProvider
         {
             ct.ThrowIfCancellationRequested();
 
-            using var resp = await _client.GetAsync(
-                TaskResultUrl + Uri.EscapeDataString(taskId),
-                ct
-            );
+            using var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                TaskResultUrl + Uri.EscapeDataString(taskId));
+            ApplyAuthHeader(request);
+            using var resp = await _client.SendAsync(request, ct);
 
             var json = await resp.Content.ReadAsStringAsync(ct);
 

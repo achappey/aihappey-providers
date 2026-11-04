@@ -16,6 +16,7 @@ public partial class NovitaProvider
             async ct =>
             {
                 using var req = new HttpRequestMessage(HttpMethod.Get, "openai/v1/models");
+                ApplyAuthHeader(req);
                 using var resp = await _client.SendAsync(req, cancellationToken);
 
                 if (!resp.IsSuccessStatusCode)
