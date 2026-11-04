@@ -16,7 +16,6 @@ public partial class SonioxProvider
 
     public async Task<TranscriptionResponse> TranscriptionRequest(TranscriptionRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -47,8 +46,19 @@ public partial class SonioxProvider
         }
         finally
         {
-            await CleanupRemoteResourceAsync(transcriptionId is null ? null : $"v1/transcriptions/{transcriptionId}", primaryFailure);
-            await CleanupRemoteResourceAsync(fileId is null ? null : $"v1/files/{fileId}", primaryFailure);
+            try
+            {
+                await CleanupRemoteResourceAsync(transcriptionId is null ? null : $"v1/transcriptions/{transcriptionId}", primaryFailure);
+            }
+            catch (Exception ex)
+            {
+                primaryFailure ??= ex;
+                throw;
+            }
+            finally
+            {
+                await CleanupRemoteResourceAsync(fileId is null ? null : $"v1/files/{fileId}", primaryFailure);
+            }
         }
     }
 
@@ -80,7 +90,9 @@ public partial class SonioxProvider
         if (!string.IsNullOrWhiteSpace(referenceId))
             form.Add(new StringContent(referenceId), "client_reference_id");
 
-        using var response = await _client.PostAsync("v1/files", form, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/files") { Content = form };
+        ApplyAuthHeader(httpRequest);
+        using var response = await _client.SendAsync(httpRequest, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Soniox file upload failed ({(int)response.StatusCode}): {body}");
@@ -127,7 +139,12 @@ public partial class SonioxProvider
 
         payload["model"] = NormalizeSonioxModel(requestedModel);
         payload["file_id"] = fileId;
-        using var response = await _client.PostAsJsonAsync("v1/transcriptions", payload, SonioxJsonOptions, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/transcriptions")
+        {
+            Content = JsonContent.Create(payload, options: SonioxJsonOptions)
+        };
+        ApplyAuthHeader(httpRequest);
+        using var response = await _client.SendAsync(httpRequest, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Soniox transcription creation failed ({(int)response.StatusCode}): {body}");
@@ -213,11 +230,15 @@ public partial class SonioxProvider
             Segments = segments,
             Language = language,
             DurationInSeconds = durationMs is null ? null : durationMs / 1000f,
-            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(),
+            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(new
+            {
+                transcription = terminal,
+                transcript
+            }),
             Response = new()
             {
                 Timestamp = DateTime.UtcNow,
-                ModelId = requestedModel.ToModelId(GetIdentifier()),
+                ModelId = NormalizeSonioxModel(requestedModel).ToModelId(GetIdentifier()),
                 Body = transcript.Clone()
             }
         };
@@ -229,7 +250,9 @@ public partial class SonioxProvider
             return;
         try
         {
-            using var response = await _client.DeleteAsync(path, CancellationToken.None);
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Delete, path);
+            ApplyAuthHeader(httpRequest);
+            using var response = await _client.SendAsync(httpRequest, CancellationToken.None);
             if (!response.IsSuccessStatusCode && response.StatusCode != System.Net.HttpStatusCode.NotFound && primaryFailure is null)
             {
                 var body = await response.Content.ReadAsStringAsync();

@@ -16,7 +16,6 @@ public partial class SonioxProvider
             this.GetCacheKey(key),
             async ct =>
             {
-                ApplyAuthHeader();
                 var models = new List<Model>();
 
                 using (var stt = await GetJsonAsync("v1/models", ct))
@@ -35,7 +34,10 @@ public partial class SonioxProvider
                             OwnedBy = nameof(Soniox),
                             Type = "transcription",
                             Description = $"Soniox {mode ?? "speech-to-text"} transcription model.",
-                            Tags = BuildLanguageTags(item, mode).Concat(["real-time"])
+                            Tags = BuildLanguageTags(item, mode).Concat(
+                                string.Equals(mode, "real_time", StringComparison.OrdinalIgnoreCase)
+                                    ? ["real-time", "realtime-token"]
+                                    : Array.Empty<string>()).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
                         });
                     }
                 }
@@ -73,7 +75,7 @@ public partial class SonioxProvider
                                 Type = "speech",
                                 Description = ReadString(voice, "description"),
                                 Tags = languageTags.Concat(BuildVoiceTags(voice))
-                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
                             });
                         }
                     }
@@ -110,7 +112,9 @@ public partial class SonioxProvider
 
     private async Task<JsonDocument> GetJsonAsync(string path, CancellationToken cancellationToken)
     {
-        using var response = await _client.GetAsync(path, cancellationToken);
+        using var httpRequest = new HttpRequestMessage(HttpMethod.Get, path);
+        ApplyAuthHeader(httpRequest);
+        using var response = await _client.SendAsync(httpRequest, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"Soniox request to {path} failed ({(int)response.StatusCode}): {body}");

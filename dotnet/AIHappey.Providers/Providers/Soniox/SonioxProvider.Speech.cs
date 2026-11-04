@@ -20,7 +20,6 @@ public partial class SonioxProvider
 
     public async Task<SpeechResponse> SpeechRequest(SpeechRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -51,6 +50,7 @@ public partial class SonioxProvider
         {
             Content = new StringContent(JsonSerializer.Serialize(payload, SonioxJsonOptions), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(httpRequest);
         using var response = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var audio = await response.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
