@@ -302,19 +302,13 @@ public partial class AnthropicProvider
                 continue;
             }
 
-            output.Add(new
-            {
-                type = "custom_tool_call",
-                id = toolPart.ToolCallId,
-                name = DownloadFileToolName,
-                status = string.Equals(toolPart.State, "output-error", StringComparison.OrdinalIgnoreCase)
-                    ? "failed"
-                    : "completed",
-                input = toolPart.Input,
-                output = toolPart.Output,
-                provider_executed = true,
-                provider_metadata = TryGetAnthropicProviderMetadata(toolPart.Metadata)
-            });
+            // The shared mapper already projects these tools. Do not append a
+            // second download item when enriching a completed response.
+            if (output.Any(item => JsonSerializer.SerializeToElement(item, JsonSerializerOptions.Web)
+                .TryGetProperty("id", out var id) && id.GetString() == toolPart.ToolCallId)) continue;
+            output.Add(AIHappey.Responses.Mapping.SyntheticResponsesTool.Create(toolPart.ToolCallId!, DownloadFileToolName,
+                toolPart.Input, toolPart.Output, "anthropic", TryGetAnthropicProviderMetadata(toolPart.Metadata),
+                toolPart.State == "output-error" ? "failed" : "completed"));
         }
 
         response.Output = output;

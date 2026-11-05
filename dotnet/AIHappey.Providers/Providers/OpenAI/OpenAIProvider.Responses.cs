@@ -9,6 +9,8 @@ using AIHappey.Common.Extensions;
 using AIHappey.Core.AI;
 using AIHappey.Responses;
 using AIHappey.Responses.Extensions;
+using AIHappey.Responses.Mapping;
+using AIHappey.Responses.Output;
 using AIHappey.Responses.Streaming;
 using ModelContextProtocol.Protocol;
 using OpenAI.Containers;
@@ -93,21 +95,17 @@ public partial class OpenAIProvider
         };
         enrichmentState.SeenCitationKeys.UnionWith(containerDownloadContext.DownloadedFileKeys);
 
-        foreach (var uploadUpdate in CreateUploadedAttachmentStreamParts(
-                     attachmentPreparation,
-                     enrichmentState))
-        {
-            yield return uploadUpdate;
-        }
-
         await foreach (var update in _client.GetResponsesUpdates(options,
             providerId: GetIdentifier(),
             ct: cancellationToken))
         {
+            var mappedUpdate = RemapNativeResponseOutputIndex(update, enrichmentState);
             var enrichedUpdates = await EnrichResponseStreamPartWithContainerFilesAsync(
-                update,
+                mappedUpdate,
                 enrichmentState,
                 cancellationToken);
+            if (update is ResponseCreated)
+                enrichedUpdates.AddRange(CreateUploadedAttachmentStreamParts(attachmentPreparation, enrichmentState));
 
             foreach (var enrichedUpdate in enrichedUpdates)
             {
@@ -144,9 +142,27 @@ public partial class OpenAIProvider
                             CountCompletedWebSearchCalls(completed.Response.Output)));
                 }
 
-                yield return enrichedUpdate;
+                // Provider and gateway events share one monotonically increasing sequence.
+                var wire = JsonSerializer.SerializeToNode(enrichedUpdate, ResponseJson.Default)!.AsObject();
+                wire["sequence_number"] = enrichmentState.WireSequenceNumber++;
+                if (enrichedUpdate is ResponseOutputItemAdded added)
+                    enrichmentState.OutputIndexesById[added.Item.Id!] = added.OutputIndex;
+                yield return JsonSerializer.Deserialize<ResponseStreamPart>(wire, ResponseJson.Default)!;
             }
         }
+    }
+
+    private static ResponseStreamPart RemapNativeResponseOutputIndex(ResponseStreamPart part, OpenAiResponseStreamEnrichmentState state)
+    {
+        var wire = JsonSerializer.SerializeToNode(part, ResponseJson.Default)!.AsObject();
+        if (wire["output_index"] is System.Text.Json.Nodes.JsonValue indexValue && indexValue.TryGetValue<int>(out var nativeIndex))
+        {
+            if (!state.NativeOutputIndexes.TryGetValue(nativeIndex, out var mappedIndex))
+                state.NativeOutputIndexes[nativeIndex] = mappedIndex = state.NextOutputIndex++;
+            wire["output_index"] = mappedIndex;
+            if (wire["item"]?["id"]?.GetValue<string>() is { } id) state.OutputIndexesById[id] = mappedIndex;
+        }
+        return JsonSerializer.Deserialize<ResponseStreamPart>(wire, ResponseJson.Default)!;
     }
 
     private static void CaptureCompletedWebSearchCall(
@@ -307,7 +323,8 @@ public partial class OpenAIProvider
         OpenAiResponseStreamEnrichmentState state,
         CancellationToken cancellationToken)
     {
-        var parts = new List<ResponseStreamPart> { update };
+        var parts = new List<ResponseStreamPart>();
+        if (update is not ResponseCompleted) parts.Add(update);
 
         CaptureResponseContainerId(update, state);
 
@@ -358,6 +375,16 @@ public partial class OpenAIProvider
         if (update is not ResponseOutputTextAnnotationAdded annotationAdded
             || !string.Equals(annotationAdded.Annotation.Type, "container_file_citation", StringComparison.OrdinalIgnoreCase))
         {
+            if (update is ResponseCompleted completed)
+            {
+                completed.Response.Output = (completed.Response.Output ?? []).Concat(state.SyntheticOutput)
+                    .OrderBy(item =>
+                    {
+                        var id = JsonSerializer.SerializeToElement(item, ResponseJson.Default).TryGetProperty("id", out var value) ? value.GetString() : null;
+                        return id is not null && state.OutputIndexesById.TryGetValue(id, out var index) ? index : int.MaxValue;
+                    }).ToList();
+                parts.Add(completed);
+            }
             return parts;
         }
 
@@ -396,74 +423,19 @@ public partial class OpenAIProvider
         int? outputIndex = null)
     {
         var syntheticOutputIndex = outputIndex ?? state.NextOutputIndex++;
-
-        parts.Add(new ResponseOutputItemAdded
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            OutputIndex = syntheticOutputIndex,
-            Item = new ResponseStreamItem
-            {
-                Id = toolCallId,
-                Type = "custom_tool_call",
-                Name = toolName,
-                Status = "in_progress",
-                AdditionalProperties = ToJsonElementDictionary(new Dictionary<string, object?>
-                {
-                    ["provider_executed"] = true,
-                    ["provider_metadata"] = providerMetadata
-                })
-            }
-        });
-
-        parts.Add(new ResponseUnknownEvent
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            Type = "response.custom_tool_call.input",
-            Data = ToJsonElementDictionary(new Dictionary<string, object?>
-            {
-                ["output_index"] = syntheticOutputIndex,
-                ["item_id"] = toolCallId,
-                ["tool_name"] = toolName,
-                ["title"] = toolName,
-                ["provider_executed"] = true,
-                ["provider_metadata"] = providerMetadata,
-                ["input"] = input
-            })
-        });
-
-        parts.Add(new ResponseUnknownEvent
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            Type = "response.custom_tool_call.output",
-            Data = ToJsonElementDictionary(new Dictionary<string, object?>
-            {
-                ["output_index"] = syntheticOutputIndex,
-                ["item_id"] = toolCallId,
-                ["tool_name"] = toolName,
-                ["provider_executed"] = true,
-                ["provider_metadata"] = providerMetadata,
-                ["output"] = output
-            })
-        });
-
+        var call = SyntheticResponsesTool.Create(toolCallId, toolName, input, output, "openai", providerMetadata);
+        state.SyntheticOutput.Add(call);
+        state.OutputIndexesById[toolCallId] = syntheticOutputIndex;
+        var started = SyntheticResponsesTool.Create(toolCallId, toolName, input, null, "openai", status: "in_progress");
+        parts.Add(new ResponseOutputItemAdded { SequenceNumber = state.NextSequenceNumber++,
+            OutputIndex = syntheticOutputIndex, Item = started.ToStreamItem() });
+        parts.Add(new ResponseMcpCallArgumentsDone { SequenceNumber = state.NextSequenceNumber++,
+            OutputIndex = syntheticOutputIndex, ItemId = toolCallId, Arguments = call.Arguments });
         parts.Add(new ResponseOutputItemDone
         {
             SequenceNumber = state.NextSequenceNumber++,
             OutputIndex = syntheticOutputIndex,
-            Item = new ResponseStreamItem
-            {
-                Id = toolCallId,
-                Type = "custom_tool_call",
-                Name = toolName,
-                Status = "completed",
-                AdditionalProperties = ToJsonElementDictionary(new Dictionary<string, object?>
-                {
-                    ["provider_executed"] = true,
-                    ["provider_metadata"] = providerMetadata,
-                    ["input"] = input,
-                    ["output"] = output
-                })
-            }
+            Item = call.ToStreamItem()
         });
     }
 
@@ -476,17 +448,9 @@ public partial class OpenAIProvider
 
         var toolCallId = Guid.NewGuid().ToString("n");
         var output = response.Output?.ToList() ?? [];
-        output.Insert(0, new
-        {
-            type = "custom_tool_call",
-            id = toolCallId,
-            status = "completed",
-            name = UploadFilesToolName,
-            input = CreateUploadedAttachmentToolInput(preparation),
-            output = CreateUploadedAttachmentToolResult(preparation.UploadedFiles),
-            provider_executed = true,
-            provider_metadata = CreateUploadedAttachmentProviderMetadata(preparation, toolCallId)
-        });
+        output.Insert(0, SyntheticResponsesTool.Create(toolCallId, UploadFilesToolName,
+            CreateUploadedAttachmentToolInput(preparation), CreateUploadedAttachmentToolResult(preparation.UploadedFiles),
+            "openai", CreateUploadedAttachmentProviderMetadata(preparation, toolCallId)));
         response.Output = output;
     }
 
@@ -498,106 +462,12 @@ public partial class OpenAIProvider
             yield break;
 
         var toolCallId = Guid.NewGuid().ToString("n");
-        var outputIndex = state.NextOutputIndex++;
         var providerMetadata = CreateUploadedAttachmentProviderMetadata(preparation, toolCallId);
-
-        yield return new ResponseOutputItemAdded
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            OutputIndex = outputIndex,
-            Item = new ResponseStreamItem
-            {
-                Id = toolCallId,
-                Type = "custom_tool_call",
-                Name = UploadFilesToolName,
-                Status = "in_progress",
-                AdditionalProperties = ToJsonElementDictionary(new Dictionary<string, object?>
-                {
-                    ["provider_executed"] = true,
-                    ["provider_metadata"] = providerMetadata
-                })
-            }
-        };
-
-        yield return new ResponseUnknownEvent
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            Type = "response.custom_tool_call.input",
-            Data = ToJsonElementDictionary(new Dictionary<string, object?>
-            {
-                ["output_index"] = outputIndex,
-                ["item_id"] = toolCallId,
-                ["tool_name"] = UploadFilesToolName,
-                ["title"] = UploadFilesToolName,
-                ["provider_executed"] = true,
-                ["provider_metadata"] = providerMetadata,
-                ["input"] = CreateUploadedAttachmentToolInput(preparation)
-            })
-        };
-
-        for (var count = 1; count <= preparation.UploadedFiles.Count; count++)
-        {
-            yield return new ResponseUnknownEvent
-            {
-                SequenceNumber = state.NextSequenceNumber++,
-                Type = "response.custom_tool_call.output",
-                Data = ToJsonElementDictionary(new Dictionary<string, object?>
-                {
-                    ["output_index"] = outputIndex,
-                    ["item_id"] = toolCallId,
-                    ["tool_name"] = UploadFilesToolName,
-                    ["provider_executed"] = true,
-                    ["provider_metadata"] = providerMetadata,
-                    ["preliminary"] = true,
-                    ["dynamic"] = true,
-                    ["output"] = CreateUploadedAttachmentToolResult(
-                        preparation.UploadedFiles.Take(count),
-                        preliminary: true,
-                        dynamic: true)
-                })
-            };
-        }
-
-        var finalOutput = CreateUploadedAttachmentToolResult(
-            preparation.UploadedFiles,
-            preliminary: false,
-            dynamic: true);
-        yield return new ResponseUnknownEvent
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            Type = "response.custom_tool_call.output",
-            Data = ToJsonElementDictionary(new Dictionary<string, object?>
-            {
-                ["output_index"] = outputIndex,
-                ["item_id"] = toolCallId,
-                ["tool_name"] = UploadFilesToolName,
-                ["provider_executed"] = true,
-                ["provider_metadata"] = providerMetadata,
-                ["preliminary"] = false,
-                ["dynamic"] = true,
-                ["output"] = finalOutput
-            })
-        };
-
-        yield return new ResponseOutputItemDone
-        {
-            SequenceNumber = state.NextSequenceNumber++,
-            OutputIndex = outputIndex,
-            Item = new ResponseStreamItem
-            {
-                Id = toolCallId,
-                Type = "custom_tool_call",
-                Name = UploadFilesToolName,
-                Status = "completed",
-                AdditionalProperties = ToJsonElementDictionary(new Dictionary<string, object?>
-                {
-                    ["provider_executed"] = true,
-                    ["provider_metadata"] = providerMetadata,
-                    ["input"] = CreateUploadedAttachmentToolInput(preparation),
-                    ["output"] = finalOutput
-                })
-            }
-        };
+        var parts = new List<ResponseStreamPart>();
+        AddSyntheticCustomToolCallParts(parts, state, toolCallId, UploadFilesToolName,
+            CreateUploadedAttachmentToolInput(preparation),
+            CreateUploadedAttachmentToolResult(preparation.UploadedFiles, preliminary: false, dynamic: true), providerMetadata);
+        foreach (var part in parts) yield return part;
     }
 
     private static JsonElement CreateUploadedAttachmentToolInput(
@@ -661,34 +531,9 @@ public partial class OpenAIProvider
 
     private static void AddDownloadArtifacts(List<object> result, OpenAiContainerCitationDownload download)
     {
-        result.Add(new
-        {
-            type = "custom_tool_call",
-            id = download.ToolCallId,
-            status = "completed",
-            name = DownloadFileToolName,
-            input = download.Input,
-            output = CreateDownloadToolCallResult(download),
-            provider_executed = true,
-            provider_metadata = download.ProviderMetadata
-        });
+        result.Add(SyntheticResponsesTool.Create(download.ToolCallId, DownloadFileToolName,
+            download.Input, CreateDownloadToolCallResult(download), "openai", download.ProviderMetadata));
 
-        result.Add(new
-        {
-            type = "message",
-            role = "assistant",
-            status = "completed",
-            content = new object[]
-            {
-                new InputFilePart
-                {
-                    FileId = download.FileId,
-                    FileUrl = download.CanonicalUrl,
-                    FileData = download.DataUrl,
-                    Filename = download.Filename
-                }
-            }
-        });
     }
 
     private async Task<List<object>> CreateResponseContainerFileArtifactsAsync(
@@ -1251,12 +1096,7 @@ public partial class OpenAIProvider
         [
             new EmbeddedResourceBlock
             {
-                Resource = new BlobResourceContents
-                {
-                    Uri = download.CanonicalUrl,
-                    MimeType = download.MediaType,
-                    Blob = download.Bytes
-                }
+                Resource = BlobResourceContents.FromBytes(download.Bytes, download.CanonicalUrl, download.MediaType)
             }
         ];
 
@@ -1407,6 +1247,13 @@ public partial class OpenAIProvider
 
     private sealed class OpenAiResponseStreamEnrichmentState
     {
+        public int WireSequenceNumber { get; set; }
+
+        public List<object> SyntheticOutput { get; } = [];
+
+        public Dictionary<int, int> NativeOutputIndexes { get; } = [];
+
+        public Dictionary<string, int> OutputIndexesById { get; } = new(StringComparer.Ordinal);
         public HashSet<string> SeenCitationKeys { get; } = new(StringComparer.OrdinalIgnoreCase);
 
         public HashSet<string> UploadedGeneratedImageItemIds { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -1423,7 +1270,7 @@ public partial class OpenAIProvider
 
         public long TurnStartedAtUnixSeconds { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        public int NextOutputIndex { get; set; } = 100_000;
+        public int NextOutputIndex { get; set; }
 
         public int NextSequenceNumber { get; set; } = 1_000_000;
     }
