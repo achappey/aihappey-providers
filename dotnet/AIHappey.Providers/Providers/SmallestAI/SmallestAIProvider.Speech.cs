@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.SmallestAI;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.AI;
@@ -111,7 +110,10 @@ public partial class SmallestAIProvider
     {
         if (string.IsNullOrWhiteSpace(request.Text) || request.Text.Trim().Length > 8000)
             throw new ArgumentException("SmallestAI speech text must contain between 1 and 8000 characters after trimming.", nameof(request));
-        var metadata = request.GetProviderMetadata<SmallestAISpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata is { ValueKind: not JsonValueKind.Object })
+            throw new JsonException("SmallestAI speech metadata must be an object.");
+
         var (modelId, modelVoiceId) = ParseTtsModelAndVoiceFromModel(request.Model);
         var voiceId = modelVoiceId ?? request.Voice?.Trim();
 
@@ -129,13 +131,15 @@ public partial class SmallestAIProvider
         if (!double.IsFinite(speed) || speed < 0.5 || speed > 2)
             throw new ArgumentOutOfRangeException(nameof(request.Speed), "SmallestAI speed must be between 0.5 and 2.");
 
-        var sampleRate = metadata?.SampleRate ?? 44100;
+        var sampleRate = ReadSpeechMetadataValue<int?>(metadata, "sampleRate") ?? 44100;
         if (sampleRate is not (8000 or 16000 or 24000 or 44100))
-            throw new ArgumentOutOfRangeException(nameof(SmallestAISpeechProviderMetadata.SampleRate), "SmallestAI sampleRate must be one of: 8000, 16000, 24000, 44100.");
+            throw new ArgumentOutOfRangeException("SampleRate", "SmallestAI sampleRate must be one of: 8000, 16000, 24000, 44100.");
 
-        var language = request.Language?.Trim() ?? metadata?.Language?.Trim();
+        var metadataLanguage = ReadSpeechMetadataValue<string>(metadata, "language");
+        var numberPronunciationLanguage = ReadSpeechMetadataValue<string>(metadata, "numberPronunciationLanguage");
+        var language = request.Language?.Trim() ?? metadataLanguage?.Trim();
         ValidateLanguage(language, nameof(request.Language));
-        ValidateLanguage(metadata?.NumberPronunciationLanguage, nameof(SmallestAISpeechProviderMetadata.NumberPronunciationLanguage));
+        ValidateLanguage(numberPronunciationLanguage, "NumberPronunciationLanguage");
 
         return new TtsSynthesisSettings(
             modelId,
@@ -143,12 +147,28 @@ public partial class SmallestAIProvider
             sampleRate,
             speed,
             language,
-            NormalizeOutputFormat(request.OutputFormat ?? metadata?.OutputFormat),
-            metadata?.PronunciationDicts,
-            metadata?.NumberPronunciationLanguage?.Trim(),
-            metadata?.SessionId?.Trim(),
-            metadata?.RequestId?.Trim(),
-            metadata?.WordTimestamps);
+            NormalizeOutputFormat(request.OutputFormat ?? ReadSpeechMetadataValue<string>(metadata, "outputFormat")),
+            ReadSpeechMetadataValue<List<string>>(metadata, "pronunciationDicts"),
+            numberPronunciationLanguage?.Trim(),
+            ReadSpeechMetadataValue<string>(metadata, "sessionId")?.Trim(),
+            ReadSpeechMetadataValue<string>(metadata, "requestId")?.Trim(),
+            ReadSpeechMetadataValue<bool?>(metadata, "wordTimestamps"),
+            metadata);
+    }
+
+    private static T? ReadSpeechMetadataValue<T>(JsonElement? metadata, string propertyName)
+    {
+        if (metadata is not { ValueKind: JsonValueKind.Object } metadataObject)
+            return default;
+
+        JsonElement? value = null;
+        foreach (var property in metadataObject.EnumerateObject())
+            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                value = property.Value;
+
+        return value is { } element
+            ? element.Deserialize<T>(JsonSerializerOptions.Web)
+            : default;
     }
 
     private static (string ModelId, string? VoiceId) ParseTtsModelAndVoiceFromModel(string model)
@@ -185,7 +205,7 @@ public partial class SmallestAIProvider
 
     private static Dictionary<string, object?> BuildTtsPayload(string text, TtsSynthesisSettings settings)
     {
-        var payload = new Dictionary<string, object?>
+        var payload = new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["text"] = text,
             ["voice_id"] = settings.VoiceId,
@@ -200,6 +220,27 @@ public partial class SmallestAIProvider
             ["request_id"] = settings.RequestId,
             ["word_timestamps"] = settings.WordTimestamps
         };
+        if (settings.Metadata is { ValueKind: JsonValueKind.Object } metadata)
+        {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                switch (property.Name.ToLowerInvariant())
+                {
+                    case "samplerate":
+                    case "language":
+                    case "outputformat":
+                    case "pronunciationdicts":
+                    case "numberpronunciationlanguage":
+                    case "sessionid":
+                    case "requestid":
+                    case "wordtimestamps":
+                        continue;
+                    default:
+                        payload[property.Name] = property.Value.Clone();
+                        break;
+                }
+            }
+        }
 
         return payload;
     }
@@ -335,6 +376,6 @@ public partial class SmallestAIProvider
         string? NumberPronunciationLanguage,
         string? SessionId,
         string? RequestId,
-        bool? WordTimestamps);
+        bool? WordTimestamps,
+        JsonElement? Metadata);
 }
-
