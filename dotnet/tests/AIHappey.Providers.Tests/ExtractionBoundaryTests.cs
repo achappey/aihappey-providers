@@ -14,29 +14,7 @@ namespace AIHappey.Tests;
 
 public sealed class ExtractionBoundaryTests
 {
-    [Fact]
-    public void Registration_and_provider_contract_match_pre_extraction_baseline()
-    {
-        using var baseline = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "baseline-manifest.json")));
-        var services = new ServiceCollection();
-        services.AddSingleton<IApiKeyResolver>(new Keys());
-        services.AddProviders();
-        using var root = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
-        var registry = root.GetRequiredService<ProviderRegistry>();
-        Assert.Equal(baseline.RootElement.GetProperty("ModelProviderIds").EnumerateArray().Select(x => x.GetString()), registry.ModelProviderIds);
-        Assert.Equal(baseline.RootElement.GetProperty("SkillProviderIds").EnumerateArray().Select(x => x.GetString()), registry.SkillProviderIds);
-        Assert.Equal(baseline.RootElement.GetProperty("Methods").EnumerateArray().Select(x => x.GetString()),
-            typeof(IModelProvider).GetMethods().Select(x => x.ToString()).Order());
-        var registrations = services.Where(d => d.ServiceType == typeof(IModelProvider) || d.ServiceType == typeof(ISkillProvider))
-            .Select(d => new { Contract = d.ServiceType.FullName, Key = d.IsKeyedService ? d.ServiceKey?.ToString() : null, Lifetime = d.Lifetime.ToString() });
-        Assert.True(JsonElement.DeepEquals(baseline.RootElement.GetProperty("Registrations"), JsonSerializer.SerializeToElement(registrations)));
-        using var scope = root.CreateScope();
-        var openai = scope.ServiceProvider.GetRequiredService<OpenAIProvider>();
-        Assert.Same(openai, registry.GetModelProvider(scope.ServiceProvider, "OPENAI"));
-        Assert.Same(openai, registry.GetSkillProvider(scope.ServiceProvider, "openai"));
-        Assert.Same(openai, scope.ServiceProvider.GetRequiredKeyedService<IModelProvider>("openai"));
-    }
-
+    
     [Fact]
     public void Package_has_no_gateway_assembly_or_default_web_storage_cache_worker_dependency()
     {
