@@ -2,7 +2,6 @@ using AIHappey.Core.AI;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.Mistral;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
 using AIHappey.Core.Extensions;
@@ -17,7 +16,10 @@ public partial class MistralProvider
         ApplyAuthHeader();
 
         var bytes = Convert.FromBase64String(request.Audio.ToString()!);
-        var metadata = request.GetProviderMetadata<MistralTranscriptionProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            _ = metadata.Deserialize<Dictionary<string, JsonElement>>(JsonSerializerOptions.Web);
+
         using var form = new MultipartFormDataContent();
 
         // audio file
@@ -30,16 +32,44 @@ public partial class MistralProvider
         // REQUIRED diarization fields
         form.Add(new StringContent(request.Model), "model");
 
-        if (metadata?.TimestampGranularities != null && metadata.TimestampGranularities.Any())
+        JsonElement? language = null;
+        JsonElement? timestampGranularities = null;
+        if (metadata.ValueKind == JsonValueKind.Object)
         {
-            foreach (var g in metadata.TimestampGranularities)
+            foreach (var property in metadata.EnumerateObject())
             {
-                form.Add(new StringContent(g), "timestamp_granularities[]");
+                if (string.Equals(property.Name, "language", StringComparison.OrdinalIgnoreCase))
+                {
+                    language = property.Value;
+                }
+                else if (string.Equals(property.Name, "timestamp_granularities", StringComparison.OrdinalIgnoreCase))
+                {
+                    timestampGranularities = property.Value;
+                }
+                else if (!string.Equals(property.Name, "model", StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(property.Name, "file", StringComparison.OrdinalIgnoreCase))
+                {
+                    form.Add(new StringContent(ToMultipartValue(property.Value)), property.Name);
+                }
             }
         }
 
-        if (!string.IsNullOrWhiteSpace(metadata?.Language))
-            form.Add(new StringContent(metadata.Language), "language");
+        if (timestampGranularities is { } timestampValue)
+        {
+            var granularities = timestampValue.Deserialize<IEnumerable<string>>(JsonSerializerOptions.Web);
+            if (granularities is not null)
+            {
+                foreach (var granularity in granularities)
+                    form.Add(new StringContent(granularity), "timestamp_granularities[]");
+            }
+        }
+
+        if (language is { } languageValue)
+        {
+            var languageText = languageValue.Deserialize<string>(JsonSerializerOptions.Web);
+            if (!string.IsNullOrWhiteSpace(languageText))
+                form.Add(new StringContent(languageText), "language");
+        }
 
         using var resp = await _client.PostAsync(
             "https://api.mistral.ai/v1/audio/transcriptions",
@@ -52,6 +82,13 @@ public partial class MistralProvider
 
         return ConvertTranscriptionResponse(json, request.Model, GetIdentifier(), resp.GetHeaders());
     }
+
+    private static string ToMultipartValue(JsonElement value)
+        => value.ValueKind switch
+        {
+            JsonValueKind.String => value.GetString() ?? string.Empty,
+            _ => value.GetRawText()
+        };
 
     private static TranscriptionResponse ConvertTranscriptionResponse(
        string json,
