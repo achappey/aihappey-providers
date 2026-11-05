@@ -111,7 +111,7 @@ public partial class SmallestAIProvider
         if (string.IsNullOrWhiteSpace(request.Text) || request.Text.Trim().Length > 8000)
             throw new ArgumentException("SmallestAI speech text must contain between 1 and 8000 characters after trimming.", nameof(request));
         var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
-        if (metadata is { ValueKind: not JsonValueKind.Object })
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
             throw new JsonException("SmallestAI speech metadata must be an object.");
 
         var (modelId, modelVoiceId) = ParseTtsModelAndVoiceFromModel(request.Model);
@@ -220,6 +220,12 @@ public partial class SmallestAIProvider
             ["request_id"] = settings.RequestId,
             ["word_timestamps"] = settings.WordTimestamps
         };
+
+        // Null dictionary entries are not omitted by WhenWritingNull. Remove only
+        // generated nulls before merging metadata so explicit raw nulls survive.
+        foreach (var key in payload.Where(entry => entry.Value is null).Select(entry => entry.Key).ToArray())
+            payload.Remove(key);
+
         if (settings.Metadata is { ValueKind: JsonValueKind.Object } metadata)
         {
             foreach (var property in metadata.EnumerateObject())

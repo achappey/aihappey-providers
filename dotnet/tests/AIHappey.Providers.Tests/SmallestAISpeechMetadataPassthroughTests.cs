@@ -106,6 +106,10 @@ public sealed class SmallestAISpeechMetadataPassthroughTests
         Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
         Assert.False(payload.TryGetProperty("language", out _));
         Assert.False(payload.TryGetProperty("pronunciation_dicts", out _));
+        Assert.False(payload.TryGetProperty("number_pronunciation_language", out _));
+        Assert.False(payload.TryGetProperty("session_id", out _));
+        Assert.False(payload.TryGetProperty("request_id", out _));
+        Assert.False(payload.TryGetProperty("word_timestamps", out _));
         Assert.Equal(7, payload.EnumerateObject().Count());
 
         await Assert.ThrowsAsync<JsonException>(() => provider.SpeechRequest(new SpeechRequest
@@ -137,6 +141,83 @@ public sealed class SmallestAISpeechMetadataPassthroughTests
             Text = "Hello"
         }));
         Assert.Contains("SmallestAI TTS failed (400): upstream failure", error.Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("{}")]
+    [InlineData("""{"sampleRate":null,"outputFormat":null,"language":null,"pronunciationDicts":null,"numberPronunciationLanguage":null,"sessionId":null,"requestId":null,"wordTimestamps":null}""")]
+    public async Task Speech_omits_unset_known_options_and_preserves_defaults(string? metadataJson)
+    {
+        JsonElement payload = default;
+        var provider = CreateProvider(async request =>
+        {
+            payload = ParseElement(await request.Content!.ReadAsStringAsync());
+            return new(HttpStatusCode.OK) { Content = new ByteArrayContent(Encoding.UTF8.GetBytes("audio")) };
+        });
+        var speechRequest = new SpeechRequest
+        {
+            Model = "smallestai/lightning-v3.1/voice-1",
+            Text = "Hello"
+        };
+        if (metadataJson is not null)
+            speechRequest.ProviderOptions = new() { ["smallestai"] = ParseElement(metadataJson) };
+
+        await provider.SpeechRequest(speechRequest);
+
+        Assert.True(JsonElement.DeepEquals(ParseElement("""
+            {
+              "text": "Hello",
+              "voice_id": "voice-1",
+              "model": "lightning_v3.1",
+              "sample_rate": 44100,
+              "speed": 1,
+              "output_format": "wav"
+            }
+            """), payload));
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("true")]
+    [InlineData("123")]
+    [InlineData("\"invalid\"")]
+    public async Task Speech_rejects_non_object_metadata(string metadataJson)
+    {
+        var provider = CreateProvider(_ => throw new InvalidOperationException("No upstream request expected."));
+
+        await Assert.ThrowsAsync<JsonException>(() => provider.SpeechRequest(new SpeechRequest
+        {
+            Model = "smallestai/lightning-v3.1/voice-1",
+            Text = "Hello",
+            ProviderOptions = new() { ["smallestai"] = ParseElement(metadataJson) }
+        }));
+    }
+
+    [Fact]
+    public async Task Speech_preserves_raw_nulls_after_omitting_unset_known_options()
+    {
+        JsonElement payload = default;
+        var provider = CreateProvider(async request =>
+        {
+            payload = ParseElement(await request.Content!.ReadAsStringAsync());
+            return new(HttpStatusCode.OK) { Content = new ByteArrayContent(Encoding.UTF8.GetBytes("audio")) };
+        });
+
+        await provider.SpeechRequest(new SpeechRequest
+        {
+            Model = "smallestai/lightning-v3.1/voice-1",
+            Text = "Hello",
+            ProviderOptions = new()
+            {
+                ["smallestai"] = ParseElement("""{"sessionId":"session-1","session_id":null,"future_null":null}""")
+            }
+        });
+
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("session_id").ValueKind);
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+        Assert.False(payload.TryGetProperty("language", out _));
+        Assert.Equal(8, payload.EnumerateObject().Count());
     }
 
     private static SmallestAIProvider CreateProvider(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)
