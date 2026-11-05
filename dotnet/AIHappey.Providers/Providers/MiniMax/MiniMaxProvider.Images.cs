@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.MiniMax;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Extensions;
@@ -58,7 +57,17 @@ public partial class MiniMaxProvider
         if (imageRequest.Mask is not null)
             warnings.Add(new { type = "unsupported", feature = "mask" });
 
-        var metadata = imageRequest.GetProviderMetadata<MiniMaxImageProviderMetadata>(GetIdentifier());
+        var metadata = imageRequest.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null or JsonValueKind.Object))
+            throw new JsonException("MiniMax image provider options must be a JSON object.");
+
+        bool? promptOptimizer = null;
+        if (metadata.ValueKind == JsonValueKind.Object &&
+            metadata.TryGetProperty("prompt_optimizer", out var promptOptimizerElement) &&
+            promptOptimizerElement.ValueKind != JsonValueKind.Null)
+        {
+            promptOptimizer = JsonSerializer.Deserialize<bool?>(promptOptimizerElement.GetRawText());
+        }
 
         // ---- model name ----
         // Tooling usually strips "minimax/" before calling provider.ImageRequest, but accept both.
@@ -87,11 +96,14 @@ public partial class MiniMaxProvider
         var seed = imageRequest.Seed;
         var n = imageRequest.N;
 
-        var payloadDict = new Dictionary<string, object?>
-        {
-            ["model"] = model,
-            ["prompt"] = imageRequest.Prompt
-        };
+        var payloadDict = metadata.ValueKind == JsonValueKind.Object
+            ? metadata.EnumerateObject()
+                .Where(property => property.Name is not "prompt_optimizer")
+                .ToDictionary(property => property.Name, property => (object?)property.Value.Clone())
+            : new Dictionary<string, object?>();
+
+        payloadDict["model"] = model;
+        payloadDict["prompt"] = imageRequest.Prompt;
 
         // ---- image-to-image (subject_reference) ----
         if (firstFile is not null)
@@ -114,8 +126,8 @@ public partial class MiniMaxProvider
         if (responseFormat is not null) payloadDict["response_format"] = responseFormat;
         if (seed is not null) payloadDict["seed"] = seed;
         if (n is not null) payloadDict["n"] = n;
-        if (metadata?.PromptOptimizer is not null)
-            payloadDict["prompt_optimizer"] = metadata.PromptOptimizer;
+        if (promptOptimizer is { } promptOptimizerValue)
+            payloadDict["prompt_optimizer"] = promptOptimizerValue;
 
         var payload = JsonSerializer.Serialize(payloadDict, ImageJson);
 
@@ -251,4 +263,3 @@ public partial class MiniMaxProvider
         return best;
     }
 }
-
