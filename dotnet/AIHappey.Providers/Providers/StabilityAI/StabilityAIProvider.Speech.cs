@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
-using AIHappey.Common.Model.Providers.StabilityAI;
+using System.Text.Json;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.Extensions;
@@ -21,7 +21,7 @@ public partial class StabilityAIProvider
         if (string.IsNullOrWhiteSpace(request.Text))
             throw new ArgumentException("Text is required.", nameof(request));
 
-        var metadata = request.GetProviderMetadata<StabilityAISpeechProviderMetadata>(GetIdentifier());
+        var metadata = GetMetadataObject(request.GetProviderMetadata<JsonElement>(GetIdentifier()));
         var now = DateTime.UtcNow;
 
         var warnings = new List<object>();
@@ -35,29 +35,40 @@ public partial class StabilityAIProvider
         if (request.Speed is not null)
             warnings.Add(new { type = "unsupported", feature = "speed" });
 
-        var outputFormat =
-            request.OutputFormat
-            ?? metadata?.OutputFormat
-            ?? "mp3";
+        var metadataOutputFormat = GetMetadataProperty<string>(metadata, "output_format");
+        var outputFormat = request.OutputFormat ?? metadataOutputFormat ?? "mp3";
 
         using var form = new MultipartFormDataContent();
         form.Add(NamedField("prompt", request.Text));
         form.Add(NamedField("output_format", outputFormat));
         form.Add(NamedField("model", request.Model));
 
-        if (metadata?.DurationSeconds is not null)
+        var duration = GetMetadataProperty<double?>(metadata, "duration");
+        if (duration is not null)
             form.Add(NamedField(
                 "duration",
-                metadata.DurationSeconds.Value.ToString(CultureInfo.InvariantCulture)));
+                duration.Value.ToString(CultureInfo.InvariantCulture)));
 
-        if (metadata?.Seed is not null)
-            form.Add(NamedField("seed", metadata.Seed.Value.ToString(CultureInfo.InvariantCulture)));
+        var seed = GetMetadataProperty<uint?>(metadata, "seed");
+        if (seed is not null)
+            form.Add(NamedField("seed", seed.Value.ToString(CultureInfo.InvariantCulture)));
 
-        if (metadata?.Steps is not null)
-            form.Add(NamedField("steps", metadata.Steps.Value.ToString(CultureInfo.InvariantCulture)));
+        var steps = GetMetadataProperty<int?>(metadata, "steps");
+        if (steps is not null)
+            form.Add(NamedField("steps", steps.Value.ToString(CultureInfo.InvariantCulture)));
 
-        if (metadata?.CfgScale is not null)
-            form.Add(NamedField("cfg_scale", metadata.CfgScale.Value.ToString(CultureInfo.InvariantCulture)));
+        var cfgScale = GetMetadataProperty<double?>(metadata, "cfg_scale");
+        if (cfgScale is not null)
+            form.Add(NamedField("cfg_scale", cfgScale.Value.ToString(CultureInfo.InvariantCulture)));
+
+        AddRawMetadataFields(
+            form,
+            metadata,
+            "output_format",
+            "duration",
+            "seed",
+            "steps",
+            "cfg_scale");
 
         // sanity check (copy from image MCP)
         foreach (var part in form)
@@ -107,4 +118,3 @@ public partial class StabilityAIProvider
         };
     }
 }
-
