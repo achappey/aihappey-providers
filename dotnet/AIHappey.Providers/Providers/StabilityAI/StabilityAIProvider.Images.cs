@@ -2,7 +2,6 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
 using System.Globalization;
-using AIHappey.Common.Model.Providers.StabilityAI;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.Extensions;
@@ -15,7 +14,10 @@ public partial class StabilityAIProvider
     {
         ApplyAuthHeader();
 
-        var metadata = imageRequest.GetProviderMetadata<StabilityAIImageProviderMetadata>(GetIdentifier());
+        var metadata = GetMetadataObject(imageRequest.GetProviderMetadata<JsonElement>(GetIdentifier()));
+        var negativePrompt = GetMetadataProperty<string>(metadata, "negative_prompt");
+        var stylePreset = GetMetadataProperty<string>(metadata, "style_preset");
+
         ArgumentNullException.ThrowIfNull(imageRequest);
         if (string.IsNullOrWhiteSpace(imageRequest.Prompt))
             throw new ArgumentException("Prompt is required.", nameof(imageRequest));
@@ -52,11 +54,13 @@ public partial class StabilityAIProvider
         if (imageRequest.Seed is not null)
             form.Add(NamedField("seed", imageRequest.Seed.Value.ToString(CultureInfo.InvariantCulture)));
 
-        if (!string.IsNullOrEmpty(metadata?.NegativePrompt))
-            form.Add(NamedField("negative_prompt", metadata.NegativePrompt));
+        if (!string.IsNullOrEmpty(negativePrompt))
+            form.Add(NamedField("negative_prompt", negativePrompt));
 
-        if (!string.IsNullOrEmpty(metadata?.StylePreset))
-            form.Add(NamedField("style_preset", metadata.StylePreset));
+        if (!string.IsNullOrEmpty(stylePreset))
+            form.Add(NamedField("style_preset", stylePreset));
+
+        AddRawMetadataFields(form, metadata, "negative_prompt", "style_preset");
 
         // sanity check (copy from MCP)
         foreach (var part in form)
@@ -104,6 +108,52 @@ public partial class StabilityAIProvider
             Name = $"\"{name}\""
         };
         return c;
+    }
+
+    private static JsonElement? GetMetadataObject(JsonElement metadata)
+    {
+        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return null;
+
+        if (metadata.ValueKind != JsonValueKind.Object)
+            throw new JsonException("Stability AI provider metadata must be a JSON object.");
+
+        return metadata;
+    }
+
+    private static T? GetMetadataProperty<T>(JsonElement? metadata, string propertyName)
+    {
+        if (metadata is not { ValueKind: JsonValueKind.Object } element
+            || !element.TryGetProperty(propertyName, out var property)
+            || property.ValueKind == JsonValueKind.Null)
+            return default;
+
+        return property.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static void AddRawMetadataFields(
+        MultipartFormDataContent form,
+        JsonElement? metadata,
+        params string[] mappedProperties)
+    {
+        if (metadata is not { ValueKind: JsonValueKind.Object } element)
+            return;
+
+        var mapped = mappedProperties.ToHashSet(StringComparer.Ordinal);
+        var existing = form
+            .Select(part => part.Headers.ContentDisposition?.Name?.Trim('"'))
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (mapped.Contains(property.Name) || existing.Contains(property.Name))
+                continue;
+
+            var value = property.Value.ValueKind == JsonValueKind.String
+                ? property.Value.GetString() ?? string.Empty
+                : property.Value.GetRawText();
+            form.Add(NamedField(property.Name, value));
+        }
     }
 
     private static (string path, string? sd3Model) ResolveStabilityEndpoint(string modelSuffix) =>
