@@ -55,17 +55,17 @@ public partial class OpenAIProvider
             options,
             cancellationToken: cancellationToken);
     }
-   
+
     private const string DefaultOpenAiImageOutputFormat = "png";
 
     private static readonly IReadOnlyDictionary<string, OpenAiImageTokenPricing> OpenAiImagePricing =
         new Dictionary<string, OpenAiImageTokenPricing>(StringComparer.OrdinalIgnoreCase)
         {
-            ["gpt-image-2"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null),
-            ["gpt-image-1.5"] = new(8.00m, 2.00m, 32.00m, 5.00m, 1.25m, 10.00m),
-            ["gpt-image-1-mini"] = new(2.50m, 0.25m, 8.00m, 2.00m, 0.20m, null),
-            ["gpt-image-1"] = new(10.00m, 2.50m, 40.00m, 5.00m, 1.25m, null),
-            ["chatgpt-image-latest"] = new(8.00m, 2.00m, 32.00m, 5.00m, 1.25m, 10.00m)
+            ["gpt-image-2.5-sunburst"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null),
+            ["gpt-image-2.5-flare"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null),
+            ["gpt-image-2.6-sunburst"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null),
+            ["gpt-image-2.6-flare"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null),
+            ["gpt-image-2"] = new(8.00m, 2.00m, 30.00m, 5.00m, 1.25m, null)
         };
 
     public async Task<ImageResponse> ImageRequest(ImageRequest imageRequest, CancellationToken cancellationToken = default)
@@ -145,7 +145,7 @@ public partial class OpenAIProvider
     private static OpenAiImageOperation ResolveOpenAiImageOperation(int fileCount)
         => fileCount switch
         {
-            0 => OpenAiImageOperation.Generation,         
+            0 => OpenAiImageOperation.Generation,
             _ => OpenAiImageOperation.Edit
         };
 
