@@ -27,7 +27,7 @@ public partial class OpenAIProvider
 
         _client.DefaultRequestHeaders.Authorization = null;
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetKey());
-
+        options.Store = false;
 
         var attachmentPreparation = await PrepareContainerAttachmentsAsync(
             options,
@@ -83,6 +83,7 @@ public partial class OpenAIProvider
         _client.DefaultRequestHeaders.Authorization = null;
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetKey());
 
+        options.Store = false;
 
         var attachmentPreparation = await PrepareContainerAttachmentsAsync(
             options,
@@ -427,10 +428,19 @@ public partial class OpenAIProvider
         state.SyntheticOutput.Add(call);
         state.OutputIndexesById[toolCallId] = syntheticOutputIndex;
         var started = SyntheticResponsesTool.Create(toolCallId, toolName, input, null, "openai", status: "in_progress");
-        parts.Add(new ResponseOutputItemAdded { SequenceNumber = state.NextSequenceNumber++,
-            OutputIndex = syntheticOutputIndex, Item = started.ToStreamItem() });
-        parts.Add(new ResponseMcpCallArgumentsDone { SequenceNumber = state.NextSequenceNumber++,
-            OutputIndex = syntheticOutputIndex, ItemId = toolCallId, Arguments = call.Arguments });
+        parts.Add(new ResponseOutputItemAdded
+        {
+            SequenceNumber = state.NextSequenceNumber++,
+            OutputIndex = syntheticOutputIndex,
+            Item = started.ToStreamItem()
+        });
+        parts.Add(new ResponseMcpCallArgumentsDone
+        {
+            SequenceNumber = state.NextSequenceNumber++,
+            OutputIndex = syntheticOutputIndex,
+            ItemId = toolCallId,
+            Arguments = call.Arguments
+        });
         parts.Add(new ResponseOutputItemDone
         {
             SequenceNumber = state.NextSequenceNumber++,

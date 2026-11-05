@@ -21,6 +21,8 @@ public static class ModelProviderChatCompletionUnifiedExtensions
          CancellationToken cancellationToken = default)
     {
         var headers = MergeRequestHeaders(null, options.Headers);
+        options.StreamOptions ??= new StreamOptions();
+        options.StreamOptions.IncludeUsage = true;
 
         return await client.GetChatCompletion(options,
             modelProvider.GetIdentifier(),
@@ -59,6 +61,8 @@ public static class ModelProviderChatCompletionUnifiedExtensions
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var headers = MergeRequestHeaders(null, options.Headers);
+        options.StreamOptions ??= new StreamOptions();
+        options.StreamOptions.IncludeUsage = true;
 
         await foreach (var update in client.GetChatCompletionUpdates(options,
             relativeUrl: relativeUrl,

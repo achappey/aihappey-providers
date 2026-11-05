@@ -14,7 +14,7 @@ public partial class OpenAIProvider
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetKey());
 
         options.ParallelToolCalls ??= true;
-
+        options.Store = false;
 
         await foreach (var update in this.GetChatCompletions(
             _client,
@@ -31,7 +31,7 @@ public partial class OpenAIProvider
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetKey());
 
         chatRequest.ParallelToolCalls ??= true;
-
+        chatRequest.Store = false;
 
         return await this.GetChatCompletion(_client,
            chatRequest, cancellationToken: cancellationToken);

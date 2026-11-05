@@ -10,6 +10,7 @@ public partial class SpaceXAIProvider
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
+        options.Store = false;
 
         var response = await this.GetResponse(_client,
                    options, cancellationToken: cancellationToken);
@@ -22,6 +23,7 @@ public partial class SpaceXAIProvider
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ApplyAuthHeader();
+        options.Store = false;
 
         await foreach (var update in this.GetResponses(_client, options, cancellationToken: cancellationToken))
         {
