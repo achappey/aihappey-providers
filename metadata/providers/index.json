@@ -1,5 +1,9 @@
 [
   {
+    "id": "parel",
+    "file": "parel.json"
+  },
+  {
     "id": "ampersand",
     "file": "ampersand.json"
   },
