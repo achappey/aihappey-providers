@@ -1390,6 +1390,10 @@
       "sha256": "732b60f3ba83b2e3266fdb1f6e9a3773bb9b0279d9b2886a106f66bb8d14630f"
     },
     {
+      "file": "providers/ampersand.json",
+      "sha256": "b1d46d26a52565e081c133e840d3d4aa6f57b24b6037d565f7005a2850cb96e3"
+    },
+    {
       "file": "providers/andyapi.json",
       "sha256": "c80470f35607fdafdafdeb6253c25df0ba85c41b37fa3df6ae825dfb5a0afa22"
     },
@@ -2275,7 +2279,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "2417c28eef5faf75ca848f1e0fc78a6683f6aa4d9a5b9011ccba630e4bc28182"
+      "sha256": "3cc510a8a8ae436a87b2a1285114ca4be6fe1cdce2467ae580e02abd6d6a0c52"
     },
     {
       "file": "providers/infercom.json",

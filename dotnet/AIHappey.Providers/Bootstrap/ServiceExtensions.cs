@@ -688,6 +688,7 @@ using AIHappey.Core.Providers.Getimg;
 using AIHappey.Core.Providers.Astria;
 using AIHappey.Core.Providers.Vercel;
 using AIHappey.Core.Providers.AgenticWorkforceME;
+using AIHappey.Core.Providers.Ampersand;
 
 namespace AIHappey.Core.AI;
 
@@ -710,6 +711,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, OpenAIProvider>();
 
         services.AddScoped<IModelProvider, AbacusAIProvider>();
+        services.AddScoped<IModelProvider, AmpersandProvider>();
         services.AddScoped<IModelProvider, MachineFiProvider>();
         services.AddScoped<IModelProvider, BespokeLabsProvider>();
         services.AddScoped<ISkillProvider, GrooveDevProvider>();
