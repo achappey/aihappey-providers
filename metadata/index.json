@@ -2271,7 +2271,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "e3949f4f017b1228fe5960d53989b0d2a5fe49fcb38955b894b769ea21b60919"
+      "sha256": "2417c28eef5faf75ca848f1e0fc78a6683f6aa4d9a5b9011ccba630e4bc28182"
     },
     {
       "file": "providers/infercom.json",
@@ -3800,6 +3800,10 @@
     {
       "file": "providers/vikasit.json",
       "sha256": "8f275b70d0918e5923ce206a39fbdb78373168da661f5ac59606b1be974c054d"
+    },
+    {
+      "file": "providers/viktor.json",
+      "sha256": "5b7ce13332292863a478e44068712cd86ba764ad29c6f1487f714899b51c35db"
     },
     {
       "file": "providers/vivgrid.json",

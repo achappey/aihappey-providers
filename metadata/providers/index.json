@@ -1,5 +1,9 @@
 [
   {
+    "id": "viktor",
+    "file": "viktor.json"
+  },
+  {
     "id": "agenticworkforceme",
     "file": "agenticworkforceme.json"
   },
