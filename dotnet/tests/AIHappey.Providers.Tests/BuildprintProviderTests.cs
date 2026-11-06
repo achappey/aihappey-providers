@@ -130,38 +130,93 @@ public sealed class BuildprintProviderTests
             Assert.Single(result.Output!.Items![0].Content!.OfType<AIToolCallContentPart>()).ToolName);
     }
 
-    [Theory]
-    [InlineData("chat")]
-    [InlineData("responses")]
-    [InlineData("messages")]
-    public async Task Adapters_preserve_native_metadata(string endpoint)
+    [Fact]
+    public async Task Conversation_preserves_native_prompt_without_mutating_input()
     {
         using var client = Client(async (http, ct) =>
         {
             Assert.Equal("https://api.buildprint.ai/api/v1/agents/agent_1/messages", http.RequestUri!.AbsoluteUri);
             var body = JsonSerializer.Deserialize<JsonElement>(await http.Content!.ReadAsStringAsync(ct));
             Assert.Equal("native conversation prompt", body.GetProperty("prompt").GetString());
-            Assert.Equal(1, body.EnumerateObject().Count());
+            Assert.Single(body.EnumerateObject());
+            return Json("""{"agentId":"agent_1","queued":true}""");
+        });
+        var request = Request("agent_1", JsonSerializer.Deserialize<JsonElement>(NativeMessage));
+        var before = JsonSerializer.Serialize(request);
+
+        await Provider(client).ExecuteUnifiedAsync(request);
+
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData("chat", false, true)]
+    [InlineData("chat", true, true)]
+    [InlineData("responses", false, true)]
+    [InlineData("responses", true, true)]
+    [InlineData("messages", false, true)]
+    [InlineData("messages", true, true)]
+    [InlineData("chat", false, false)]
+    [InlineData("chat", true, false)]
+    [InlineData("responses", false, false)]
+    [InlineData("responses", true, false)]
+    [InlineData("messages", false, false)]
+    [InlineData("messages", true, false)]
+    public async Task Adapters_preserve_native_options_and_fall_back_to_user_text(string endpoint, bool streaming, bool nativePrompt)
+    {
+        var calls = 0;
+        using var client = Client(async (http, ct) =>
+        {
+            calls++;
+            Assert.Equal(HttpMethod.Post, http.Method);
+            Assert.Equal("https://api.buildprint.ai/api/v1/agents/agent_1/messages", http.RequestUri!.AbsoluteUri);
+            var body = JsonSerializer.Deserialize<JsonElement>(await http.Content!.ReadAsStringAsync(ct));
+            Assert.Equal(nativePrompt ? "native conversation prompt" : "Hello", body.GetProperty("prompt").GetString());
+            Assert.Single(body.EnumerateObject());
             return Json("""{"agentId":"agent_1","queued":true}""");
         });
         var provider = Provider(client);
-        var extra = NativeMessage[1..^1];
+        // Native endpoint options belong at the request root; provider-keyed options are for unified/Vercel requests.
+        var extra = nativePrompt ? NativeMessage[1..^1] : "\"future\":\"ignored by the message endpoint\"";
         switch (endpoint)
         {
             case "chat":
-                await provider.CompleteChatAsync(JsonSerializer.Deserialize<ChatCompletionOptions>(
-                    $$$"""{"model":"agent_1","messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!);
+                var chat = JsonSerializer.Deserialize<ChatCompletionOptions>(
+                    $$$"""{"model":"agent_1","messages":[{"role":"user","content":"Hello"}],{{{extra}}} }""")!;
+                if (streaming) await Drain(provider.CompleteChatStreamingAsync(chat));
+                else await provider.CompleteChatAsync(chat);
                 break;
             case "responses":
-                await provider.ResponsesAsync(JsonSerializer.Deserialize<ResponseRequest>(
-                    $$$"""{"model":"agent_1","input":"Hello","buildprint":{ {{{extra}}} }}""")!);
+                var responses = JsonSerializer.Deserialize<ResponseRequest>(
+                    $$$"""{"model":"agent_1","input":"Hello",{{{extra}}} }""")!;
+                if (streaming) await Drain(provider.ResponsesStreamingAsync(responses));
+                else await provider.ResponsesAsync(responses);
                 break;
             default:
-                await provider.MessagesAsync(JsonSerializer.Deserialize<MessagesRequest>(
-                    $$$"""{"model":"agent_1","max_tokens":100,"messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!, []);
+                var messages = JsonSerializer.Deserialize<MessagesRequest>(
+                    $$$"""{"model":"agent_1","max_tokens":100,"messages":[{"role":"user","content":"Hello"}],{{{extra}}} }""")!;
+                if (streaming) await Drain(provider.MessagesStreamingAsync(messages, []));
+                else await provider.MessagesAsync(messages, []);
                 break;
         }
 
+        Assert.Equal(1, calls);
+    }
+
+    [Theory]
+    [InlineData("null")]
+    [InlineData("1")]
+    [InlineData("true")]
+    [InlineData("{}")]
+    [InlineData("[]")]
+    [InlineData("\"\"")]
+    [InlineData("\"   \"")]
+    public async Task Invalid_native_conversation_prompts_fail_before_sending(string prompt)
+    {
+        using var client = Client((_, _) => throw new InvalidOperationException("Unexpected network call."));
+        var request = Request("agent_1", JsonSerializer.Deserialize<JsonElement>($$"""{"prompt":{{prompt}}}"""));
+
+        await Assert.ThrowsAsync<ArgumentException>(() => Provider(client).ExecuteUnifiedAsync(request));
     }
 
     [Fact]
@@ -241,6 +296,12 @@ public sealed class BuildprintProviderTests
     private static HttpClient Client(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> send) => new(new Handler(send));
     private static HttpResponseMessage Json(string text) => new(HttpStatusCode.OK)
     { Content = new StringContent(text, Encoding.UTF8, "application/json") };
+    private static async Task Drain<T>(IAsyncEnumerable<T> stream)
+    {
+        var count = 0;
+        await foreach (var _ in stream) count++;
+        Assert.True(count > 0, "The streaming adapter must emit at least one event.");
+    }
     private sealed class Keys : IApiKeyResolver { public string Resolve(string provider) => "test-key"; }
     private sealed class Factory(HttpClient client) : IHttpClientFactory { public HttpClient CreateClient(string name) => client; }
     private sealed class Handler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> send) : HttpMessageHandler
