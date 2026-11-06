@@ -29,8 +29,9 @@ public partial class MistralProvider : IModelProvider
     {
         if (IsOcrModel(options.Model))
         {
-            await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return item.ToChatCompletionUpdate();
+            await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+                .ToChatCompletionUpdates(cancellationToken))
+                yield return item;
             yield break;
         }
 

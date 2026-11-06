@@ -17,7 +17,8 @@ public partial class MIMICXAIProvider
     private async IAsyncEnumerable<ChatCompletionUpdate> StreamChatCompletionsAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+        await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+            .ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 }

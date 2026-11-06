@@ -24,8 +24,9 @@ public partial class GreenPTProvider
     {
         if (IsSpecialUnifiedModel(options.Model))
         {
-            await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return item.ToChatCompletionUpdate();
+            await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+                .ToChatCompletionUpdates(cancellationToken))
+                yield return item;
             yield break;
         }
 

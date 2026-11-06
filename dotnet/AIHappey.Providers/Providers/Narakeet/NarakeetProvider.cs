@@ -59,8 +59,9 @@ public sealed partial class NarakeetProvider : IModelProvider, IUnifiedModelProv
 
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+            .ToChatCompletionUpdates(cancellationToken))
+            yield return part;
     }
 
     public async IAsyncEnumerable<UIMessagePart> StreamAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)
