@@ -63,8 +63,14 @@ public partial class HCompanyProvider : IModelProvider, IUnifiedModelProvider
     {
         if (TryAgent(options.Model, out _))
         {
-            await foreach (var evt in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return evt.ToChatCompletionUpdate();
+            var stream = StreamUnifiedAsync(
+                options.ToUnifiedRequest(GetIdentifier()),
+                cancellationToken);
+
+            await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+            {
+                yield return update;
+            }
             yield break;
         }
         var prepared = PrepareHolo(options);
