@@ -61,8 +61,8 @@ public partial class OVHcloudProvider : IModelProvider
         if (IsImageModel(options.Model))
         {
             await foreach (var streamEvent in StreamUnifiedAsync(
-                               options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return streamEvent.ToChatCompletionUpdate();
+                               options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+                yield return streamEvent;
 
             yield break;
         }

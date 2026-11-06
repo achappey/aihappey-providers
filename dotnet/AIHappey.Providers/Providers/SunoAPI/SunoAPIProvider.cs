@@ -55,8 +55,8 @@ public partial class SunoAPIProvider : IModelProvider, IUnifiedModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await foreach (var update in StreamUnifiedAsync(
-            options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return update.ToChatCompletionUpdate();
+            options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return update;
     }
 
     public string GetIdentifier() => nameof(SunoAPI).ToLowerInvariant();

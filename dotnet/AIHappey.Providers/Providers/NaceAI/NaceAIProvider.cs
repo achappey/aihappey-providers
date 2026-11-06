@@ -69,9 +69,8 @@ public sealed partial class NaceAIProvider : IModelProvider
     {
         if (await IsSpecialModelAsync(options.Model, cancellationToken))
         {
-            await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-                               .WithCancellation(cancellationToken))
-                yield return streamEvent.ToChatCompletionUpdate();
+            await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+                yield return streamEvent;
 
             yield break;
         }
