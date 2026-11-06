@@ -65,28 +65,32 @@ public partial class CohereProvider
                     .ToList()
                 : [];
 
-        decimal? searchUnits = null;
+        var usesTokenBasedPricing = request.Model.Contains("rerank-v5.0-", StringComparison.OrdinalIgnoreCase);
+        decimal? billedUnits = null;
 
         if (root.TryGetProperty("meta", out var metaEl)
             && metaEl.ValueKind == JsonValueKind.Object
             && metaEl.TryGetProperty("billed_units", out var billedUnitsEl)
-            && billedUnitsEl.ValueKind == JsonValueKind.Object
-            && billedUnitsEl.TryGetProperty("search_units", out var searchUnitsEl)
-            && searchUnitsEl.ValueKind == JsonValueKind.Number
-            && searchUnitsEl.TryGetDecimal(out var parsedSearchUnits))
+            && billedUnitsEl.ValueKind == JsonValueKind.Object)
         {
-            searchUnits = parsedSearchUnits;
+            var billedUnitsProperty = usesTokenBasedPricing ? "input_tokens" : "search_units";
+            if (billedUnitsEl.TryGetProperty(billedUnitsProperty, out var unitsEl)
+                && unitsEl.ValueKind == JsonValueKind.Number
+                && unitsEl.TryGetDecimal(out var parsedBilledUnits))
+            {
+                billedUnits = parsedBilledUnits;
+            }
         }
 
         decimal? cost = null;
 
-        if (searchUnits is not null)
+        if (billedUnits is not null)
         {
             try
             {
                 var rerankModel = await this.GetModel(request.Model, cancellationToken);
                 if (rerankModel.Pricing?.Input is not null)
-                    cost = searchUnits.Value * rerankModel.Pricing.Input;
+                    cost = billedUnits.Value * rerankModel.Pricing.Input;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
