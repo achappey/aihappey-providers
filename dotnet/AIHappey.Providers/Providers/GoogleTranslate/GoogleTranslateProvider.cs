@@ -67,8 +67,9 @@ public sealed partial class GoogleTranslateProvider : IModelProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+        await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+            .ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     

@@ -48,8 +48,9 @@ public sealed partial class MurfAIProvider
     {
         if (await this.IsSpeechModelAsync(options.Model, cancellationToken))
         {
-            await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return part.ToChatCompletionUpdate();
+            await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+                .ToChatCompletionUpdates(cancellationToken))
+                yield return part;
             yield break;
         }
 
