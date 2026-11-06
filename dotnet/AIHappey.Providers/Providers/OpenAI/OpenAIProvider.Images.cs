@@ -1,5 +1,4 @@
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.OpenAI;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Models;
 using System.Globalization;
@@ -121,7 +120,10 @@ public partial class OpenAIProvider
         using var doc = JsonDocument.Parse(raw);
         var root = doc.RootElement.Clone();
 
-        var results = ExtractOpenAiImages(root);
+        var requestedOutputFormat = IsGptOpenAiImageModel(imageRequest.Model)
+            ? imageRequest.GetProviderMetadata<OpenAIImageGenerationRequest>(GetIdentifier())?.OutputFormat
+            : null;
+        var results = ExtractOpenAiImages(root, requestedOutputFormat);
         if (results.Count == 0)
             throw new InvalidOperationException("OpenAI image response did not contain generated images.");
 
@@ -151,30 +153,35 @@ public partial class OpenAIProvider
 
     private HttpRequestMessage BuildOpenAiImageGenerationRequest(ImageRequest request, List<object> warnings)
     {
-        var metadata = request.GetProviderMetadata<OpenAiImageProviderMetadata>(GetIdentifier());
-        var payload = new Dictionary<string, object?>
-        {
-            ["model"] = request.Model,
-            ["prompt"] = request.Prompt
-        };
-
-        AddOpenAiImageCommonOptions(payload, request, metadata?.Quality, warnings, OpenAiImageOperation.Generation);
-
-        if (!string.IsNullOrWhiteSpace(metadata?.Background) && IsGptOpenAiImageModel(request.Model))
-            payload["background"] = metadata.Background;
-
-        if (!string.IsNullOrWhiteSpace(metadata?.Moderation) && IsGptOpenAiImageModel(request.Model))
-            payload["moderation"] = metadata.Moderation;
+        // The generic settings envelope is translated only here; the wire contract is native OpenAI.
+        var options = request.GetProviderMetadata<OpenAIImageGenerationRequest>(GetIdentifier()) ?? new();
+        options.Model = request.Model;
+        options.Prompt = request.Prompt;
+        options.N = request.N ?? options.N;
+        options.Size = ResolveOpenAiImageSize(request, warnings, OpenAiImageOperation.Generation) ?? options.Size;
 
         if (IsGptOpenAiImageModel(request.Model))
-            payload["output_format"] = DefaultOpenAiImageOutputFormat;
+        {
+            if (string.IsNullOrWhiteSpace(options.OutputFormat))
+                options.OutputFormat = DefaultOpenAiImageOutputFormat;
+        }
         else
-            payload["response_format"] = "b64_json";
+        {
+            options.ResponseFormat ??= "b64_json";
+            options.OutputFormat = null;
+            options.OutputCompression = null;
+            options.Background = null;
+            options.Moderation = null;
+            options.Complexity = null;
+            options.FrameCount = null;
+            options.FrameDurationMs = null;
+            options.Svg = null;
+        }
 
         return new HttpRequestMessage(HttpMethod.Post, "v1/images/generations")
         {
             Content = new StringContent(
-                JsonSerializer.Serialize(payload, OpenAiImageJsonOptions),
+                JsonSerializer.Serialize(options, OpenAiImageJsonOptions),
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
@@ -182,7 +189,7 @@ public partial class OpenAIProvider
 
     private HttpRequestMessage BuildOpenAiImageEditRequest(ImageRequest request, List<ImageFile> files, List<object> warnings)
     {
-        var metadata = request.GetProviderMetadata<OpenAiImageEditProviderMetadata>(GetIdentifier());
+        var options = request.GetProviderMetadata<OpenAIImageEditRequest>(GetIdentifier()) ?? new();
         var inputFiles = files.Take(16).ToList();
 
         if (files.Count > inputFiles.Count)
@@ -195,52 +202,25 @@ public partial class OpenAIProvider
             });
         }
 
-        var payload = new Dictionary<string, object?>
-        {
-            ["model"] = request.Model,
-            ["prompt"] = request.Prompt,
-            ["images"] = inputFiles.Select(ToOpenAiImageReference).ToList()
-        };
+        options.Model = request.Model;
+        options.Prompt = request.Prompt;
+        options.Images = inputFiles.Select(ToOpenAiImageReference).ToArray();
+        options.N = request.N ?? options.N;
+        options.Size = ResolveOpenAiImageSize(request, warnings, OpenAiImageOperation.Edit) ?? options.Size;
 
-        AddOpenAiImageCommonOptions(payload, request, metadata?.Quality, warnings, OpenAiImageOperation.Edit);
-
-        if (!string.IsNullOrWhiteSpace(metadata?.Background))
-            payload["background"] = metadata.Background;
-
-        if (!string.IsNullOrWhiteSpace(metadata?.InputFidelity))
-            payload["input_fidelity"] = metadata.InputFidelity;
-
-        if (IsGptOpenAiImageModel(request.Model))
-            payload["output_format"] = DefaultOpenAiImageOutputFormat;
+        if (IsGptOpenAiImageModel(request.Model) && string.IsNullOrWhiteSpace(options.OutputFormat))
+            options.OutputFormat = DefaultOpenAiImageOutputFormat;
 
         if (request.Mask is not null)
-            payload["mask"] = ToOpenAiImageReference(request.Mask);
+            options.Mask = ToOpenAiImageReference(request.Mask);
 
         return new HttpRequestMessage(HttpMethod.Post, "v1/images/edits")
         {
             Content = new StringContent(
-                JsonSerializer.Serialize(payload, OpenAiImageJsonOptions),
+                JsonSerializer.Serialize(options, OpenAiImageJsonOptions),
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
-    }
-
-    private static void AddOpenAiImageCommonOptions(
-        Dictionary<string, object?> payload,
-        ImageRequest request,
-        string? quality,
-        List<object> warnings,
-        OpenAiImageOperation operation)
-    {
-        if (request.N.HasValue)
-            payload["n"] = request.N.Value;
-
-        var size = ResolveOpenAiImageSize(request, warnings, operation);
-        if (!string.IsNullOrWhiteSpace(size))
-            payload["size"] = size;
-
-        if (!string.IsNullOrWhiteSpace(quality))
-            payload["quality"] = quality;
     }
 
     private static string? ResolveOpenAiImageSize(ImageRequest request, List<object> warnings, OpenAiImageOperation operation)
@@ -272,22 +252,22 @@ public partial class OpenAIProvider
         return size;
     }
 
-    private static Dictionary<string, object?> ToOpenAiImageReference(ImageFile file)
+    private static OpenAIImageReference ToOpenAiImageReference(ImageFile file)
     {
         ArgumentNullException.ThrowIfNull(file);
 
         if (string.Equals(file.Type, "file_id", StringComparison.OrdinalIgnoreCase)
             || string.Equals(file.Type, "fileId", StringComparison.OrdinalIgnoreCase))
         {
-            return new Dictionary<string, object?>
+            return new OpenAIImageReference
             {
-                ["file_id"] = file.Data
+                FileId = file.Data
             };
         }
 
-        return new Dictionary<string, object?>
+        return new OpenAIImageReference
         {
-            ["image_url"] = NormalizeOpenAiImageInput(file)
+            ImageUrl = NormalizeOpenAiImageInput(file)
         };
     }
 
@@ -346,14 +326,14 @@ public partial class OpenAIProvider
         content.Add(new StringContent(value, Encoding.UTF8), name);
     }
 
-    private static List<string> ExtractOpenAiImages(JsonElement root)
+    private static List<string> ExtractOpenAiImages(JsonElement root, string? requestedOutputFormat = null)
     {
         List<string> images = [];
 
         if (!root.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Array)
             return images;
 
-        var outputFormat = ReadOpenAiImageString(root, "output_format");
+        var outputFormat = ReadOpenAiImageString(root, "output_format") ?? requestedOutputFormat;
         var mediaType = OpenAiImageMediaTypeFromFormat(outputFormat);
 
         foreach (var image in data.EnumerateArray())
@@ -516,6 +496,8 @@ public partial class OpenAIProvider
         {
             "jpeg" or "jpg" => MediaTypeNames.Image.Jpeg,
             "webp" => "image/webp",
+            "gif" => "image/gif",
+            "svg" => "image/svg+xml",
             _ => MediaTypeNames.Image.Png
         };
 

@@ -1,6 +1,6 @@
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.OpenAI;
 using AIHappey.Core.AI;
+using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using System.Globalization;
@@ -85,7 +85,7 @@ public partial class OhMyGPTProvider
 
     private HttpRequestMessage BuildOhMyGptImageGenerationRequest(ImageRequest request, List<object> warnings)
     {
-        var metadata = request.GetProviderMetadata<OpenAiImageProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<OpenAIImageGenerationRequest>(GetIdentifier());
         var payload = new Dictionary<string, object?>
         {
             ["model"] = request.Model,
@@ -113,7 +113,7 @@ public partial class OhMyGPTProvider
 
     private HttpRequestMessage BuildOhMyGptImageEditRequest(ImageRequest request, List<ImageFile> files, List<object> warnings)
     {
-        var metadata = request.GetProviderMetadata<OpenAiImageEditProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<OpenAIImageEditRequest>(GetIdentifier());
         var inputFiles = files.Take(16).ToList();
 
         if (files.Count > inputFiles.Count)

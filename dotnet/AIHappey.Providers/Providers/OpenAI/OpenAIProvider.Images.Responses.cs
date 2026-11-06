@@ -1,7 +1,7 @@
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.OpenAI;
 using AIHappey.Core.AI;
+using AIHappey.Core.Models;
 using AIHappey.Responses;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
@@ -56,25 +56,25 @@ public partial class OpenAIProvider
         if (files.Count > inputFiles.Count)
             warnings.Add(new { type = "unsupported", feature = "files", details = "OpenAI supports up to 16 input images. Used first 16 images." });
 
-        var editMetadata = request.GetProviderMetadata<OpenAiImageEditProviderMetadata>(GetIdentifier());
-        var imageMetadata = request.GetProviderMetadata<OpenAiImageProviderMetadata>(GetIdentifier());
+        var options = request.GetProviderMetadata<OpenAIImageEditRequest>(GetIdentifier()) ?? new();
+        var outputFormat = string.IsNullOrWhiteSpace(options.OutputFormat) ? DefaultOpenAiImageOutputFormat : options.OutputFormat;
         var toolOptions = new Dictionary<string, object?>
         {
             ["model"] = request.Model,
             ["action"] = "edit",
-            ["output_format"] = DefaultOpenAiImageOutputFormat
+            ["output_format"] = outputFormat
         };
-        AddImageResponseToolOption(toolOptions, "size", ResolveOpenAiImageSize(request, warnings, OpenAiImageOperation.Edit));
-        AddImageResponseToolOption(toolOptions, "quality", editMetadata?.Quality);
-        AddImageResponseToolOption(toolOptions, "background", editMetadata?.Background);
-        AddImageResponseToolOption(toolOptions, "moderation", imageMetadata?.Moderation);
-        if (!string.IsNullOrWhiteSpace(editMetadata?.InputFidelity))
-        {
-            if (request.Model.StartsWith("gpt-image-2", StringComparison.OrdinalIgnoreCase))
-                warnings.Add(new { type = "unsupported", feature = "input_fidelity", details = "Input fidelity is not supported by this image model and was omitted." });
-            else
-                toolOptions["input_fidelity"] = editMetadata.InputFidelity;
-        }
+        AddImageResponseToolOption(toolOptions, "size", ResolveOpenAiImageSize(request, warnings, OpenAiImageOperation.Edit) ?? options.Size);
+        AddImageResponseToolOption(toolOptions, "quality", options.Quality);
+        AddImageResponseToolOption(toolOptions, "background", options.Background);
+        AddImageResponseToolOption(toolOptions, "moderation", options.Moderation);
+        AddImageResponseToolOption(toolOptions, "input_fidelity", options.InputFidelity);
+        AddImageResponseToolOption(toolOptions, "complexity", options.Complexity);
+        AddImageResponseToolOption(toolOptions, "frame_count", options.FrameCount);
+        AddImageResponseToolOption(toolOptions, "frame_duration_ms", options.FrameDurationMs);
+        AddImageResponseToolOption(toolOptions, "output_compression", options.OutputCompression);
+        AddImageResponseToolOption(toolOptions, "svg", options.Svg);
+        AddImageResponseToolOption(toolOptions, "markup", options.Markup);
         if (request.Mask is not null)
             toolOptions["input_image_mask"] = ToOpenAiImageReference(request.Mask);
 
@@ -85,8 +85,8 @@ public partial class OpenAIProvider
             content.Add(new InputImagePart
             {
                 Detail = "auto",
-                ImageUrl = reference.TryGetValue("image_url", out var url) ? (string?)url : null,
-                FileId = reference.TryGetValue("file_id", out var id) ? (string?)id : null
+                ImageUrl = reference.ImageUrl,
+                FileId = reference.FileId
             });
         }
 
@@ -112,6 +112,7 @@ public partial class OpenAIProvider
                 }],
                 ToolChoice = new { type = "image_generation" },
                 ParallelToolCalls = false,
+                SafetyIdentifier = options.SafetyIdentifier,
                 Stream = false,
                 Store = false,
                 AdditionalProperties = new() { ["max_tool_calls"] = JsonSerializer.SerializeToElement(1) }
@@ -131,7 +132,7 @@ public partial class OpenAIProvider
                 var result = ReadOpenAiImageString(item, "result");
                 if (!string.IsNullOrWhiteSpace(result))
                     completedImages.Add(NormalizeOpenAiImageOutput(result,
-                        OpenAiImageMediaTypeFromFormat(ReadOpenAiImageString(item, "output_format") ?? DefaultOpenAiImageOutputFormat)));
+                        OpenAiImageMediaTypeFromFormat(ReadOpenAiImageString(item, "output_format") ?? outputFormat)));
             }
             if (completedImages.Count != 1)
                 throw new InvalidOperationException("OpenAI Responses image request must return exactly one completed image per call.");
@@ -173,9 +174,9 @@ public partial class OpenAIProvider
         };
     }
 
-    private static void AddImageResponseToolOption(Dictionary<string, object?> options, string name, string? value)
+    private static void AddImageResponseToolOption(Dictionary<string, object?> options, string name, object? value)
     {
-        if (!string.IsNullOrWhiteSpace(value))
+        if (value is not null && (value is not string text || !string.IsNullOrWhiteSpace(text)))
             options[name] = value;
     }
 }

@@ -37,7 +37,7 @@ public static class ImageCompatibilityExtensions
             Prompt = request.Prompt,
             Size = request.Size,
             N = request.N,
-            ProviderOptions = BuildProviderOptions(providerIdentifier, BuildGenerationProviderOptions(request))
+            ProviderOptions = BuildProviderOptions(providerIdentifier, BuildImageProviderOptions(request))
         };
 
     public static async Task<ImageRequest> ToImageRequest(this OpenAIImageEditRequest request, string model, string providerIdentifier, CancellationToken cancellationToken = default)
@@ -49,7 +49,7 @@ public static class ImageCompatibilityExtensions
             N = request.N,
             Files = await ResolveImageFiles(request.ImageFiles, request.Images, cancellationToken),
             Mask = await ResolveImageFile(request.MaskFile, request.Mask, cancellationToken),
-            ProviderOptions = BuildProviderOptions(providerIdentifier, BuildEditProviderOptions(request))
+            ProviderOptions = BuildProviderOptions(providerIdentifier, BuildImageProviderOptions(request))
         };
 
 
@@ -57,9 +57,15 @@ public static class ImageCompatibilityExtensions
         => new()
         {
             ImageFiles = ReadImageFiles(form),
+            Images = ReadFormJson<OpenAIImageReference[]>(form, "images"),
             Prompt = ReadFormString(form, "prompt")!,
             Background = ReadFormString(form, "background"),
+            Complexity = ReadFormString(form, "complexity"),
+            FrameCount = ReadFormInt(form, "frame_count"),
+            FrameDurationMs = ReadFormInt(form, "frame_duration_ms"),
             InputFidelity = ReadFormString(form, "input_fidelity"),
+            Markup = ReadFormJson<OpenAIImageReference>(form, "markup"),
+            Mask = ReadFormJson<OpenAIImageReference>(form, "mask"),
             MaskFile = form.Files.GetFile("mask"),
             Model = ReadFormString(form, "model") ?? throw new Exception("Model required"),
             Moderation = ReadFormString(form, "moderation"),
@@ -68,8 +74,10 @@ public static class ImageCompatibilityExtensions
             OutputFormat = ReadFormString(form, "output_format"),
             PartialImages = ReadFormInt(form, "partial_images"),
             Quality = ReadFormString(form, "quality"),
+            SafetyIdentifier = ReadFormString(form, "safety_identifier"),
             Size = ReadFormString(form, "size"),
             Stream = ReadFormBool(form, "stream"),
+            Svg = ReadFormJson<OpenAIImageSvgOptions>(form, "svg"),
             User = ReadFormString(form, "user")
         };
 
@@ -157,52 +165,18 @@ public static class ImageCompatibilityExtensions
         return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     }
 
-    private static Dictionary<string, object?> BuildGenerationProviderOptions(OpenAIImageGenerationRequest request)
+    private static Dictionary<string, object?> BuildImageProviderOptions<T>(T request)
     {
-        var options = new Dictionary<string, object?>
+        var options = new Dictionary<string, object?>();
+        foreach (var field in JsonSerializer.SerializeToElement(request, JsonSerializerOptions.Web).EnumerateObject())
         {
-         /*   ["background"] = request.Background,
-            ["moderation"] = request.Moderation,
-            ["output_compression"] = request.OutputCompression,
-            ["output_format"] = request.OutputFormat,
-            ["partial_images"] = request.PartialImages,
-            ["quality"] = request.Quality,
-            ["response_format"] = request.ResponseFormat,
-            ["stream"] = request.Stream,
-            ["style"] = request.Style,
-            ["user"] = request.User*/
-        };
-
-        AddAdditionalProperties(options, request.AdditionalProperties);
-        return options;
-    }
-
-    private static Dictionary<string, object?> BuildEditProviderOptions(OpenAIImageEditRequest request)
-    {
-        var options = new Dictionary<string, object?>
-        {
-          /*  ["background"] = request.Background,
-            ["input_fidelity"] = request.InputFidelity,
-            ["moderation"] = request.Moderation,
-            ["output_compression"] = request.OutputCompression,
-            ["output_format"] = request.OutputFormat,
-            ["partial_images"] = request.PartialImages,
-            ["quality"] = request.Quality,
-            ["stream"] = request.Stream,
-            ["user"] = request.User*/
-        };
-
-        AddAdditionalProperties(options, request.AdditionalProperties);
-        return options;
-    }
-
-    private static void AddAdditionalProperties(Dictionary<string, object?> options, Dictionary<string, JsonElement>? additionalProperties)
-    {
-        foreach (var (name, value) in additionalProperties ?? [])
-        {
-            if (!options.ContainsKey(name))
-                options[name] = value;
+            // These fields have first-class equivalents on the generic request. Everything
+            // else retains the native wire shape, including nested options and extension data.
+            if (field.Name is "model" or "prompt" or "size" or "n" or "images" or "mask")
+                continue;
+            options.TryAdd(field.Name, field.Value.Clone());
         }
+        return options;
     }
 
     private static Dictionary<string, JsonElement>? BuildProviderOptions(string providerIdentifier, Dictionary<string, object?> options)
@@ -299,6 +273,9 @@ public static class ImageCompatibilityExtensions
 
     private static int? ReadFormInt(IFormCollection form, string name)
         => int.TryParse(ReadFormString(form, name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : null;
+
+    private static T? ReadFormJson<T>(IFormCollection form, string name)
+        => ReadFormString(form, name) is { } json ? JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Web) : default;
 
     private static bool? ReadFormBool(IFormCollection form, string name)
         => ReadFormString(form, name)?.Trim().ToLowerInvariant() switch { "true" or "1" => true, "false" or "0" => false, _ => null };

@@ -54,8 +54,6 @@ public static class ModelProviderImageCompatibilityExtensions
          string? endpoint = "v1/images/generations",
          [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        options.ResponseFormat = "b64_json";
-
         var response = await httpClient.OpenAICompatibleImageGenerationRequestAsync(
             options,
             endpoint,
@@ -89,8 +87,6 @@ public static class ModelProviderImageCompatibilityExtensions
             string? endpoint = "v1/images/generations",
             CancellationToken cancellationToken = default)
     {
-
-        options.ResponseFormat = "b64_json";
 
         using var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
@@ -289,19 +285,18 @@ public static class ModelProviderImageCompatibilityExtensions
         CancellationToken cancellationToken)
     {
         var content = new MultipartFormDataContent();
-        AddMultipartString(content, "model", options.Model);
-        AddMultipartString(content, "prompt", options.Prompt);
-        AddMultipartString(content, "background", options.Background);
-        AddMultipartString(content, "input_fidelity", options.InputFidelity);
-        AddMultipartString(content, "moderation", options.Moderation);
-        AddMultipartString(content, "n", options.N?.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        AddMultipartString(content, "output_compression", options.OutputCompression?.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        AddMultipartString(content, "output_format", options.OutputFormat);
-        AddMultipartString(content, "partial_images", options.PartialImages?.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        AddMultipartString(content, "quality", options.Quality);
-        AddMultipartString(content, "size", options.Size);
-        AddMultipartString(content, "stream", forceStream ? "true" : options.Stream?.ToString().ToLowerInvariant());
-        AddMultipartString(content, "user", options.User);
+        // Serialize the native contract for both transports so new fields and extension data
+        // cannot be lost to a separate multipart whitelist. Structured fields retain JSON shape.
+        var fields = JsonSerializer.SerializeToElement(options, OpenAIImageCompatibilityJsonOptions);
+        foreach (var field in fields.EnumerateObject())
+        {
+            if ((field.Name == "stream" && forceStream) || (field.Name == "mask" && options.MaskFile is not null))
+                continue;
+            AddMultipartString(content, field.Name,
+                field.Value.ValueKind == JsonValueKind.String ? field.Value.GetString() : field.Value.GetRawText());
+        }
+        if (forceStream)
+            AddMultipartString(content, "stream", "true");
 
         var imageFiles = options.ImageFiles ?? [];
         for (var i = 0; i < imageFiles.Length; i++)
@@ -332,7 +327,7 @@ public static class ModelProviderImageCompatibilityExtensions
 
     private static void AddMultipartString(MultipartFormDataContent content, string name, string? value)
     {
-        if (!string.IsNullOrWhiteSpace(value))
+        if (value is not null)
             content.Add(new StringContent(value, Encoding.UTF8), name);
     }
 
