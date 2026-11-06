@@ -6,7 +6,6 @@ using AIHappey.Core.Contracts;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using AIHappey.Common.MCP;
-using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 using AIHappey.Core.Extensions;
 

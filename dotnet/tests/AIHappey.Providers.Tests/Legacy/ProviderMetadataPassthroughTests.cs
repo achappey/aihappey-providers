@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
-using AIHappey.Core.Models;
 using AIHappey.Core.Providers.ARKLabs;
 using AIHappey.Core.Providers.Fireworks;
 using AIHappey.Core.Providers.Jina;
@@ -12,7 +11,6 @@ using AIHappey.Core.Providers.Portkey;
 using AIHappey.Core.Providers.Pollinations;
 using AIHappey.Core.Providers.VoyageAI;
 using AIHappey.Vercel.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace AIHappey.Tests;

@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text;
-using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Speechmatics;
 using AIHappey.Vercel.Models;

@@ -5,7 +5,6 @@ using System.Text.Json;
 using AIHappey.Common.Extensions;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Models;
-using AIHappey.Vercel.Extensions;
 using AIHappey.Core.Extensions;
 
 namespace AIHappey.Core.Providers.Mistral;

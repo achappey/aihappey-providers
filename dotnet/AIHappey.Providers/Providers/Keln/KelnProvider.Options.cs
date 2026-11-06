@@ -1,7 +1,5 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using AIHappey.ChatCompletions.Models;
-using AIHappey.Core.AI;
 using AIHappey.Messages;
 using AIHappey.Responses;
 

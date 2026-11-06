@@ -2,12 +2,10 @@ using System.Net.Http.Headers;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
-using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Models;
 using AIHappey.Messages;
 using AIHappey.Responses;
-using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.DecisionModels;

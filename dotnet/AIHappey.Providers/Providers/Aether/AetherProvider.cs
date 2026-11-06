@@ -9,7 +9,6 @@ using AIHappey.Messages.Mapping;
 using AIHappey.Responses;
 using System.Runtime.CompilerServices;
 using AIHappey.Unified.Models;
-using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Aether;

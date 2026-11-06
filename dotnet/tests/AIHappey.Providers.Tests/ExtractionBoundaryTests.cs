@@ -3,7 +3,6 @@ using AIHappey.Core.Contracts;
 using AIHappey.Core.Diagnostics;
 using AIHappey.Core.Models;
 using AIHappey.Core.Providers.Cursor;
-using AIHappey.Core.Providers.OpenAI;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;

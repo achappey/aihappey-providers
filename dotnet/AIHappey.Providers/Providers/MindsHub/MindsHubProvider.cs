@@ -12,7 +12,6 @@ using AIHappey.Responses.Extensions;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Mapping;
 using AIHappey.Responses;
-using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.MindsHub;

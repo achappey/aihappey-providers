@@ -4,7 +4,6 @@ using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using System.Runtime.CompilerServices;
 using AIHappey.Vercel.Models;
-using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Mistral;

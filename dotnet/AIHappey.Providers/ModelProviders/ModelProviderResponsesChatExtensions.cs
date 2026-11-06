@@ -1,12 +1,6 @@
-using AIHappey.Common.Extensions;
 using AIHappey.Core.Contracts;
-using AIHappey.Messages;
-using AIHappey.Responses;
-using AIHappey.Messages.Mapping;
-using AIHappey.ChatCompletions.Models;
 using System.Text.Json;
 using AIHappey.Interactions;
-using AIHappey.ChatCompletions.Mapping;
 
 namespace AIHappey.Core.AI;
 

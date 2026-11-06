@@ -5,7 +5,6 @@ using AIHappey.Common.Model;
 using AIHappey.Core.Contracts;
 using AIHappey.Messages;
 using AIHappey.Unified.Models;
-using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 

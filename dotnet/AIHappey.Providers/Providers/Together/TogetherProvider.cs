@@ -8,7 +8,6 @@ using AIHappey.Responses.Mapping;
 using AIHappey.Unified.Models;
 using AIHappey.Core.AI;
 using System.Runtime.CompilerServices;
-using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 

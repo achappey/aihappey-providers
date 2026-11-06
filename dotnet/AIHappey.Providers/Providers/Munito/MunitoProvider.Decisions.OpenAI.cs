@@ -1,6 +1,4 @@
 using AIHappey.Core.AI;
-using AIHappey.Core.Models;
-using AIHappey.Core.Extensions;
 
 namespace AIHappey.Core.Providers.Munito;
 

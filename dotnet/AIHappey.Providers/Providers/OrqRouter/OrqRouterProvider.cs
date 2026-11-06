@@ -12,7 +12,6 @@ using AIHappey.Vercel.Mapping;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using AIHappey.Unified.Models;
-using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.OrqRouter;

@@ -7,7 +7,6 @@ using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Viktor;
 using AIHappey.Messages;
 using AIHappey.Responses;
-using AIHappey.Responses.Extensions;
 using AIHappey.Unified.Models;
 using Microsoft.Extensions.DependencyInjection;
 

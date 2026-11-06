@@ -10,7 +10,6 @@ using AIHappey.Messages;
 using AIHappey.Core.AI;
 using System.Runtime.CompilerServices;
 using AIHappey.Common.MCP;
-using AIHappey.Core.Models;
 using AIHappey.Core.Diagnostics;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
 

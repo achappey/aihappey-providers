@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Text.Json;
-using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.AI;

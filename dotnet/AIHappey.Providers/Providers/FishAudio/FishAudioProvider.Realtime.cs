@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using AIHappey.Common.Model;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
