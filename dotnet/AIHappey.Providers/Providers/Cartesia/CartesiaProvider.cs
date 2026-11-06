@@ -85,11 +85,13 @@ public partial class CartesiaProvider : IModelProvider, IUnifiedModelProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var streamEvent in StreamUnifiedAsync(
-                           options.ToUnifiedRequest(GetIdentifier()),
-                           cancellationToken).WithCancellation(cancellationToken))
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
         {
-            yield return streamEvent.ToChatCompletionUpdate();
+            yield return update;
         }
     }
 

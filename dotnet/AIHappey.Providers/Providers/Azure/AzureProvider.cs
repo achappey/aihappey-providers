@@ -78,8 +78,14 @@ public sealed partial class AzureProvider(
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return item.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        {
+            yield return update;
+        }
     }
 
     public async Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
@@ -190,4 +196,3 @@ public sealed partial class AzureProvider(
         throw new NotImplementedException();
     }
 }
-

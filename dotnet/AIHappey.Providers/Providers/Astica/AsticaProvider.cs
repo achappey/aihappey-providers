@@ -55,8 +55,14 @@ public partial class AsticaProvider : IModelProvider, IUnifiedModelProvider
 
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        {
+            yield return update;
+        }
     }
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
@@ -198,4 +204,3 @@ public partial class AsticaProvider : IModelProvider, IUnifiedModelProvider
         throw new NotImplementedException();
     }
 }
-
