@@ -734,6 +734,10 @@
       "sha256": "7b43500d4c4715a3f2e119a52932648f8f33c3aed216f72655ac3e253bffde7f"
     },
     {
+      "file": "models/providers/sippulseai.json",
+      "sha256": "0415329f7b0d1450b898ada85361a87c019cfd38651541c1077596695b04f47b"
+    },
+    {
       "file": "models/providers/sluis.json",
       "sha256": "90c49df3ecef9e473b7dc9eb65d58538465e6ef304304230f04f1a89718408b1"
     },
