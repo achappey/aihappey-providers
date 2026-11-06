@@ -82,11 +82,12 @@ public partial class GoogleAIProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
         await foreach (var item in StreamUnifiedAsync(
                            options.ToUnifiedRequest(GetIdentifier()),
                            cancellationToken))
         {
-            var update = item.ToChatCompletionUpdate();
+            var update = item.ToChatCompletionUpdate(mappingState);
             if (item.Event.Data is AIHappey.Unified.Models.AIFinishEventData finish)
             {
                 update.AdditionalProperties = AddGoogleOmniChatGatewayMetadata(
