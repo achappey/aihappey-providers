@@ -85,8 +85,14 @@ public partial class AsyncProvider(IApiKeyResolver keyResolver, IHttpClientFacto
 
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        {
+            yield return update;
+        }
     }
 
     public Task<RealtimeResponse> GetRealtimeToken(RealtimeRequest realtimeRequest, CancellationToken cancellationToken)
@@ -192,4 +198,3 @@ public partial class AsyncProvider(IApiKeyResolver keyResolver, IHttpClientFacto
         throw new NotImplementedException();
     }
 }
-

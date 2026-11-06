@@ -110,8 +110,14 @@ public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
     {
         if (IsAgentModel(options.Model))
         {
-            await foreach (var part in StreamAgentAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return part.ToChatCompletionUpdate();
+            var stream = StreamAgentAsync(
+                options.ToUnifiedRequest(GetIdentifier()),
+                cancellationToken);
+
+            await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+            {
+                yield return update;
+            }
             yield break;
         }
 
