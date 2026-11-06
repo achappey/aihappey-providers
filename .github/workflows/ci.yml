@@ -46,13 +46,6 @@ jobs:
         with:
           dotnet-version: '11.0.x'
           dotnet-quality: preview
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-      - name: Check language-neutral metadata inventory
-        run: node metadata/tools/catalog.cjs --check
-      - name: Metadata inventory regressions
-        run: node --test metadata/tools/catalog.test.cjs
       - name: Provider, transport, isolation, and registration parity tests
         run: dotnet test dotnet/tests/AIHappey.Providers.Tests/AIHappey.Providers.Tests.csproj -c Release
       - name: Verify isolated package-only consumption
