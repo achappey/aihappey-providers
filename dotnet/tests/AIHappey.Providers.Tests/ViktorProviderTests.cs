@@ -28,13 +28,17 @@ public sealed class ViktorProviderTests
     }
 
     [Theory]
-    [InlineData("chat/completions", false)]
-    [InlineData("chat/completions", true)]
-    [InlineData("responses", false)]
-    [InlineData("responses", true)]
-    [InlineData("messages", false)]
-    [InlineData("messages", true)]
-    public async Task Native_endpoints_preserve_raw_options_and_use_request_scoped_auth(string endpoint, bool streaming)
+    [InlineData("chat/completions", false, null)]
+    [InlineData("chat/completions", true, null)]
+    [InlineData("responses", false, null)]
+    [InlineData("responses", true, null)]
+    [InlineData("responses", false, false)]
+    [InlineData("responses", false, true)]
+    [InlineData("responses", true, false)]
+    [InlineData("responses", true, true)]
+    [InlineData("messages", false, null)]
+    [InlineData("messages", true, null)]
+    public async Task Native_endpoints_preserve_raw_options_and_use_request_scoped_auth(string endpoint, bool streaming, bool? initialStream)
     {
         var input = JsonSerializer.Deserialize<JsonElement>("""
             {"model":"viktor/reasoning","messages":[],"input":"Hello","max_tokens":100,
@@ -52,7 +56,9 @@ public sealed class ViktorProviderTests
             var body = JsonSerializer.Deserialize<JsonElement>(await request.Content!.ReadAsStringAsync(ct));
             foreach (var name in new[] { "model", "previous_response_id", "metadata", "future", "future_null" })
                 Assert.True(JsonElement.DeepEquals(input.GetProperty(name), body.GetProperty(name)), name);
-            if (streaming)
+            if (endpoint == "responses")
+                Assert.Equal(streaming, body.GetProperty("stream").GetBoolean());
+            else if (streaming)
                 Assert.True(body.GetProperty("stream").GetBoolean());
             return Json(streaming ? "data: [DONE]\n\n" : endpoint switch
             {
@@ -78,6 +84,7 @@ public sealed class ViktorProviderTests
                 break;
             default:
                 var responses = input.Deserialize<ResponseRequest>(ResponseJson.Default)!;
+                responses.Stream = initialStream;
                 if (streaming) await Drain(provider.ResponsesStreamingAsync(responses));
                 else await provider.ResponsesAsync(responses);
                 break;

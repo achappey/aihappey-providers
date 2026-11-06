@@ -55,10 +55,16 @@ public sealed partial class ViktorProvider : IModelProvider
         => _client.GetChatCompletionUpdates(options, GetIdentifier(), headers: RequestHeaders(options.Headers), ct: cancellationToken);
 
     public Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
-        => _client.GetResponses(options, GetIdentifier(), headers: RequestHeaders(options.Headers), ct: cancellationToken);
+    {
+        options.Stream = false;
+        return _client.GetResponses(options, GetIdentifier(), headers: RequestHeaders(options.Headers), ct: cancellationToken);
+    }
 
     public IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(ResponseRequest options, CancellationToken cancellationToken = default)
-        => _client.GetResponsesUpdates(options, GetIdentifier(), headers: RequestHeaders(options.Headers), ct: cancellationToken);
+    {
+        options.Stream = true;
+        return _client.GetResponsesUpdates(options, GetIdentifier(), headers: RequestHeaders(options.Headers), ct: cancellationToken);
+    }
 
     public Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
     {
