@@ -2283,7 +2283,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "40ec6c351edd3b012d692dfa7b41510f9ec37fd5478a26603ee4a7c786e66db2"
+      "sha256": "4beecae4e54f772e225c18d78e5a22ea50c3c7e5b30b7ae6990fd13c1e1c2e90"
     },
     {
       "file": "providers/infercom.json",
@@ -3076,6 +3076,10 @@
     {
       "file": "providers/parasail.json",
       "sha256": "f18c07568564663005183f9b2a7d737c6808c81613be64fa35967f841f18865a"
+    },
+    {
+      "file": "providers/parel.json",
+      "sha256": "c6485e601fa4030916ea5a5f6c4fa250d27358065a0f66d7fabc472e1fd58402"
     },
     {
       "file": "providers/paul.json",
