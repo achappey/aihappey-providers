@@ -18,6 +18,7 @@ public sealed class BuildprintProviderTests
         {"appId":"app_1","model":"native-model","reasoningEffort":"high","branches":["main"],
          "allowEdits":false,"future":{"number":9007199254740993,"array":[true,null,{},[]]},"futureNull":null}
         """;
+    private const string NativeMessage = """{"prompt":"native conversation prompt","future":"ignored by the message endpoint"}""";
     private const string Receipt = """{"agentId":"agent_1","future":{"number":9007199254740993,"array":[null,{}]}}""";
 
     [Fact]
@@ -33,10 +34,16 @@ public sealed class BuildprintProviderTests
     }
 
     [Fact]
-    public async Task Discovery_exposes_only_documented_operations_without_network()
+    public async Task Discovery_lists_agents_and_the_start_operation()
     {
-        using var client = Client((_, _) => throw new InvalidOperationException("Unexpected network call."));
-        Assert.Equal(["buildprint/agents/start", "buildprint/agents/list"],
+        using var client = Client((http, _) =>
+        {
+            Assert.Equal(HttpMethod.Get, http.Method);
+            Assert.Equal("https://api.buildprint.ai/api/v1/agents?limit=100", http.RequestUri!.AbsoluteUri);
+            Assert.Equal("Bearer", http.Headers.Authorization?.Scheme);
+            return Task.FromResult(Json("""{"items":[{"id":"agent_1","title":"Agent One"}],"cursor":null,"isDone":true}"""));
+        });
+        Assert.Equal(["buildprint/agents/start", "buildprint/agent_1"],
             (await Provider(client).ListModels()).Select(model => model.Id));
     }
 
@@ -82,24 +89,45 @@ public sealed class BuildprintProviderTests
     }
 
     [Fact]
-    public async Task List_forwards_filters_and_returns_the_raw_page_without_draining_pagination()
+    public async Task List_models_follows_native_pagination_and_maps_agent_ids()
     {
-        const string page = """{"items":[{"id":"agent_1","title":"Agent","status":"running"}],"cursor":"next","isDone":false,"future":null}""";
+        const string firstPage = """{"items":[{"id":"agent_1","title":"Agent One"}],"cursor":"next /+=","isDone":false}""";
+        const string lastPage = """{"items":[{"id":"agent_2","title":"Agent Two"}],"cursor":null,"isDone":true}""";
         var calls = 0;
         using var client = Client((http, _) =>
         {
-            calls++;
             Assert.Equal(HttpMethod.Get, http.Method);
-            Assert.Equal("?appId=app%20%2F%26&archived=false&limit=100&cursor=next%2F%2B%3D&status=running&future=9007199254740993",
-                http.RequestUri!.Query);
+            Assert.Equal("Bearer", http.Headers.Authorization?.Scheme);
             Assert.Null(http.Content);
-            return Task.FromResult(Json(page));
+            Assert.Equal(calls++ == 0 ? "?limit=100" : "?limit=100&cursor=next%20%2F%2B%3D", http.RequestUri!.Query);
+            return Task.FromResult(Json(calls == 1 ? firstPage : lastPage));
         });
-        var result = await Provider(client).ExecuteUnifiedAsync(Request("agents/list",
-            JsonSerializer.Deserialize<JsonElement>("""{"appId":"app /&","archived":false,"limit":100,"cursor":"next/+=","status":"running","future":9007199254740993}""")));
-        Assert.Equal(1, calls);
-        Assert.True(JsonElement.DeepEquals(JsonSerializer.Deserialize<JsonElement>(page),
-            Assert.IsType<JsonElement>(result.Metadata!["buildprint"])));
+        var models = (await Provider(client).ListModels()).ToArray();
+        Assert.Equal(2, calls);
+        Assert.Equal(["buildprint/agent_1", "buildprint/agent_2"], models.Skip(1).Select(model => model.Id));
+        Assert.Equal(["Agent One", "Agent Two"], models.Skip(1).Select(model => model.Name));
+    }
+
+    [Fact]
+    public async Task Conversation_sends_a_message_to_the_selected_agent()
+    {
+        using var client = Client(async (http, ct) =>
+        {
+            Assert.Equal(HttpMethod.Post, http.Method);
+            Assert.Equal("https://api.buildprint.ai/api/v1/agents/agent_1/messages", http.RequestUri!.AbsoluteUri);
+            Assert.Equal("Bearer", http.Headers.Authorization?.Scheme);
+            var body = JsonSerializer.Deserialize<JsonElement>(await http.Content!.ReadAsStringAsync(ct));
+            Assert.Equal("latest", body.GetProperty("prompt").GetString());
+            Assert.Equal(1, body.EnumerateObject().Count());
+            return Json("""{"agentId":"agent_1","queued":true}""");
+        });
+
+        var result = await Provider(client).ExecuteUnifiedAsync(Request("buildprint/agent_1",
+            JsonSerializer.Deserialize<JsonElement>("{}")));
+
+        Assert.Equal("buildprint/agent_1", result.Model);
+        Assert.Equal("buildprint_send_agent_message",
+            Assert.Single(result.Output!.Items![0].Content!.OfType<AIToolCallContentPart>()).ToolName);
     }
 
     [Theory]
@@ -110,26 +138,27 @@ public sealed class BuildprintProviderTests
     {
         using var client = Client(async (http, ct) =>
         {
+            Assert.Equal("https://api.buildprint.ai/api/v1/agents/agent_1/messages", http.RequestUri!.AbsoluteUri);
             var body = JsonSerializer.Deserialize<JsonElement>(await http.Content!.ReadAsStringAsync(ct));
-            Assert.True(JsonElement.DeepEquals(JsonSerializer.Deserialize<JsonElement>(Native).GetProperty("future"),
-                body.GetProperty("future")));
-            return Json(Receipt);
+            Assert.Equal("native conversation prompt", body.GetProperty("prompt").GetString());
+            Assert.Equal(1, body.EnumerateObject().Count());
+            return Json("""{"agentId":"agent_1","queued":true}""");
         });
         var provider = Provider(client);
-        var extra = Native[1..^1];
+        var extra = NativeMessage[1..^1];
         switch (endpoint)
         {
             case "chat":
                 await provider.CompleteChatAsync(JsonSerializer.Deserialize<ChatCompletionOptions>(
-                    $$$"""{"model":"agents/start","messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!);
+                    $$$"""{"model":"agent_1","messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!);
                 break;
             case "responses":
                 await provider.ResponsesAsync(JsonSerializer.Deserialize<ResponseRequest>(
-                    $$$"""{"model":"agents/start","input":"Hello","buildprint":{ {{{extra}}} }}""")!);
+                    $$$"""{"model":"agent_1","input":"Hello","buildprint":{ {{{extra}}} }}""")!);
                 break;
             default:
                 await provider.MessagesAsync(JsonSerializer.Deserialize<MessagesRequest>(
-                    $$$"""{"model":"agents/start","max_tokens":100,"messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!, []);
+                    $$$"""{"model":"agent_1","max_tokens":100,"messages":[{"role":"user","content":"Hello"}],"buildprint":{ {{{extra}}} }}""")!, []);
                 break;
         }
 
@@ -140,11 +169,10 @@ public sealed class BuildprintProviderTests
     {
         using var client = Client((http, _) =>
         {
-            Assert.Equal("", http.RequestUri!.Query);
+            Assert.Equal("?limit=100", http.RequestUri!.Query);
             return Task.FromResult(Json("""{"items":[],"cursor":null,"isDone":true}"""));
         });
-        await Provider(client).ExecuteUnifiedAsync(Request("agents/list",
-            JsonSerializer.Deserialize<JsonElement>("""{"cursor":null}""")));
+        await Provider(client).ListModels();
     }
 
     [Fact]
@@ -163,8 +191,8 @@ public sealed class BuildprintProviderTests
     [Theory]
     [InlineData("agents/start", "{}")]
     [InlineData("agents/start", "[]")]
-    [InlineData("agents/list", """{"filter":{}}""")]
-    [InlineData("unknown", "{}")]
+    [InlineData("agents/list", "{}")]
+    [InlineData("", "{}")]
     public async Task Invalid_requests_fail_before_sending(string model, string options)
     {
         using var client = Client((_, _) => throw new InvalidOperationException("Unexpected network call."));

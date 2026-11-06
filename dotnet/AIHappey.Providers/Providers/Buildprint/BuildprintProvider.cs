@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using AIHappey.ChatCompletions.Mapping;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
@@ -28,16 +30,67 @@ public sealed partial class BuildprintProvider : IModelProvider
 
     public string GetIdentifier() => "buildprint";
 
-    public Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult<IEnumerable<Model>>(
-        [
-            new Model { Id = "buildprint/agents/start", Name = "Buildprint Start Agent",
-                Description = "Start an agent and return its receipt. Requires native appId.", OwnedBy = "Buildprint", Type = "chat", Tags = ["agent"] },
-            new Model { Id = "buildprint/agents/list", Name = "Buildprint List Agents",
-                Description = "List agent conversations with native filters and pagination.", OwnedBy = "Buildprint", Type = "chat", Tags = ["agent"] }
-        ]);
+        var models = new List<Model>
+        {
+            new() { Id = "buildprint/agents/start", Name = "Buildprint Start Agent",
+                Description = "Start an agent and return its receipt. Requires native appId.", OwnedBy = "Buildprint", Type = "chat", Tags = ["agent"] }
+        };
+        var key = _keys.Resolve(GetIdentifier());
+        if (string.IsNullOrWhiteSpace(key)) return models;
+
+        string? cursor = null;
+        var cursors = new HashSet<string>(StringComparer.Ordinal);
+        do
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                "https://api.buildprint.ai/api/v1/agents?limit=100" +
+                (cursor is null ? "" : "&cursor=" + Uri.EscapeDataString(cursor)));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+            using var response = await _client.SendAsync(request, cancellationToken);
+            var text = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"Buildprint HTTP {(int)response.StatusCode}: {text}", null, response.StatusCode);
+
+            using var document = JsonDocument.Parse(text);
+            var page = document.RootElement;
+            if (page.ValueKind != JsonValueKind.Object
+                || !page.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array)
+                throw new JsonException("Buildprint agent list response must contain an items array.");
+
+            foreach (var item in items.EnumerateArray())
+            {
+                if (!item.TryGetProperty("id", out var idElement) || idElement.ValueKind != JsonValueKind.String
+                    || string.IsNullOrWhiteSpace(idElement.GetString()))
+                    continue;
+
+                var id = idElement.GetString()!;
+                var name = item.TryGetProperty("title", out var titleElement) && titleElement.ValueKind == JsonValueKind.String
+                    ? titleElement.GetString() : null;
+                models.Add(new Model
+                {
+                    Id = $"{GetIdentifier()}/{id}",
+                    Name = string.IsNullOrWhiteSpace(name) ? id : name,
+                    OwnedBy = "Buildprint",
+                    Type = "chat",
+                    Tags = ["agent"]
+                });
+            }
+
+            var isDone = page.TryGetProperty("isDone", out var doneElement)
+                && doneElement.ValueKind == JsonValueKind.True;
+            cursor = page.TryGetProperty("cursor", out var cursorElement)
+                && cursorElement.ValueKind == JsonValueKind.String ? cursorElement.GetString() : null;
+            if (!isDone && cursor is null)
+                throw new JsonException("Buildprint agent list response is missing its next cursor.");
+            if (!isDone && !cursors.Add(cursor!))
+                throw new JsonException("Buildprint agent list returned a repeated cursor.");
+            if (isDone) break;
+        } while (true);
+
+        return models;
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)

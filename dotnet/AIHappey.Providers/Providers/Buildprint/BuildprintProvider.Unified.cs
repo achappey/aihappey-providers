@@ -18,8 +18,9 @@ public sealed partial class BuildprintProvider
         if (request.Tools?.Count > 0) throw new NotSupportedException("Buildprint does not execute local function tools.");
         var route = request.Model?.StartsWith("buildprint/", StringComparison.OrdinalIgnoreCase) == true
             ? request.Model["buildprint/".Length..] : request.Model;
-        if (route is not ("agents/start" or "agents/list"))
-            throw new ArgumentException("Buildprint requires model buildprint/agents/start or buildprint/agents/list.");
+        var start = route == "agents/start";
+        if (string.IsNullOrWhiteSpace(route) || route == "agents/list")
+            throw new ArgumentException("Buildprint requires a listed agent ID or model buildprint/agents/start.");
 
         var body = new Dictionary<string, JsonElement>();
         if (request.Metadata?.TryGetValue(GetIdentifier(), out var native) == true && native is not null)
@@ -30,28 +31,23 @@ public sealed partial class BuildprintProvider
             foreach (var property in options.EnumerateObject()) body[property.Name] = property.Value.Clone();
         }
 
-        var start = route == "agents/start";
         if (start)
         {
             if (!body.TryGetValue("appId", out var appId) || appId.ValueKind != JsonValueKind.String
                 || string.IsNullOrWhiteSpace(appId.GetString()))
                 throw new ArgumentException("Buildprint start requires provider metadata appId.");
-            if (!body.ContainsKey("prompt"))
-            {
-                var prompt = request.Input?.Items?.AsEnumerable().Reverse()
-                    .Where(item => string.Equals(item.Role, "user", StringComparison.OrdinalIgnoreCase))
-                    .Select(item => string.Join("\n", item.Content?.OfType<AITextContentPart>().Select(part => part.Text) ?? []))
-                    .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text)) ?? request.Input?.Text;
-                if (string.IsNullOrWhiteSpace(prompt)) throw new ArgumentException("Buildprint start requires a user prompt.");
-                body["prompt"] = JsonSerializer.SerializeToElement(prompt);
-            }
         }
-        var query = start ? "" : string.Join("&", body.Where(property => property.Value.ValueKind != JsonValueKind.Null).Select(property =>
-            Uri.EscapeDataString(property.Key) + "=" + Uri.EscapeDataString(QueryValue(property.Value))));
-        using var http = new HttpRequestMessage(start ? HttpMethod.Post : HttpMethod.Get,
-            "https://api.buildprint.ai/api/v1/agents" + (query.Length > 0 ? "?" + query : ""));
+        var prompt = GetPrompt(request, body, start ? "start" : "message");
+        if (start)
+            body["prompt"] = JsonSerializer.SerializeToElement(prompt);
+        else
+            body = new Dictionary<string, JsonElement> { ["prompt"] = JsonSerializer.SerializeToElement(prompt) };
+
+        using var http = new HttpRequestMessage(HttpMethod.Post, start
+            ? "https://api.buildprint.ai/api/v1/agents"
+            : $"https://api.buildprint.ai/api/v1/agents/{Uri.EscapeDataString(route!)}/messages");
         http.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
-        if (start) http.Content = JsonContent.Create(body);
+        http.Content = JsonContent.Create(body);
         using var response = await _client.SendAsync(http, cancellationToken);
         var text = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -64,7 +60,7 @@ public sealed partial class BuildprintProvider
             || string.IsNullOrWhiteSpace(agentId.GetString())))
             throw new JsonException("Buildprint start response is missing agentId.");
         var metadata = new Dictionary<string, object?> { [GetIdentifier()] = raw };
-        var toolName = start ? "buildprint_start_agent" : "buildprint_list_agents";
+        var toolName = start ? "buildprint_start_agent" : "buildprint_send_agent_message";
         return new AIResponse
         {
             ProviderId = GetIdentifier(), Model = $"buildprint/{route}", Status = "completed", Metadata = metadata,
@@ -89,12 +85,23 @@ public sealed partial class BuildprintProvider
         };
     }
 
-    private static string QueryValue(JsonElement value) => value.ValueKind switch
+    private static string GetPrompt(AIRequest request, Dictionary<string, JsonElement> body, string operation)
     {
-        JsonValueKind.String => value.GetString()!,
-        JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False or JsonValueKind.Null => value.GetRawText(),
-        _ => throw new ArgumentException("Buildprint list query options must be scalar JSON values.")
-    };
+        if (body.TryGetValue("prompt", out var nativePrompt))
+        {
+            if (nativePrompt.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(nativePrompt.GetString()))
+                throw new ArgumentException($"Buildprint {operation} requires a non-empty provider metadata prompt.");
+            return nativePrompt.GetString()!;
+        }
+
+        var prompt = request.Input?.Items?.AsEnumerable().Reverse()
+            .Where(item => string.Equals(item.Role, "user", StringComparison.OrdinalIgnoreCase))
+            .Select(item => string.Join("\n", item.Content?.OfType<AITextContentPart>().Select(part => part.Text) ?? []))
+            .FirstOrDefault(text => !string.IsNullOrWhiteSpace(text)) ?? request.Input?.Text;
+        if (string.IsNullOrWhiteSpace(prompt))
+            throw new ArgumentException($"Buildprint {operation} requires a user prompt.");
+        return prompt;
+    }
 
     public async IAsyncEnumerable<AIStreamEvent> StreamUnifiedAsync(AIRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
