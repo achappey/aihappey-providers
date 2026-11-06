@@ -1,6 +1,7 @@
 using AIHappey.Core.Providers.AIML;
 using AIHappey.Core.Providers.Buildprint;
 using AIHappey.Core.Providers.Spawnlabs;
+using AIHappey.Core.Providers.Nolgia;
 using AIHappey.Core.Providers.Allternit;
 using AIHappey.Core.Providers.Keln;
 using AIHappey.Core.Providers.Codebase;
@@ -1021,6 +1022,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AgencyOSXProvider>();
         services.AddScoped<IModelProvider, BuildprintProvider>();
         services.AddScoped<IModelProvider, SpawnlabsProvider>();
+        services.AddScoped<IModelProvider, NolgiaProvider>();
         services.AddScoped<IModelProvider, AllternitProvider>();
         //services.AddScoped<IModelProvider, SovereignAPIProvider>();
         services.AddScoped<IModelProvider, NRPNautilusProvider>();
