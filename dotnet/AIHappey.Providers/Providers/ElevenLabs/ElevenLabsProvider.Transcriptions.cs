@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.ElevenLabs;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
@@ -14,7 +13,12 @@ public partial class ElevenLabsProvider
     {
         ApplyAuthHeader();
 
-        var metadata = request.GetProviderMetadata<ElevenLabsTranscriptionProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null or JsonValueKind.Object))
+            throw new JsonException("ElevenLabs provider metadata must be an object.");
+        if (TryGetMetadataProperty(metadata, "model_id", out _)
+            || TryGetMetadataProperty(metadata, "file", out _))
+            throw new JsonException("ElevenLabs provider metadata cannot override the request model_id or file fields.");
 
         var modelId = !string.IsNullOrWhiteSpace(request.Model)
             ? request.Model
@@ -31,38 +35,34 @@ public partial class ElevenLabsProvider
         form.Add(file, "file", fileName);
         form.Add(new StringContent(modelId), "model_id");
 
-        var languageCode = metadata?.LanguageCode ?? metadata?.OpenAILanguage;
+        var languageCode = ReadMetadataValue<string>(metadata, "language_code")
+            ?? ReadMetadataValue<string>(metadata, "language");
         if (!string.IsNullOrWhiteSpace(languageCode))
             form.Add(new StringContent(languageCode), "language_code");
-        if (metadata?.TagAudioEvents is not null)
-            form.Add(new StringContent(metadata.TagAudioEvents.Value.ToString().ToLowerInvariant()), "tag_audio_events");
-        if (metadata?.NumSpeakers is not null)
-            form.Add(new StringContent(metadata.NumSpeakers.Value.ToString()), "num_speakers");
-        var timestampsGranularity = metadata?.TimestampsGranularity;
+        AddBooleanMetadata(form, metadata, "tag_audio_events");
+        AddIntegerMetadata(form, metadata, "num_speakers");
+        var timestampsGranularity = ReadMetadataValue<string>(metadata, "timestamps_granularity");
         if (string.IsNullOrWhiteSpace(timestampsGranularity)
-            && metadata?.OpenAITimestampGranularities?.Contains("word", StringComparer.OrdinalIgnoreCase) == true)
+            && ReadMetadataValue<string[]>(metadata, "timestamp_granularities")?
+                .Contains("word", StringComparer.OrdinalIgnoreCase) == true)
         {
             timestampsGranularity = "word";
         }
 
         if (!string.IsNullOrWhiteSpace(timestampsGranularity))
             form.Add(new StringContent(timestampsGranularity), "timestamps_granularity");
-        if (metadata?.Diarize is not null)
-            form.Add(new StringContent(metadata.Diarize.Value.ToString().ToLowerInvariant()), "diarize");
-        if (metadata?.DiarizationThreshold is not null)
-            form.Add(new StringContent(metadata.DiarizationThreshold.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)), "diarization_threshold");
-        if (!string.IsNullOrWhiteSpace(metadata?.FileFormat))
-            form.Add(new StringContent(metadata.FileFormat), "file_format");
-        if (metadata?.Temperature is not null)
-            form.Add(new StringContent(metadata.Temperature.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)), "temperature");
-        if (metadata?.Seed is not null)
-            form.Add(new StringContent(metadata.Seed.Value.ToString()), "seed");
-        if (metadata?.UseMultiChannel is not null)
-            form.Add(new StringContent(metadata.UseMultiChannel.Value.ToString().ToLowerInvariant()), "use_multi_channel");
+        AddBooleanMetadata(form, metadata, "diarize");
+        AddFloatMetadata(form, metadata, "diarization_threshold");
+        AddStringMetadata(form, metadata, "file_format");
+        AddFloatMetadata(form, metadata, "temperature");
+        AddIntegerMetadata(form, metadata, "seed");
+        AddBooleanMetadata(form, metadata, "use_multi_channel");
 
         var query = new List<string>();
-        if (metadata?.EnableLogging is not null)
-            query.Add($"enable_logging={metadata.EnableLogging.Value.ToString().ToLowerInvariant()}");
+        if (ReadMetadataValue<bool?>(metadata, "enable_logging") is { } enableLogging)
+            query.Add($"enable_logging={enableLogging.ToString().ToLowerInvariant()}");
+
+        AddUnknownMetadataFields(form, metadata);
 
         var url = "v1/speech-to-text" + (query.Count > 0 ? "?" + string.Join("&", query) : string.Empty);
 
@@ -73,6 +73,93 @@ public partial class ElevenLabsProvider
             throw new InvalidOperationException($"ElevenLabs STT failed ({(int)resp.StatusCode}): {json}");
 
         return ConvertResponse(json, modelId);
+    }
+
+    private static T? ReadMetadataValue<T>(JsonElement metadata, string propertyName)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object
+            || !TryGetMetadataProperty(metadata, propertyName, out var value)
+            || value.ValueKind == JsonValueKind.Null)
+            return default;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static void AddBooleanMetadata(MultipartFormDataContent form, JsonElement metadata, string propertyName)
+    {
+        if (ReadMetadataValue<bool?>(metadata, propertyName) is { } value)
+            form.Add(new StringContent(value.ToString().ToLowerInvariant()), propertyName);
+    }
+
+    private static void AddStringMetadata(MultipartFormDataContent form, JsonElement metadata, string propertyName)
+    {
+        var value = ReadMetadataValue<string>(metadata, propertyName);
+        if (!string.IsNullOrWhiteSpace(value))
+            form.Add(new StringContent(value), propertyName);
+    }
+
+    private static void AddIntegerMetadata(MultipartFormDataContent form, JsonElement metadata, string propertyName)
+    {
+        if (ReadMetadataValue<int?>(metadata, propertyName) is { } value)
+            form.Add(new StringContent(value.ToString(System.Globalization.CultureInfo.InvariantCulture)), propertyName);
+    }
+
+    private static void AddFloatMetadata(MultipartFormDataContent form, JsonElement metadata, string propertyName)
+    {
+        if (ReadMetadataValue<float?>(metadata, propertyName) is { } value)
+            form.Add(new StringContent(value.ToString(System.Globalization.CultureInfo.InvariantCulture)), propertyName);
+    }
+
+    private static void AddUnknownMetadataFields(MultipartFormDataContent form, JsonElement metadata)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (IsConsumedMetadataField(property.Name))
+                continue;
+
+            form.Add(new StringContent(FormatMetadataValue(property.Value)), property.Name);
+        }
+    }
+
+    private static bool IsConsumedMetadataField(string propertyName)
+        => propertyName.Equals("enable_logging", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("language_code", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("language", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("tag_audio_events", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("num_speakers", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("timestamps_granularity", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("timestamp_granularities", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("diarize", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("diarization_threshold", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("file_format", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("temperature", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("seed", StringComparison.OrdinalIgnoreCase)
+            || propertyName.Equals("use_multi_channel", StringComparison.OrdinalIgnoreCase);
+
+    private static string FormatMetadataValue(JsonElement value)
+        => value.ValueKind == JsonValueKind.String
+            ? value.GetString() ?? string.Empty
+            : value.GetRawText();
+
+    private static bool TryGetMetadataProperty(JsonElement metadata, string propertyName, out JsonElement value)
+    {
+        if (metadata.TryGetProperty(propertyName, out value))
+            return true;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
     }
 
     private static TranscriptionResponse ConvertResponse(string json, string modelId)
