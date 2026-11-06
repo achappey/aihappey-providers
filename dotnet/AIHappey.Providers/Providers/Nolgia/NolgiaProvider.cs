@@ -27,7 +27,7 @@ public sealed partial class NolgiaProvider(IApiKeyResolver keys, IHttpClientFact
         cancellationToken.ThrowIfCancellationRequested();
         return Task.FromResult<IEnumerable<Model>>([new Model
         {
-            Id = "nolgia/agent", Name = "Nolgia Agent", OwnedBy = "Nolgia", Type = "language", Tags = ["agent"]
+            Id = "nolgia/agent", Name = "NOLGIA Agent", OwnedBy = "NOLGIA", Type = "language", Tags = ["agent"]
         }]);
     }
 
