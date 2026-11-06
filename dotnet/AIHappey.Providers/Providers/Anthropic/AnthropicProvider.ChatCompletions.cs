@@ -24,13 +24,14 @@ public partial class AnthropicProvider
      [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
 
         await foreach (var part in this.StreamUnifiedAsync(
             unifiedRequest,
             cancellationToken))
         {
 
-            var update = part.ToChatCompletionUpdate();
+            var update = part.ToChatCompletionUpdate(mappingState);
             if (part.Event.Type == "finish" && part.Event.Data is AIFinishEventData finish)
                 update.AdditionalProperties = AddAnthropicChatCompletionCost(
                     update.AdditionalProperties, finish.MessageMetadata?.Gateway?.Cost ?? GetAnthropicGatewayCost(part.Metadata));

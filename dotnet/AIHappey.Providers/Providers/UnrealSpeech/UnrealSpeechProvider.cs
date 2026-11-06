@@ -51,8 +51,9 @@ public partial class UnrealSpeechProvider : IModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+            yield return update;
     }
 
 
@@ -193,4 +194,3 @@ public partial class UnrealSpeechProvider : IModelProvider
         throw new NotImplementedException();
     }
 }
-

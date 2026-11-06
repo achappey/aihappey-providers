@@ -60,11 +60,12 @@ public partial class ManyfoldProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
 
         await foreach (var part in this.StreamUnifiedAsync(
                            unifiedRequest,
                            cancellationToken))
-            yield return ToManyfoldChatCompletionUpdate(part, options.Model);
+            yield return ToManyfoldChatCompletionUpdate(part, options.Model, mappingState);
     }
 
     public string GetIdentifier() => nameof(Manyfold).ToLowerInvariant();

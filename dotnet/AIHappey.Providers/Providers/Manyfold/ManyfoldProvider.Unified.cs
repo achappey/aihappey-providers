@@ -322,9 +322,10 @@ public partial class ManyfoldProvider
         Event = new AIEventEnvelope { Type = type, Id = id, Data = data, Timestamp = DateTimeOffset.UtcNow }
     };
 
-    private static ChatCompletionUpdate ToManyfoldChatCompletionUpdate(AIStreamEvent evt, string model)
+    private static ChatCompletionUpdate ToManyfoldChatCompletionUpdate(AIStreamEvent evt, string model,
+        ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState mappingState)
     {
-        var update = evt.ToChatCompletionUpdate();
+        var update = evt.ToChatCompletionUpdate(mappingState);
         object? delta = evt.Event.Data switch
         {
             AITextDeltaEventData text => new { content = text.Delta },
