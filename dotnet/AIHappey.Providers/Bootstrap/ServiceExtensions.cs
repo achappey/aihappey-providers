@@ -685,6 +685,7 @@ using AIHappey.Core.Providers.Manus;
 using AIHappey.Core.Providers.Getimg;
 using AIHappey.Core.Providers.Astria;
 using AIHappey.Core.Providers.Vercel;
+using AIHappey.Core.Providers.AgenticWorkforceME;
 
 namespace AIHappey.Core.AI;
 
@@ -700,6 +701,7 @@ public static class ServiceExtensions
         services.TryAddSingleton(new AsyncCacheHelper());
         services.TryAddSingleton(new ProviderRequestOptions());
         services.AddOptions<EdgeSpeakProviderOptions>();
+        services.AddOptions<AgenticWorkforceMEProviderOptions>();
 
         services.AddScoped<OpenAIProvider>();
         services.AddScoped<ISkillProvider, OpenAIProvider>();
@@ -1021,6 +1023,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AinventedProvider>();
         services.AddScoped<IModelProvider, PloriProvider>();
         services.AddScoped<IModelProvider, AgencyOSXProvider>();
+        services.AddScoped<IModelProvider, AgenticWorkforceMEProvider>();
         services.AddScoped<IModelProvider, BuildprintProvider>();
         services.AddScoped<IModelProvider, SpawnlabsProvider>();
         services.AddScoped<IModelProvider, NolgiaProvider>();
