@@ -64,8 +64,8 @@ public partial class DocsRouterProvider : IModelProvider
             ? await ExecuteOcrUnifiedAsync(request, cancellationToken)
             : (await CompleteChatAsync(options, cancellationToken)).ToUnifiedResponse(GetIdentifier());
 
-        await foreach (var streamEvent in StreamCompletedResponseAsync(response, request, cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+        await foreach (var streamEvent in StreamCompletedResponseAsync(response, request, cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     public string GetIdentifier() => nameof(DocsRouter).ToLowerInvariant();

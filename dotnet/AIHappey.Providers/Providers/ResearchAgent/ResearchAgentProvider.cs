@@ -47,8 +47,8 @@ public partial class ResearchAgentProvider : IModelProvider, IUnifiedModelProvid
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(WithHeaders(options.ToUnifiedRequest(GetIdentifier()), options.Headers), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        await foreach (var part in StreamUnifiedAsync(WithHeaders(options.ToUnifiedRequest(GetIdentifier()), options.Headers), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return part;
     }
 
     public async Task<Responses.ResponseResult> ResponsesAsync(Responses.ResponseRequest options, CancellationToken cancellationToken = default)

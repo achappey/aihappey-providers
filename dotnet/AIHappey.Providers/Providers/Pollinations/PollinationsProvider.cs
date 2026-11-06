@@ -85,8 +85,8 @@ public partial class PollinationsProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var streamEvent in StreamUnifiedAsync(
-                           options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+                           options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     public Task<RealtimeResponse> GetRealtimeToken(RealtimeRequest realtimeRequest, CancellationToken cancellationToken)

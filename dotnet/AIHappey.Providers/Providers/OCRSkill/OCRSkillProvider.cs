@@ -50,8 +50,8 @@ public sealed partial class OCRSkillProvider(IApiKeyResolver keyResolver,
     {
         await foreach (var part in StreamUnifiedAsync(
             options.ToUnifiedRequest(GetIdentifier()),
-            cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+            cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return part;
     }
 
     public Task<ImageResponse> ImageRequest(ImageRequest imageRequest, CancellationToken cancellationToken = default)

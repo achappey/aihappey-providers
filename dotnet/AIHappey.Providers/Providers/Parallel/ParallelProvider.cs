@@ -74,8 +74,8 @@ public partial class ParallelProvider : IModelProvider
         }
 
         var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
-        await foreach (var streamEvent in StreamParallelTaskUnifiedAsync(unifiedRequest, cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+        await foreach (var streamEvent in StreamParallelTaskUnifiedAsync(unifiedRequest, cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     public string GetIdentifier() => nameof(Parallel).ToLowerInvariant();
