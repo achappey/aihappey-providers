@@ -1358,6 +1358,10 @@
       "sha256": "8357972ab1df9ac59758d439eee20da56017b6ed571471336510f041918bc5d7"
     },
     {
+      "file": "providers/allternit.json",
+      "sha256": "68bf1a41f19544a86f0d675d490acef36ff45e253edace6b3d49ca633c5ad37e"
+    },
+    {
       "file": "providers/alltoken.json",
       "sha256": "9732a1eb7d27630473d8b9f0db99a3aa61b30085a45458d8e4f64b8c748b8d33"
     },
