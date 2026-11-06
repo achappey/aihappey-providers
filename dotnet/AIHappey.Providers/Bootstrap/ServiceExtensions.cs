@@ -689,6 +689,7 @@ using AIHappey.Core.Providers.Astria;
 using AIHappey.Core.Providers.Vercel;
 using AIHappey.Core.Providers.AgenticWorkforceME;
 using AIHappey.Core.Providers.Ampersand;
+using AIHappey.Core.Providers.SippulseAI;
 
 namespace AIHappey.Core.AI;
 
@@ -1031,6 +1032,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, BuildprintProvider>();
         services.AddScoped<IModelProvider, SpawnlabsProvider>();
         services.AddScoped<IModelProvider, NolgiaProvider>();
+        services.AddScoped<IModelProvider, SippulseAIProvider>();
         services.AddScoped<IModelProvider, AllternitProvider>();
         //services.AddScoped<IModelProvider, SovereignAPIProvider>();
         services.AddScoped<IModelProvider, NRPNautilusProvider>();
