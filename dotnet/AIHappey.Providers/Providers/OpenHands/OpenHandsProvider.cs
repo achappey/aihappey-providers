@@ -57,9 +57,9 @@ public partial class OpenHandsProvider : IModelProvider
 
         await foreach (var part in this.StreamUnifiedAsync(
             unifiedRequest,
-            cancellationToken))
+            cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return part.ToChatCompletionUpdate();
+            yield return part;
         }
 
         yield break;

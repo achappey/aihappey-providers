@@ -19,7 +19,7 @@ public partial class ExaProvider
     {
         var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
 
-        await foreach (var part in StreamUnifiedAsync(unifiedRequest, cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        await foreach (var part in StreamUnifiedAsync(unifiedRequest, cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return part;
     }
 }

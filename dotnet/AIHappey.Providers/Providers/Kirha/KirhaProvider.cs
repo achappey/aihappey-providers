@@ -53,8 +53,8 @@ public partial class KirhaProvider : IModelProvider
     {
         var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
 
-        await foreach (var update in StreamUnifiedAsync(unifiedRequest, cancellationToken))
-            yield return update.ToChatCompletionUpdate();
+        await foreach (var update in StreamUnifiedAsync(unifiedRequest, cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return update;
     }
 
     public string GetIdentifier() => nameof(Kirha).ToLowerInvariant();

@@ -57,8 +57,8 @@ public partial class KlingAIProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await foreach (var streamEvent in StreamUnifiedAsync(
-            options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+            options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     public string GetIdentifier() => nameof(KlingAI).ToLowerInvariant();

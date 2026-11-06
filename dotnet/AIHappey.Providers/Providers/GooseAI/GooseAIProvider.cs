@@ -52,9 +52,9 @@ public partial class GooseAIProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         await foreach (var streamEvent in StreamUnifiedAsync(
-            options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
+            options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return streamEvent.ToChatCompletionUpdate();
+            yield return streamEvent;
         }
     }
 
