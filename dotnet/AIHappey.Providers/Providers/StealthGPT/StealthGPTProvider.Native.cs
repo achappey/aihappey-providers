@@ -571,9 +571,9 @@ public partial class StealthGPTProvider
 
         await foreach (var part in StreamUnifiedAsync(
             unifiedRequest,
-            cancellationToken))
+            cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return part.ToChatCompletionUpdate();
+            yield return part;
         }
     }
 }

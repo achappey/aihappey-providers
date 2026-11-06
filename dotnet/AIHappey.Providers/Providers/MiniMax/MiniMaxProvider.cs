@@ -62,8 +62,8 @@ public partial class MiniMaxProvider : IModelProvider
         if (await this.IsImageModelAsync(options.Model, cancellationToken))
         {
             await foreach (var streamEvent in StreamUnifiedAsync(
-                               options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-                yield return streamEvent.ToChatCompletionUpdate();
+                               options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
+                yield return streamEvent;
 
             yield break;
         }

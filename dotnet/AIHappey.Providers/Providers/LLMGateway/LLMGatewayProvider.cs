@@ -65,8 +65,8 @@ public partial class LLMGatewayProvider : IModelProvider
         {
             await foreach (var streamEvent in StreamUnifiedAsync(
                                options.ToUnifiedRequest(GetIdentifier()),
-                               cancellationToken).WithCancellation(cancellationToken))
-                yield return streamEvent.ToChatCompletionUpdate();
+                               cancellationToken).ToChatCompletionUpdates(cancellationToken))
+                yield return streamEvent;
 
             yield break;
         }

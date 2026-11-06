@@ -61,9 +61,9 @@ public partial class SonioxProvider : IModelProvider
     {
         await foreach (var part in StreamUnifiedAsync(
             options.ToUnifiedRequest(GetIdentifier()),
-            cancellationToken))
+            cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return part.ToChatCompletionUpdate();
+            yield return part;
         }
 
     }
