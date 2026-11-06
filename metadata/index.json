@@ -2283,7 +2283,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "3cc510a8a8ae436a87b2a1285114ca4be6fe1cdce2467ae580e02abd6d6a0c52"
+      "sha256": "40ec6c351edd3b012d692dfa7b41510f9ec37fd5478a26603ee4a7c786e66db2"
     },
     {
       "file": "providers/infercom.json",
@@ -3884,6 +3884,10 @@
     {
       "file": "providers/wiserouter.json",
       "sha256": "1170d58e5fb5b37499cbfff7ff9a6a5ee07873fb6496e32569ce6ddbe1eeb555"
+    },
+    {
+      "file": "providers/wrenai.json",
+      "sha256": "6107a19f5341eb2eae9060cda12becaa01e443ee89c670c466f4fa259e973223"
     },
     {
       "file": "providers/writer.json",
