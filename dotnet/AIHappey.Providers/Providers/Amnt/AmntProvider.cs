@@ -76,8 +76,14 @@ public partial class AmntProvider : IModelProvider, IUnifiedModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), ct))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            ct);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(ct))
+        {
+            yield return update;
+        }
     }
 
     public async Task<Responses.ResponseResult> ResponsesAsync(Responses.ResponseRequest options, CancellationToken ct = default)

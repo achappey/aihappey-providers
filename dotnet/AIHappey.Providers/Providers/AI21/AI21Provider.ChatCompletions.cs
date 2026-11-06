@@ -47,9 +47,14 @@ public sealed partial class AI21Provider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        {
+            yield return update;
+        }
     }
 
 }
-
