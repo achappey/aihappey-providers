@@ -82,9 +82,9 @@ public partial class SpeechmaticsProvider : IModelProvider
 
         await foreach (var update in StreamUnifiedAsync(
                                  request,
-                                  cancellationToken: cancellationToken))
+                                  cancellationToken: cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return update.ToChatCompletionUpdate();
+            yield return update;
         }
     }
 

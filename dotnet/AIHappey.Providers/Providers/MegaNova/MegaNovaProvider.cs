@@ -62,10 +62,9 @@ public partial class MegaNovaProvider : IModelProvider
     {
         if (await this.IsTranscriptionModelAsync(options.Model, cancellationToken))
         {
-            await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-                               .WithCancellation(cancellationToken))
+            await foreach (var streamEvent in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken).ToChatCompletionUpdates(cancellationToken))
             {
-                yield return streamEvent.ToChatCompletionUpdate();
+                yield return streamEvent;
             }
 
             yield break;

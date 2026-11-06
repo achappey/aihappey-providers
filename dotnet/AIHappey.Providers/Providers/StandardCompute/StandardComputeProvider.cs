@@ -60,8 +60,8 @@ public partial class StandardComputeProvider : IModelProvider
 
         await foreach (var part in this.StreamUnifiedAsync(
                            unifiedRequest,
-                           cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+                           cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return part;
 
     }
 
