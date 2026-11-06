@@ -13,7 +13,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.WebsearchAPI;
 
-public partial class WebsearchAPIProvider : IModelProvider, IUnifiedModelProvider
+public partial class WebsearchAPIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.LOVO;
 
-public partial class LOVOProvider : IModelProvider, IUnifiedModelProvider
+public partial class LOVOProvider : IModelProvider
 {
     private const string ProviderId = "lovo";
     private const string ProviderName = "LOVO";

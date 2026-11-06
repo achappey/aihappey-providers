@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.AgentDiscuss;
 
-public partial class AgentDiscussProvider : IModelProvider, IUnifiedModelProvider
+public partial class AgentDiscussProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly AsyncCacheHelper _memoryCache;

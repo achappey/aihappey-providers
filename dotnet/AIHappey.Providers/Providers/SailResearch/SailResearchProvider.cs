@@ -13,7 +13,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.SailResearch;
 
-public partial class SailResearchProvider : IModelProvider, IUnifiedModelProvider
+public partial class SailResearchProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

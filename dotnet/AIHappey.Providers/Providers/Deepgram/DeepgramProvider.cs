@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 namespace AIHappey.Core.Providers.Deepgram;
 
 public sealed partial class DeepgramProvider
-    : IModelProvider, IUnifiedModelProvider
+    : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

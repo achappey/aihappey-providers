@@ -13,7 +13,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.MurfAI;
 
-public sealed partial class MurfAIProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class MurfAIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly AsyncCacheHelper _memoryCache;

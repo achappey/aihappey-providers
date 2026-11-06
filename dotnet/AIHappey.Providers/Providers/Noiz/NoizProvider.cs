@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Noiz;
 
-public partial class NoizProvider : IModelProvider, IUnifiedModelProvider
+public partial class NoizProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;

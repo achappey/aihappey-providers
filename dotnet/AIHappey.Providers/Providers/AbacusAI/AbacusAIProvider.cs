@@ -18,7 +18,7 @@ namespace AIHappey.Core.Providers.AbacusAI;
 public sealed partial class AbacusAIProvider(
     IApiKeyResolver keyResolver,
     IHttpClientFactory httpClientFactory,
-    AsyncCacheHelper memoryCache) : IModelProvider, IUnifiedModelProvider
+    AsyncCacheHelper memoryCache) : IModelProvider
 {
     private readonly HttpClient _client = CreateClient(httpClientFactory);
 

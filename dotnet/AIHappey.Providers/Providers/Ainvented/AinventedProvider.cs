@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Ainvented;
 
-public sealed partial class AinventedProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class AinventedProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

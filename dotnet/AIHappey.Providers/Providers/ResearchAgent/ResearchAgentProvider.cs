@@ -15,7 +15,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.ResearchAgent;
 
-public partial class ResearchAgentProvider : IModelProvider, IUnifiedModelProvider
+public partial class ResearchAgentProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly AsyncCacheHelper _memoryCache;

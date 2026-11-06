@@ -19,7 +19,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Amnt;
 
-public partial class AmntProvider : IModelProvider, IUnifiedModelProvider
+public partial class AmntProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

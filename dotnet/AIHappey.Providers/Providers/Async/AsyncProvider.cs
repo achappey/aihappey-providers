@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 namespace AIHappey.Core.Providers.Async;
 
 public partial class AsyncProvider(IApiKeyResolver keyResolver, IHttpClientFactory httpClientFactory)
-    : IModelProvider, IUnifiedModelProvider
+    : IModelProvider
 {
     private readonly HttpClient _client = httpClientFactory.CreateClient();
 

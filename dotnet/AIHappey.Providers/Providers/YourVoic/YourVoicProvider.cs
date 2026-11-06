@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.YourVoic;
 
-public partial class YourVoicProvider : IModelProvider, IUnifiedModelProvider
+public partial class YourVoicProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;

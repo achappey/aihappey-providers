@@ -15,7 +15,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Cursor;
 
-public sealed partial class CursorProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class CursorProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

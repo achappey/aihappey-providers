@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.ResembleAI;
 
-public partial class ResembleAIProvider : IModelProvider, IUnifiedModelProvider
+public partial class ResembleAIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

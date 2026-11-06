@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.UVoiceAI;
 
-public partial class UVoiceAIProvider : IModelProvider, IUnifiedModelProvider
+public partial class UVoiceAIProvider : IModelProvider
 {
     private const string ProviderId = "uvoiceai";
     private const string ProviderName = "UVoiceAI";

@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 
 namespace AIHappey.Core.Providers.EdgeSpeak;
 
-public sealed partial class EdgeSpeakProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class EdgeSpeakProvider : IModelProvider
 {
     private const string ProviderId = "edgespeak";
     private readonly IApiKeyResolver _keys;

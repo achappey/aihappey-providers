@@ -17,7 +17,7 @@ using System.Text.Json.Nodes;
 
 namespace AIHappey.Core.Providers.Groq;
 
-public partial class GroqProvider : IModelProvider, IUnifiedModelProvider
+public partial class GroqProvider : IModelProvider
 {
     private readonly HttpClient _client;
 

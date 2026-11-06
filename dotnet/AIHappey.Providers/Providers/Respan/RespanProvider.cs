@@ -17,7 +17,7 @@ namespace AIHappey.Core.Providers.Respan;
 
 public sealed partial class RespanProvider(
     IApiKeyResolver keyResolver,
-    IHttpClientFactory httpClientFactory) : IModelProvider, IUnifiedModelProvider
+    IHttpClientFactory httpClientFactory) : IModelProvider
 {
     private const string AnthropicMessagesPath = "api/anthropic/v1/messages";
     private const string ChatCompletionsPath = "api/chat/completions";

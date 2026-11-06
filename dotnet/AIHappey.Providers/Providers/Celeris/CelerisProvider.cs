@@ -21,7 +21,7 @@ namespace AIHappey.Core.Providers.Celeris;
 public sealed partial class CelerisProvider(
     IApiKeyResolver keyResolver,
     IHttpClientFactory httpClientFactory,
-    AsyncCacheHelper memoryCache) : IModelProvider, IUnifiedModelProvider
+    AsyncCacheHelper memoryCache) : IModelProvider
 {
     private readonly HttpClient _client = CreateClient(httpClientFactory);
     private readonly AsyncCacheHelper _memoryCache = memoryCache;

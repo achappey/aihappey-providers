@@ -20,7 +20,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.HCompany;
 
-public partial class HCompanyProvider : IModelProvider, IUnifiedModelProvider
+public partial class HCompanyProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly AsyncCacheHelper _memoryCache;

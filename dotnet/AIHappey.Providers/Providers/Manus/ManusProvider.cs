@@ -15,7 +15,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Manus;
 
-public sealed partial class ManusProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class ManusProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

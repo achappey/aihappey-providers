@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.EverypixelLabs;
 
-public partial class EverypixelLabsProvider : IModelProvider, IUnifiedModelProvider
+public partial class EverypixelLabsProvider : IModelProvider
 {
     private const string ProviderId = "everypixellabs";
     private const string ProviderName = "EverypixelLabs";

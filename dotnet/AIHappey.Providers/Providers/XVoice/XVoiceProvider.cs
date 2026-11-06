@@ -24,7 +24,7 @@ namespace AIHappey.Core.Providers.XVoice;
 public partial class XVoiceProvider(
     IApiKeyResolver keyResolver,
     AsyncCacheHelper cache,
-    IHttpClientFactory httpClientFactory) : IModelProvider, IUnifiedModelProvider
+    IHttpClientFactory httpClientFactory) : IModelProvider
 {
     private const string ProviderId = "xvoice";
     private const string ProviderName = "xVoice";

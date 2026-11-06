@@ -16,7 +16,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Narakeet;
 
-public sealed partial class NarakeetProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class NarakeetProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;

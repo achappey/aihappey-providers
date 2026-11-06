@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Speechify;
 
-public partial class SpeechifyProvider : IModelProvider, IUnifiedModelProvider
+public partial class SpeechifyProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

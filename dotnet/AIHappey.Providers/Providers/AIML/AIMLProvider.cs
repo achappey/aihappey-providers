@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.AIML;
 
-public partial class AIMLProvider : IModelProvider, IUnifiedModelProvider
+public partial class AIMLProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

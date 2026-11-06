@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.M8tes;
 
-public partial class M8tesProvider : IModelProvider, IUnifiedModelProvider
+public partial class M8tesProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly IEndUserIdResolver _userResolver;

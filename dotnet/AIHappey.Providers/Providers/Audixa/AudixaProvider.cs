@@ -16,7 +16,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Audixa;
 
-public partial class AudixaProvider : IModelProvider, IUnifiedModelProvider
+public partial class AudixaProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

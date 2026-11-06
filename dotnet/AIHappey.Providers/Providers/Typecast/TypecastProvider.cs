@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Typecast;
 
-public partial class TypecastProvider : IModelProvider, IUnifiedModelProvider
+public partial class TypecastProvider : IModelProvider
 {
     private const string ProviderId = "typecast";
     private const string ProviderName = "Typecast";

@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Verbatik;
 
-public partial class VerbatikProvider : IModelProvider, IUnifiedModelProvider
+public partial class VerbatikProvider : IModelProvider
 {
     private const string ProviderId = "verbatik";
     private const string ProviderName = "Verbatik";

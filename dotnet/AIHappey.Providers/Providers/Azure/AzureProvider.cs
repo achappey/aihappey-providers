@@ -23,7 +23,7 @@ public sealed partial class AzureProvider(
     IApiKeyResolver keyResolver,
     IOptions<AzureProviderOptions> options,
     AsyncCacheHelper memoryCache,
-    IHttpClientFactory httpClientFactory) : IModelProvider, IUnifiedModelProvider, ISkillProvider, IConfiguredSkillProvider
+    IHttpClientFactory httpClientFactory) : IModelProvider, ISkillProvider, IConfiguredSkillProvider
 {
     private readonly IApiKeyResolver _keyResolver = keyResolver;
     private readonly AsyncCacheHelper _memoryCache = memoryCache;

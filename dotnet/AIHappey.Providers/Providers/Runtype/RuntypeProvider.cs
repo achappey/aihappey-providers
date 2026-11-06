@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Runtype;
 
-public sealed partial class RuntypeProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class RuntypeProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

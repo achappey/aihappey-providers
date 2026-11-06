@@ -14,7 +14,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.HumeAI;
 
-public partial class HumeAIProvider : IModelProvider, IUnifiedModelProvider
+public partial class HumeAIProvider : IModelProvider
 {
     private const string ProviderId = "humeai";
     private const string ProviderName = "HumeAI";

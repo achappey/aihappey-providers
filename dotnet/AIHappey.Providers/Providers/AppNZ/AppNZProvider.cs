@@ -20,7 +20,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.AppNZ;
 
-public partial class AppNZProvider : IModelProvider, IUnifiedModelProvider
+public partial class AppNZProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly IHttpClientFactory _httpClientFactory;

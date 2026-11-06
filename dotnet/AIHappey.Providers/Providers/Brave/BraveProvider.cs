@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Brave;
 
-public partial class BraveProvider : IModelProvider, IUnifiedModelProvider
+public partial class BraveProvider : IModelProvider
 {
     private const string UsageStartTag = "<usage>";
     private const string UsageEndTag = "</usage>";

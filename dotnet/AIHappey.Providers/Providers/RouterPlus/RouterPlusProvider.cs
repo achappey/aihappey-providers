@@ -17,7 +17,7 @@ namespace AIHappey.Core.Providers.RouterPlus;
 public sealed partial class RouterPlusProvider(
     IApiKeyResolver keyResolver,
     IHttpClientFactory httpClientFactory,
-    AsyncCacheHelper memoryCache) : IModelProvider, IUnifiedModelProvider
+    AsyncCacheHelper memoryCache) : IModelProvider
 {
     private readonly HttpClient _client = CreateClient(httpClientFactory);
 

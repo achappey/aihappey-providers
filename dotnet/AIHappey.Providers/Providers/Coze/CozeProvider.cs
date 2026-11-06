@@ -21,7 +21,7 @@ namespace AIHappey.Core.Providers.Coze;
 public sealed partial class CozeProvider(
     IApiKeyResolver keyResolver,
     IHttpClientFactory httpClientFactory,
-    AsyncCacheHelper asyncCacheHelper) : IModelProvider, IUnifiedModelProvider
+    AsyncCacheHelper asyncCacheHelper) : IModelProvider
 {
     private readonly HttpClient _client = CreateClient(httpClientFactory);
 

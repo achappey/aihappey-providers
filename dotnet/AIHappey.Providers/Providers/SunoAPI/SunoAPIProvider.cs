@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.SunoAPI;
 
-public partial class SunoAPIProvider : IModelProvider, IUnifiedModelProvider
+public partial class SunoAPIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

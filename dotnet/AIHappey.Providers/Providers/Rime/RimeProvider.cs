@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Rime;
 
-public partial class RimeProvider : IModelProvider, IUnifiedModelProvider
+public partial class RimeProvider : IModelProvider
 {
     private const string ProviderId = "rime";
     private const string ProviderName = "Rime";

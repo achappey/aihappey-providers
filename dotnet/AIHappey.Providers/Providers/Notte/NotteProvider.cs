@@ -15,7 +15,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Notte;
 
-public partial class NotteProvider : IModelProvider, IUnifiedModelProvider
+public partial class NotteProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

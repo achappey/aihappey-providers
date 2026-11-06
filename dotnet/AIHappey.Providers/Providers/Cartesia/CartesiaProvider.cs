@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Cartesia;
 
-public partial class CartesiaProvider : IModelProvider, IUnifiedModelProvider
+public partial class CartesiaProvider : IModelProvider
 {
     private const string ProviderId = "cartesia";
     private const string ProviderName = "Cartesia";

@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 namespace AIHappey.Core.Providers.DeepInfra;
 
 public sealed partial class DeepInfraProvider(IApiKeyResolver keyResolver, IHttpClientFactory httpClientFactory, AsyncCacheHelper _memoryCache)
-    : IModelProvider, IUnifiedModelProvider
+    : IModelProvider
 {
     private readonly HttpClient _client = CreateClient(httpClientFactory);
 

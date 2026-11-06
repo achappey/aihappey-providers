@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Codebase;
 
-public partial class CodebaseProvider : IModelProvider, IUnifiedModelProvider
+public partial class CodebaseProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly HttpClient _client;

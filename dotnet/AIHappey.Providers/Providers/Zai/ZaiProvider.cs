@@ -14,7 +14,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Zai;
 
-public partial class ZaiProvider : IModelProvider, IUnifiedModelProvider
+public partial class ZaiProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

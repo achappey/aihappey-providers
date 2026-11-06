@@ -16,7 +16,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Neuphonic;
 
-public sealed partial class NeuphonicProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class NeuphonicProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;

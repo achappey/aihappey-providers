@@ -19,7 +19,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.UnrealSpeech;
 
-public partial class UnrealSpeechProvider : IModelProvider, IUnifiedModelProvider
+public partial class UnrealSpeechProvider : IModelProvider
 {
     private const string ProviderId = "unrealspeech";
     private const string ProviderName = "UnrealSpeech";

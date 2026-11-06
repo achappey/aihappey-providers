@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 namespace AIHappey.Core.Providers.Dust;
 
-public partial class DustProvider : IModelProvider, IUnifiedModelProvider
+public partial class DustProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly AsyncCacheHelper _memoryCache;

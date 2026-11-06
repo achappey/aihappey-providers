@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.StabilityAI;
 
-public partial class StabilityAIProvider : IModelProvider, IUnifiedModelProvider
+public partial class StabilityAIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

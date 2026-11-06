@@ -18,7 +18,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Astica;
 
-public partial class AsticaProvider : IModelProvider, IUnifiedModelProvider
+public partial class AsticaProvider : IModelProvider
 {
     private const string ProviderId = "astica";
     private const string ProviderName = "Astica";

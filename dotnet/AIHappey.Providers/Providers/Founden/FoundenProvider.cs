@@ -15,7 +15,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Founden;
 
-public sealed partial class FoundenProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class FoundenProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly HttpClient _client;

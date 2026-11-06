@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Connect0;
 
-public sealed partial class Connect0Provider : IModelProvider, IUnifiedModelProvider
+public sealed partial class Connect0Provider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

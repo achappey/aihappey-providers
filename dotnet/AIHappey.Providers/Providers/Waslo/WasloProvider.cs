@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Waslo;
 
-public sealed partial class WasloProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class WasloProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly IEndUserIdResolver _endUserIdResolver;

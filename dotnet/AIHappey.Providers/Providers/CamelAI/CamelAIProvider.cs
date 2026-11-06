@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.CamelAI;
 
-public sealed partial class CamelAIProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class CamelAIProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

@@ -15,7 +15,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.SmallestAI;
 
-public partial class SmallestAIProvider : IModelProvider, IUnifiedModelProvider
+public partial class SmallestAIProvider : IModelProvider
 {
     private const string ProviderId = "smallestai";
     private const string ProviderName = "SmallestAI";

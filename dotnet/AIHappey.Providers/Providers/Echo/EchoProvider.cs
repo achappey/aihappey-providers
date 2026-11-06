@@ -16,7 +16,7 @@ namespace AIHappey.Core.Providers.Echo;
 /// <summary>
 /// Debug provider that echoes the last user message back to the client.
 /// </summary>
-public sealed partial class EchoProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class EchoProvider : IModelProvider
 {
     public string GetIdentifier() => "echo";
 

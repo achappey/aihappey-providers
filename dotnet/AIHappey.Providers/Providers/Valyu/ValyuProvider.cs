@@ -10,7 +10,7 @@ using AIHappey.Unified.Models;
 
 namespace AIHappey.Core.Providers.Valyu;
 
-public partial class ValyuProvider : IModelProvider, IUnifiedModelProvider
+public partial class ValyuProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

@@ -16,7 +16,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Respeecher;
 
-public sealed partial class RespeecherProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class RespeecherProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;

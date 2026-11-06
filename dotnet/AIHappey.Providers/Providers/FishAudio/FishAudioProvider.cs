@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.FishAudio;
 
-public partial class FishAudioProvider : IModelProvider, IUnifiedModelProvider
+public partial class FishAudioProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

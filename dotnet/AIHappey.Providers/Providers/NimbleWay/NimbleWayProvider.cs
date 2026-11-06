@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 
 namespace AIHappey.Core.Providers.NimbleWay;
 
-public partial class NimbleWayProvider : IModelProvider, IUnifiedModelProvider
+public partial class NimbleWayProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

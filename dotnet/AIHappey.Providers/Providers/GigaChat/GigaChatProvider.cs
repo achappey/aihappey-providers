@@ -21,7 +21,7 @@ namespace AIHappey.Core.Providers.GigaChat;
 
 public sealed partial class GigaChatProvider(
     IApiKeyResolver keyResolver,
-    IHttpClientFactory httpClientFactory) : IModelProvider, IUnifiedModelProvider
+    IHttpClientFactory httpClientFactory) : IModelProvider
 {
     private const string OAuthUrl = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth";
     private const string OAuthScope = "GIGACHAT_API_PERS";

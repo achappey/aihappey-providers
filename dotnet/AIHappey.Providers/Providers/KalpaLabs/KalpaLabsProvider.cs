@@ -18,7 +18,7 @@ using AIHappey.Vercel.Extensions;
 
 namespace AIHappey.Core.Providers.KalpaLabs;
 
-public partial class KalpaLabsProvider : IModelProvider, IUnifiedModelProvider
+public partial class KalpaLabsProvider : IModelProvider
 {
     private const string ProviderId = "kalpalabs";
     private const string ProviderName = "KalpaLabs";

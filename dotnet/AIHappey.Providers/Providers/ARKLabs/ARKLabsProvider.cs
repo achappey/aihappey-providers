@@ -15,7 +15,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.ARKLabs;
 
-public partial class ARKLabsProvider : IModelProvider, IUnifiedModelProvider
+public partial class ARKLabsProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 

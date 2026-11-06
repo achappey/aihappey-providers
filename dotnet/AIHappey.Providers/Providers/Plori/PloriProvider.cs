@@ -16,7 +16,7 @@ using AIHappey.Vercel.Models;
 
 namespace AIHappey.Core.Providers.Plori;
 
-public sealed partial class PloriProvider : IModelProvider, IUnifiedModelProvider
+public sealed partial class PloriProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keys;
     private readonly AsyncCacheHelper _cache;

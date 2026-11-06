@@ -17,7 +17,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.TTSReader;
 
-public partial class TTSReaderProvider : IModelProvider, IUnifiedModelProvider
+public partial class TTSReaderProvider : IModelProvider
 {
     private readonly IApiKeyResolver _keyResolver;
 
