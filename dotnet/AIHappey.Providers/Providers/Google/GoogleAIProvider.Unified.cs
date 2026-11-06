@@ -22,6 +22,9 @@ public partial class GoogleAIProvider
         var mappedResponse = interaction.ToUnifiedResponse(GetIdentifier());
         var clientResponse = ownership.Apply(mappedResponse);
 
+        clientResponse = EnrichGoogleOmniUnifiedResponseWithGatewayCost(
+            clientResponse, interaction, interactionRequest.Model, interactionRequest.ServiceTier);
+
         return AddAntigravityStateTool(
             clientResponse,
             interaction, requestedAgent, isCustomAgent);

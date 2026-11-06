@@ -86,7 +86,8 @@ public partial class GoogleAIProvider
         {
             Operation = interactionId,
             Warnings = warnings,
-            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(root.Clone()),
+            ProviderMetadata = EnrichGoogleOmniVideoMetadata(
+                GetIdentifier().CreatePrimitiveProviderMetadata(root.Clone()), root, request.Model),
             Response = new()
             {
                 Timestamp = now,
@@ -197,7 +198,8 @@ public partial class GoogleAIProvider
         string operation,
         string? status,
         JsonElement interaction)
-        => new()
+    {
+        var metadata = new Dictionary<string, JsonElement>
         {
             [GetIdentifier()] = JsonSerializer.SerializeToElement(new
             {
@@ -206,6 +208,23 @@ public partial class GoogleAIProvider
                 interaction
             }, JsonSerializerOptions.Web)
         };
+
+        return EnrichGoogleOmniVideoMetadata(metadata, interaction);
+    }
+
+    private static Dictionary<string, JsonElement> EnrichGoogleOmniVideoMetadata(
+        Dictionary<string, JsonElement> metadata, JsonElement interaction, string? requestModel = null)
+    {
+        if (TryGetProperty(interaction, "usage", out var usage) && usage.ValueKind == JsonValueKind.Object)
+        {
+            var costMetadata = EnrichGoogleUsageWithGatewayCost(
+                usage, null, TryGetString(interaction, "model") ?? requestModel, TryGetString(interaction, "service_tier"));
+            if (TryGetGatewayMetadata(costMetadata, out var gateway))
+                metadata["gateway"] = JsonSerializer.SerializeToElement(gateway, JsonSerializerOptions.Web);
+        }
+
+        return metadata;
+    }
 
     private static string CreateGoogleOmniVideoFailure(
         string operation,

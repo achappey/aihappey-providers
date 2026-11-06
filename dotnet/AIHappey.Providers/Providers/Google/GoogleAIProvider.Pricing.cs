@@ -9,6 +9,8 @@ namespace AIHappey.Core.Providers.Google;
 
 public partial class GoogleAIProvider
 {
+    private const decimal GoogleOmniVideoOutputTokenPrice = 12m / 1_000_000m;
+
     private static Responses.ResponseResult EnrichResponseWithGatewayCost(
         Responses.ResponseResult response,
         string? requestModel = null,
@@ -23,19 +25,152 @@ public partial class GoogleAIProvider
             ? interaction?.ServiceTier ?? requestServiceTier
             : response.ServiceTier;
 
-        var pricing = GoogleTieredPricingResolver.Resolve(
-            effectiveModelId,
-            effectiveServiceTier,
-            ModelCostMetadataEnricher.GetTotalTokens(response.Usage));
+        // Unified responses/finish events already carry the modality-aware cost.
+        // Endpoint mapping can flatten usage; do not replace that cost with text pricing.
+        if (interaction is null && IsGoogleOmniFlashModel(effectiveModelId)
+            && response.Metadata is not null
+            && TryGetGatewayMetadata(response.Metadata, out var gateway)
+            && gateway.TryGetValue("cost", out var existingCost)
+            && JsonSerializer.SerializeToElement(existingCost, JsonSerializerOptions.Web) is
+                { ValueKind: JsonValueKind.Number } costElement
+            && costElement.TryGetDecimal(out _))
+        {
+            return response;
+        }
 
-        var normalizedUsage = NormalizeGoogleUsage(response.Usage, interaction?.Usage);
-
-        response.Metadata = ModelCostMetadataEnricher.AddCostFromUsage(
-            normalizedUsage,
-            response.Metadata,
-            pricing);
+        response.Metadata = EnrichGoogleUsageWithGatewayCost(
+            response.Usage, response.Metadata, effectiveModelId, effectiveServiceTier, interaction?.Usage);
 
         return response;
+    }
+
+    private static bool IsGoogleOmniFlashModel(string? model)
+        => string.Equals(NormalizeGoogleModelOrAgentId(model), "gemini-omni-1.2-flash", StringComparison.OrdinalIgnoreCase);
+
+    private static Dictionary<string, object?> EnrichGoogleUsageWithGatewayCost(
+        object? usage,
+        Dictionary<string, object?>? metadata,
+        string? model,
+        string? serviceTier,
+        InteractionUsage? interactionUsage = null)
+    {
+        var isOmni = IsGoogleOmniFlashModel(model);
+        var pricing = GoogleTieredPricingResolver.Resolve(
+            isOmni ? NormalizeGoogleModelOrAgentId(model) : model,
+            serviceTier,
+            ModelCostMetadataEnricher.GetTotalTokens(usage));
+
+        var normalizedUsage = NormalizeGoogleUsage(usage, interactionUsage);
+        var costMetadata = metadata is null ? new Dictionary<string, object?>() : new(metadata);
+        // Preserve gateway fields even when metadata was deserialized as JSON, and
+        // avoid mutating the caller's nested dictionary during repeated enrichment.
+        if (metadata is not null && TryGetGatewayMetadata(metadata, out var gateway))
+            costMetadata["gateway"] = gateway;
+
+        costMetadata = ModelCostMetadataEnricher.AddCostFromUsage(normalizedUsage, costMetadata, pricing);
+
+        if (!isOmni || pricing is null
+            || !TryNormalizeUsageFromObject(normalizedUsage, out var counts)
+            || !TryGetGoogleOmniVideoOutputTokens(interactionUsage ?? usage, out var videoTokens))
+        {
+            return costMetadata;
+        }
+
+        var inputTokens = (int)counts["input_tokens"]!;
+        var outputTokens = (int)counts["output_tokens"]!;
+        var cachedTokens = (int)counts["cached_input_tokens"]!;
+        if (outputTokens == 0 && (int)counts["total_tokens"]! > 0)
+            outputTokens = Math.Max(0, (int)counts["total_tokens"]! - inputTokens - cachedTokens);
+
+        // Invalid or contradictory modality counts must not create negative text
+        // charges. Without usable reported counts, retain catalog-based pricing.
+        if (inputTokens < 0 || videoTokens > outputTokens)
+            return costMetadata;
+
+        // Total output already includes video tokens: replace their text-rate
+        // charge, rather than charging for the same output twice. This also bills
+        // reported video-only usage when the input count is explicitly zero.
+        var cost = ModelCostMetadataEnricher.ComputeCost(pricing, inputTokens, outputTokens, cachedTokens, 0)
+            + videoTokens * (GoogleOmniVideoOutputTokenPrice - pricing.Output);
+        return ModelCostMetadataEnricher.AddCost(costMetadata, cost);
+    }
+
+    private static bool TryGetGoogleOmniVideoOutputTokens(object? usage, out int videoTokens)
+    {
+        videoTokens = 0;
+        if (usage is null)
+            return false;
+
+        try
+        {
+            var json = usage is JsonElement element
+                ? element
+                : JsonSerializer.SerializeToElement(usage, JsonSerializerOptions.Web);
+            if (!TryGetProperty(json, "output_tokens_by_modality", out var modalities)
+                || modalities.ValueKind != JsonValueKind.Array)
+                return false;
+
+            long total = 0;
+            foreach (var modality in modalities.EnumerateArray())
+            {
+                if (!string.Equals(TryGetString(modality, "modality"), "video", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var tokens = TryGetUsageInt(modality, "tokens");
+                if (!tokens.HasValue || tokens.Value < 0)
+                    return false;
+
+                total += tokens.Value;
+                if (total > int.MaxValue)
+                    return false;
+            }
+
+            videoTokens = (int)total;
+            return videoTokens > 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static AIResponse EnrichGoogleOmniUnifiedResponseWithGatewayCost(
+        AIResponse response, Interaction interaction, string? requestModel, string? requestServiceTier)
+    {
+        var model = interaction.Model ?? requestModel;
+        if (!IsGoogleOmniFlashModel(model))
+            return response;
+
+        return new AIResponse
+        {
+            ProviderId = response.ProviderId,
+            Model = response.Model,
+            Status = response.Status,
+            Output = response.Output,
+            Usage = response.Usage,
+            Metadata = EnrichGoogleUsageWithGatewayCost(
+                interaction.Usage, response.Metadata, model, interaction.ServiceTier ?? requestServiceTier)
+        };
+    }
+
+    private static Dictionary<string, JsonElement>? AddGoogleOmniChatGatewayMetadata(
+        Dictionary<string, JsonElement>? additionalProperties,
+        Dictionary<string, object?>? metadata,
+        string? model)
+    {
+        if (!IsGoogleOmniFlashModel(model) || metadata is null
+            || !TryGetGatewayMetadata(metadata, out var gateway))
+            return additionalProperties;
+
+        var additional = additionalProperties is null
+            ? new Dictionary<string, JsonElement>() : new(additionalProperties);
+        var chatMetadata = additional.TryGetValue("metadata", out var existingMetadata)
+            && existingMetadata.ValueKind == JsonValueKind.Object
+                ? existingMetadata.Deserialize<Dictionary<string, object?>>(JsonSerializerOptions.Web) ?? []
+                : new Dictionary<string, object?>();
+        chatMetadata["gateway"] = gateway;
+        additional["metadata"] = JsonSerializer.SerializeToElement(chatMetadata, JsonSerializerOptions.Web);
+        return additional;
     }
 
     private static object? NormalizeGoogleUsage(object? usage, InteractionUsage? interactionUsage)

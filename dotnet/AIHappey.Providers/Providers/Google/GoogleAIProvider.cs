@@ -64,7 +64,10 @@ public partial class GoogleAIProvider
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
         var result = await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
-        return result.ToChatCompletion();
+        var completion = result.ToChatCompletion();
+        completion.AdditionalProperties = AddGoogleOmniChatGatewayMetadata(
+            completion.AdditionalProperties, result.Metadata, result.Model ?? options.Model);
+        return completion;
     }
 
     public string GetIdentifier() => GoogleExtensions.Identifier();
@@ -83,7 +86,13 @@ public partial class GoogleAIProvider
                            options.ToUnifiedRequest(GetIdentifier()),
                            cancellationToken))
         {
-            yield return item.ToChatCompletionUpdate();
+            var update = item.ToChatCompletionUpdate();
+            if (item.Event.Data is AIHappey.Unified.Models.AIFinishEventData finish)
+            {
+                update.AdditionalProperties = AddGoogleOmniChatGatewayMetadata(
+                    update.AdditionalProperties, finish.MessageMetadata?.ToDictionary(), finish.Model ?? options.Model);
+            }
+            yield return update;
         }
     }
 
