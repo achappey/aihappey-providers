@@ -82,6 +82,29 @@ public sealed class ElevenLabsTranscriptionMetadataPassthroughTests
         Assert.DoesNotContain("timestamp_granularities", fields.Keys);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("null")]
+    [InlineData("{}")]
+    public async Task Transcription_treats_absent_null_and_empty_metadata_as_no_options(string? metadataJson)
+    {
+        var fields = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal("https://api.elevenlabs.io/v1/speech-to-text", request.RequestUri!.ToString());
+            CaptureFields(request, fields);
+            return JsonResponse("""{"text":"recognized"}""");
+        });
+        var metadata = metadataJson is null ? default : ParseElement(metadataJson);
+
+        var response = await CreateProvider(client).TranscriptionRequest(CreateRequest(metadata));
+
+        Assert.Equal("recognized", response.Text);
+        Assert.Equal("request-model", Single(fields, "model_id"));
+        Assert.Equal("audio", Single(fields, "file"));
+        Assert.Equal(2, fields.Count);
+    }
+
     [Fact]
     public async Task Transcription_preserves_omissions_validation_and_upstream_errors()
     {

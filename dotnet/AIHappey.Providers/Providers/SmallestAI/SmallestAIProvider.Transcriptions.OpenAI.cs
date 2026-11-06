@@ -53,6 +53,10 @@ public partial class SmallestAIProvider
         var metadata = existing.ValueKind == JsonValueKind.Object
             ? JsonNode.Parse(existing.GetRawText())!.AsObject()
             : new JsonObject();
+
+        // Consume the shared OpenAI option here; SmallestAI uses wordTimestamps instead.
+        metadata.Remove("timestamp_granularities");
+
         var existingLanguage = GetMetadataValue<string?>(existing, "language");
         var language = !string.IsNullOrWhiteSpace(options.Language)
             ? options.Language.Trim()

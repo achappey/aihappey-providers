@@ -31,6 +31,7 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
               "future_number": 12345678901234567890.123456789,
               "future_boolean": false,
               "future_null": null,
+              "timestamp_granularities": ["word"],
               "model": "must-not-override-request"
             }
             """);
@@ -67,7 +68,8 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
         Assert.Equal("12345678901234567890.123456789", Single(query, "future_number"));
         Assert.Equal("false", Single(query, "future_boolean"));
         Assert.Equal("null", Single(query, "future_null"));
-        Assert.Equal(14, query.Count);
+        Assert.Equal(metadata.GetProperty("timestamp_granularities").GetRawText(), Single(query, "timestamp_granularities"));
+        Assert.Equal(15, query.Count);
         Assert.Equal(1, query["model"].Count);
         Assert.DoesNotContain("providerOptions", query.Keys);
         Assert.DoesNotContain("smallestai", query.Keys);
@@ -151,8 +153,10 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
         Assert.Equal(5, query.Count);
     }
 
-    [Fact]
-    public async Task Openai_transcription_options_override_provider_parameters()
+    [Theory]
+    [InlineData("word", true)]
+    [InlineData("segment", false)]
+    public async Task Openai_transcription_options_override_provider_parameters(string granularity, bool wordTimestamps)
     {
         Dictionary<string, List<string>> query = [];
         using var client = CreateClient(request =>
@@ -165,7 +169,7 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
         {
             Model = "pulse",
             Language = "fr",
-            TimestampGranularities = ["word"],
+            TimestampGranularities = [granularity],
             File = new FormFile(audio, 0, audio.Length, "file", "audio.wav")
             {
                 Headers = new HeaderDictionary(),
@@ -176,9 +180,14 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
         await CreateProvider(client).OpenAITranscriptionRequestAsync(openAIRequest);
 
         Assert.Equal("fr", Single(query, "language"));
-        Assert.Equal("true", Single(query, "word_timestamps"));
+        if (wordTimestamps)
+            Assert.Equal("true", Single(query, "word_timestamps"));
+        else
+            Assert.DoesNotContain("word_timestamps", query.Keys);
         Assert.Equal("pulse", Single(query, "model"));
-        Assert.Equal(3, query.Count);
+        Assert.DoesNotContain("timestamp_granularities", query.Keys);
+        Assert.DoesNotContain("wordTimestamps", query.Keys);
+        Assert.Equal(wordTimestamps ? 3 : 2, query.Count);
     }
 
     private static TranscriptionRequest CreateRequest(JsonElement metadata, string model = "pulse")

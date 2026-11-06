@@ -146,6 +146,12 @@ public partial class ElevenLabsProvider
 
     private static bool TryGetMetadataProperty(JsonElement metadata, string propertyName, out JsonElement value)
     {
+        if (metadata.ValueKind != JsonValueKind.Object)
+        {
+            value = default;
+            return false;
+        }
+
         if (metadata.TryGetProperty(propertyName, out value))
             return true;
 
