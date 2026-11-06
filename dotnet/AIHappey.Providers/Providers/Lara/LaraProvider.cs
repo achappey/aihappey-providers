@@ -58,11 +58,13 @@ public partial class LaraProvider : IModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(
+        var stream = StreamUnifiedAsync(
             options.ToUnifiedRequest(GetIdentifier()),
-            cancellationToken))
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
         {
-            yield return part.ToChatCompletionUpdate();
+            yield return update;
         }
     }
 
