@@ -2255,7 +2255,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "24f261d10c694d7a32630dda416cdcb8d7d3e7eb09c29329d624debf2c4989d3"
+      "sha256": "f329d8fd4e4ec7e03522f5a3d847b39273c2967e4a43e53cfce3d8c3df634cd5"
     },
     {
       "file": "providers/infercom.json",
@@ -3852,6 +3852,10 @@
     {
       "file": "providers/writer.json",
       "sha256": "8d3bc571e41f5398b32b5c494650ef4c88706ddb67cf540eaf9b438257a0081b"
+    },
+    {
+      "file": "providers/xalen.json",
+      "sha256": "644cebbce041ea01f002d36fa8c477ab22134f9b39d74a2a5668ad2e594d853d"
     },
     {
       "file": "providers/xiaomimimo.json",

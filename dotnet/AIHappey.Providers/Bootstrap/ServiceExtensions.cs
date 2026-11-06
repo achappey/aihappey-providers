@@ -396,6 +396,7 @@ using AIHappey.Core.Providers.GateRouter;
 using AIHappey.Core.Providers.TeamDay;
 using AIHappey.Core.Providers.Chutes;
 using AIHappey.Core.Providers.XiaomiMIMO;
+using AIHappey.Core.Providers.XALEN;
 using AIHappey.Core.Providers.Ollama;
 using AIHappey.Core.Providers.Vivgrid;
 using AIHappey.Core.Providers.Ambient;
@@ -1095,6 +1096,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, TeamDayProvider>();        
         services.AddScoped<IModelProvider, ChutesProvider>();
         services.AddScoped<IModelProvider, XiaomiMIMOProvider>();
+        services.AddScoped<IModelProvider, XALENProvider>();
         services.AddScoped<IModelProvider, OllamaProvider>();
         services.AddScoped<IModelProvider, VivgridProvider>();
         services.AddScoped<IModelProvider, AmbientProvider>();
