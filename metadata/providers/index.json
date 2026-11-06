@@ -2728,6 +2728,10 @@
     "file": "infermatic.json"
   },
   {
+    "id": "kiosapi",
+    "file": "kiosapi.json"
+  },
+  {
     "id": "gigachat",
     "file": "gigachat.json"
   }
