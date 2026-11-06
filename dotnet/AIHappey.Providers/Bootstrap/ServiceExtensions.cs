@@ -1,5 +1,6 @@
 using AIHappey.Core.Providers.AIML;
 using AIHappey.Core.Providers.Buildprint;
+using AIHappey.Core.Providers.Allternit;
 using AIHappey.Core.Providers.Keln;
 using AIHappey.Core.Providers.Codebase;
 using AIHappey.Core.Providers.AbacusAI;
@@ -1018,6 +1019,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, PloriProvider>();
         services.AddScoped<IModelProvider, AgencyOSXProvider>();
         services.AddScoped<IModelProvider, BuildprintProvider>();
+        services.AddScoped<IModelProvider, AllternitProvider>();
         //services.AddScoped<IModelProvider, SovereignAPIProvider>();
         services.AddScoped<IModelProvider, NRPNautilusProvider>();
         services.AddScoped<IModelProvider, EAGMProvider>();
