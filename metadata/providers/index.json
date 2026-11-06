@@ -908,6 +908,10 @@
     "file": "agentcontainer.json"
   },
   {
+    "id": "agentcommons",
+    "file": "agentcommons.json"
+  },
+  {
     "id": "interfaze",
     "file": "interfaze.json"
   },
