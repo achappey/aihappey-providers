@@ -1246,6 +1246,10 @@
       "sha256": "0f8a785e01394ad0ebcd9705bb0e99f0c19d1f500d74394752f539c6bbf5b7f2"
     },
     {
+      "file": "providers/agentcommons.json",
+      "sha256": "2bc92f9e28d539ac6b3c1db6a1e9426d1cb98a439e91e6db8b12bc7ac7bf3b81"
+    },
+    {
       "file": "providers/agentcontainer.json",
       "sha256": "322f9c841567ebebcf9f26e8d915b636145845ed83b8ca5317cf054d999afa70"
     },
