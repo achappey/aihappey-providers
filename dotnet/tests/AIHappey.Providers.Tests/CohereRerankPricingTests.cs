@@ -22,7 +22,8 @@ public sealed class CohereRerankPricingTests
         string expectedCost)
     {
         using var catalog = CreateCatalog(model, inputPrice);
-        using var client = CreateClient(model, $$"""{"results":[],"meta":{"billed_units":{{billedUnits}}}""");
+        using var client = CreateClient(model,
+            """{"results":[],"meta":{"billed_units":""" + billedUnits + "}}");
         var provider = new CohereProvider(new TestKeyResolver(), new AsyncCacheHelper(), new TestClientFactory(client));
 
         var response = await provider.RerankingRequest(CreateRequest(model));
