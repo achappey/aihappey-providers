@@ -121,7 +121,7 @@ public sealed partial class BuildprintProvider
                 yield return Event("tool-input-available", tool.ToolCallId,
                     new AIToolInputAvailableEventData { ToolName = tool.ToolName, Input = tool.Input!, ProviderExecuted = true, ProviderMetadata = scoped }, metadata);
                 yield return Event("tool-output-available", tool.ToolCallId,
-                    new AIToolOutputAvailableEventData { ToolName = tool.ToolName, Output = tool.Output!, ProviderExecuted = true, ProviderMetadata = scoped }, metadata);
+                    new AIToolOutputAvailableEventData { ToolName = tool.ToolName!, Output = tool.Output!, ProviderExecuted = true, ProviderMetadata = scoped }, metadata);
             }
             if (part is AITextContentPart text)
             {

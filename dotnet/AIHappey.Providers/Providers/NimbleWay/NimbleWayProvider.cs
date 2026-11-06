@@ -48,9 +48,10 @@ public partial class NimbleWayProvider : IModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
         await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
         {
-            var update = part.ToChatCompletionUpdate();
+            var update = part.ToChatCompletionUpdate(mappingState);
             // The shared reverse mapper handles tools/finish, but not typed text deltas.
             if (part.Event.Data is AITextDeltaEventData text)
                 update.Choices = [new ChatCompletionStreamChoice { Index = 0, Delta = new ChatCompletionDelta { Content = text.Delta }, FinishReason = (string?)null }];

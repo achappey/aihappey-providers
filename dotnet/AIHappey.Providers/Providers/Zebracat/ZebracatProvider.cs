@@ -52,9 +52,9 @@ public partial class ZebracatProvider : IModelProvider
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(options);
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-            .WithCancellation(cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+            yield return update;
     }
 
     public string GetIdentifier() => nameof(Zebracat).ToLowerInvariant();

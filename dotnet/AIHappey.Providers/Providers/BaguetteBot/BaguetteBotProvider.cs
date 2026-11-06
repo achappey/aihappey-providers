@@ -57,9 +57,10 @@ public sealed partial class BaguetteBotProvider : IModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
         await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
         {
-            var update = part.ToChatCompletionUpdate();
+            var update = part.ToChatCompletionUpdate(mappingState);
             update.Object = "chat.completion.chunk";
             update.Model = options.Model;
             (update.AdditionalProperties ??= [])["provider_metadata"] = JsonSerializer.SerializeToElement(part.Metadata, Json);

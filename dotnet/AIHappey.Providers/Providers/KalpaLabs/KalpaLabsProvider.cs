@@ -43,9 +43,10 @@ public partial class KalpaLabsProvider : IModelProvider
         ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var id = $"chatcmpl_{Guid.NewGuid():N}";
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
         await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(ProviderId), cancellationToken))
         {
-            var update = part.ToChatCompletionUpdate();
+            var update = part.ToChatCompletionUpdate(mappingState);
             update.Id = id;
             update.Model = options.Model;
             if (part.Event.Data is AITextDeltaEventData text)

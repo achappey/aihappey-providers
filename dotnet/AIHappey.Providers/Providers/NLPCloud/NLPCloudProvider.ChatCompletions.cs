@@ -21,11 +21,12 @@ public partial class NLPCloudProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        var mappingState = new ChatCompletionsUnifiedMapper.ChatCompletionsReverseStreamMappingState();
         await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
         {
             if (part.Event.Type == "text-end")
                 continue;
-            var update = part.ToChatCompletionUpdate();
+            var update = part.ToChatCompletionUpdate(mappingState);
             update.Model = options.Model;
             if (part.Event.Data is AITextStartEventData)
                 update.Choices = [new ChatCompletionStreamChoice

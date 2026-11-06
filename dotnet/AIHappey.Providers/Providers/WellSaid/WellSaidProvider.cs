@@ -55,8 +55,9 @@ public sealed partial class WellSaidProvider : IModelProvider
 
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            yield return part.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+            yield return update;
     }
 
     public async IAsyncEnumerable<UIMessagePart> StreamAsync(ChatRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken = default)

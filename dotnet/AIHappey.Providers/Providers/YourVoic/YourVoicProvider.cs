@@ -56,13 +56,10 @@ public partial class YourVoicProvider : IModelProvider
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var request = options.ToUnifiedRequest(GetIdentifier());
-
-        await foreach (var update in StreamUnifiedAsync(
-                                 request,
-                                  cancellationToken: cancellationToken))
+        var stream = StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
         {
-            yield return update.ToChatCompletionUpdate();
+            yield return update;
         }
     }
 
@@ -224,4 +221,3 @@ public partial class YourVoicProvider : IModelProvider
         throw new NotImplementedException();
     }
 }
-
