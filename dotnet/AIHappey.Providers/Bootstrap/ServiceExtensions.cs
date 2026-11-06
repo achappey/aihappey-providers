@@ -631,6 +631,7 @@ using AIHappey.Core.Providers.Interfaze;
 using AIHappey.Core.Providers.Agent37;
 using AIHappey.Core.Providers.M8tes;
 using AIHappey.Core.Providers.AgentContainer;
+using AIHappey.Core.Providers.Kiosapi;
 using AIHappey.Core.Providers.Dust;
 using AIHappey.Core.Providers.AgentDiscuss;
 using AIHappey.Core.Providers.BaguetteBot;
@@ -1334,6 +1335,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, Agent37Provider>();
         services.AddScoped<IModelProvider, M8tesProvider>();
         services.AddScoped<IModelProvider, AgentContainerProvider>();
+        services.AddScoped<IModelProvider, KiosapiProvider>();
         services.AddScoped<IModelProvider, DustProvider>();
         services.AddScoped<IModelProvider, AgentDiscussProvider>();
         services.AddScoped<IModelProvider, BaguetteBotProvider>();

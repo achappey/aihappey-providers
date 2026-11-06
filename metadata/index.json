@@ -2267,7 +2267,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "85adba1908cce13288978c2ef19631206fc767ac8f998936000e2562081bb7c7"
+      "sha256": "31888d9d19996804fc4553f8509f1c1de570dcc1d380e9d0428fdb948b4a1fc9"
     },
     {
       "file": "providers/infercom.json",
@@ -2376,6 +2376,10 @@
     {
       "file": "providers/kimrel.json",
       "sha256": "a90cb652483001f7cf3223df88a6b78bacd63d4facac6637bd2fa97e2bd9efa1"
+    },
+    {
+      "file": "providers/kiosapi.json",
+      "sha256": "541602433a89d71f3da1865654443ed3d7daa206ae65a504c689f4ceb8b4dd4d"
     },
     {
       "file": "providers/kirha.json",
