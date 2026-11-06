@@ -457,6 +457,7 @@ using AIHappey.Core.Providers.Paul;
 using AIHappey.Core.Providers.Radient;
 using AIHappey.Core.Providers.AIHorde;
 using AIHappey.Core.Providers.WiseRouter;
+using AIHappey.Core.Providers.WrenAI;
 using AIHappey.Core.Providers.Commonstack;
 using AIHappey.Core.Providers.Llama;
 using AIHappey.Core.Providers.NinjaChat;
@@ -1171,6 +1172,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, RadientProvider>();
         services.AddScoped<IModelProvider, AIHordeProvider>();
         services.AddScoped<IModelProvider, WiseRouterProvider>();        
+        services.AddScoped<IModelProvider, WrenAIProvider>();
         services.AddScoped<IModelProvider, CommonstackProvider>();
         services.AddScoped<IModelProvider, LlamaProvider>();
         services.AddScoped<IModelProvider, NinjaChatProvider>();

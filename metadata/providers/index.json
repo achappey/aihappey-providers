@@ -2754,5 +2754,9 @@
   {
     "id": "gigachat",
     "file": "gigachat.json"
+  },
+  {
+    "id": "wrenai",
+    "file": "wrenai.json"
   }
 ]
