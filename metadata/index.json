@@ -1234,6 +1234,10 @@
       "sha256": "a6bab5bd3ffefd14b093f4edeea1db3354e6656ca7d0304b5a4f3ce3f88c449e"
     },
     {
+      "file": "providers/agencyosx.json",
+      "sha256": "8c303c161dd71321b2a506b8807b81173701cc9f83dce7683e549f86cfb75f18"
+    },
+    {
       "file": "providers/agent37.json",
       "sha256": "6f059d7c7aa866c39fc632c1e5c9547ab1cfcc0587146d75bc728eeba891ec6c"
     },
@@ -2255,7 +2259,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "f329d8fd4e4ec7e03522f5a3d847b39273c2967e4a43e53cfce3d8c3df634cd5"
+      "sha256": "85adba1908cce13288978c2ef19631206fc767ac8f998936000e2562081bb7c7"
     },
     {
       "file": "providers/infercom.json",
