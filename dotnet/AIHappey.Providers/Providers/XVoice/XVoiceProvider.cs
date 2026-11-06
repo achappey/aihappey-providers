@@ -128,8 +128,14 @@ public partial class XVoiceProvider(
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(
         ChatCompletionOptions options, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var item in StreamUnifiedAsync(options.ToUnifiedRequest(ProviderId), cancellationToken))
-            yield return item.ToChatCompletionUpdate();
+        var stream = StreamUnifiedAsync(
+            options.ToUnifiedRequest(ProviderId),
+            cancellationToken);
+
+        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        {
+            yield return update;
+        }
     }
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)

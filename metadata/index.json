@@ -1258,6 +1258,10 @@
       "sha256": "b4aca2655d2696737b0fc554c479eb52e5d2e4aae431c3de6685242835d95e0c"
     },
     {
+      "file": "providers/agenticworkforceme.json",
+      "sha256": "6e7a36e33f9d57d5cd15bb282e4322354ac1420a418361c21bae6d5b428713c6"
+    },
+    {
       "file": "providers/agentphone.json",
       "sha256": "4ea04de1f639fcbeadf80fc57b7e678b3c3668fe3cb76776df1416e1bfba1aa3"
     },
@@ -2267,7 +2271,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "31888d9d19996804fc4553f8509f1c1de570dcc1d380e9d0428fdb948b4a1fc9"
+      "sha256": "2417c28eef5faf75ca848f1e0fc78a6683f6aa4d9a5b9011ccba630e4bc28182"
     },
     {
       "file": "providers/infercom.json",
@@ -3796,6 +3800,10 @@
     {
       "file": "providers/vikasit.json",
       "sha256": "8f275b70d0918e5923ce206a39fbdb78373168da661f5ac59606b1be974c054d"
+    },
+    {
+      "file": "providers/viktor.json",
+      "sha256": "5b7ce13332292863a478e44068712cd86ba764ad29c6f1487f714899b51c35db"
     },
     {
       "file": "providers/vivgrid.json",
