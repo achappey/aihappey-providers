@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.SmallestAI;
 using AIHappey.Core.MCP.Media;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
@@ -49,11 +48,15 @@ public partial class SmallestAIProvider
             throw new ArgumentException("Audio must be valid base64 or data URL base64.", nameof(request), ex);
         }
 
-        var metadata = request.GetProviderMetadata<SmallestAITranscriptionProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            throw new JsonException("SmallestAI provider options must be a JSON object.");
+
         var now = DateTime.UtcNow;
 
-        var language = !string.IsNullOrWhiteSpace(metadata?.Language)
-            ? metadata!.Language!.Trim()
+        var languageOption = GetMetadataValue<string?>(metadata, "language");
+        var language = !string.IsNullOrWhiteSpace(languageOption)
+            ? languageOption!.Trim()
             : "en";
 
         if (string.Equals(model, PulseProModel, StringComparison.OrdinalIgnoreCase)
@@ -68,38 +71,43 @@ public partial class SmallestAIProvider
             $"language={Uri.EscapeDataString(language)}"
         };
 
-        AppendBoolQuery(query, "word_timestamps", metadata?.WordTimestamps);
-        AppendBoolQuery(query, "diarize", metadata?.Diarize);
-        AppendBoolQuery(query, "gender_detection", metadata?.GenderDetection);
-        AppendBoolQuery(query, "emotion_detection", metadata?.EmotionDetection);
-        AppendBoolQuery(query, "redact_pii", metadata?.RedactPii);
-        AppendBoolQuery(query, "redact_pci", metadata?.RedactPci);
+        AppendBoolQuery(query, "word_timestamps", GetMetadataValue<bool?>(metadata, "wordTimestamps"));
+        AppendBoolQuery(query, "diarize", GetMetadataValue<bool?>(metadata, "diarize"));
+        AppendBoolQuery(query, "gender_detection", GetMetadataValue<bool?>(metadata, "genderDetection"));
+        AppendBoolQuery(query, "emotion_detection", GetMetadataValue<bool?>(metadata, "emotionDetection"));
+        AppendBoolQuery(query, "redact_pii", GetMetadataValue<bool?>(metadata, "redactPii"));
+        AppendBoolQuery(query, "redact_pci", GetMetadataValue<bool?>(metadata, "redactPci"));
 
-        if (!string.IsNullOrWhiteSpace(metadata?.WebhookUrl))
+        var webhookUrl = GetMetadataValue<string?>(metadata, "webhookUrl");
+        if (!string.IsNullOrWhiteSpace(webhookUrl))
         {
             if (!string.Equals(model, PulseProModel, StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException($"{ProviderName} webhooks are supported only by '{PulseProModel}'.", nameof(request));
 
-            query.Add($"webhook_url={Uri.EscapeDataString(metadata.WebhookUrl)}");
+            query.Add($"webhook_url={Uri.EscapeDataString(webhookUrl)}");
         }
-        if (!string.IsNullOrWhiteSpace(metadata?.WebhookMethod))
+        var webhookMethodOption = GetMetadataValue<string?>(metadata, "webhookMethod");
+        if (!string.IsNullOrWhiteSpace(webhookMethodOption))
         {
             if (!string.Equals(model, PulseProModel, StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException($"{ProviderName} webhook methods are supported only by '{PulseProModel}'.", nameof(request));
 
-            var webhookMethod = metadata.WebhookMethod.Trim().ToUpperInvariant();
+            var webhookMethod = webhookMethodOption.Trim().ToUpperInvariant();
             if (webhookMethod is not ("GET" or "POST"))
                 throw new ArgumentException($"{ProviderName} webhookMethod must be 'GET' or 'POST'.", nameof(request));
 
             query.Add($"webhook_method={Uri.EscapeDataString(webhookMethod)}");
         }
-        if (!string.IsNullOrWhiteSpace(metadata?.WebhookExtra))
+        var webhookExtra = GetMetadataValue<string?>(metadata, "webhookExtra");
+        if (!string.IsNullOrWhiteSpace(webhookExtra))
         {
             if (!string.Equals(model, PulseProModel, StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException($"{ProviderName} webhook metadata is supported only by '{PulseProModel}'.", nameof(request));
 
-            query.Add($"webhook_extra={Uri.EscapeDataString(metadata.WebhookExtra)}");
+            query.Add($"webhook_extra={Uri.EscapeDataString(webhookExtra)}");
         }
+
+        AppendUnknownQueryOptions(query, metadata);
 
         var endpoint = $"{TranscriptionPath}?{string.Join("&", query)}";
 
@@ -172,6 +180,63 @@ public partial class SmallestAIProvider
         query.Add($"{Uri.EscapeDataString(key)}={(value.Value ? "true" : "false")}");
     }
 
+    private static T? GetMetadataValue<T>(JsonElement metadata, string name)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return default;
+
+        JsonElement value = default;
+        var found = false;
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                found = true;
+            }
+        }
+
+        return found
+            ? value.Deserialize<T>(JsonSerializerOptions.Web)
+            : default;
+    }
+
+    private static void AppendUnknownQueryOptions(List<string> query, JsonElement metadata)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (KnownMetadataProperties.Contains(property.Name))
+                continue;
+
+            // The request-level model remains authoritative.
+            if (string.Equals(property.Name, "model", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var value = property.Value.ValueKind == JsonValueKind.String
+                ? property.Value.GetString()!
+                : property.Value.GetRawText();
+
+            query.Add($"{Uri.EscapeDataString(property.Name)}={Uri.EscapeDataString(value)}");
+        }
+    }
+
+    private static readonly HashSet<string> KnownMetadataProperties = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "language",
+        "wordTimestamps",
+        "diarize",
+        "genderDetection",
+        "emotionDetection",
+        "webhookUrl",
+        "webhookMethod",
+        "webhookExtra",
+        "redactPii",
+        "redactPci"
+    };
+
     private static List<TranscriptionSegment> ParseSegments(JsonElement root)
     {
         var segments = new List<TranscriptionSegment>();
@@ -240,4 +305,3 @@ public partial class SmallestAIProvider
         return null;
     }
 }
-

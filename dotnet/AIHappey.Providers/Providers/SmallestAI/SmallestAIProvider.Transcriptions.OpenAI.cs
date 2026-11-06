@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.SmallestAI;
+using System.Text.Json.Nodes;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.Models;
 using AIHappey.Vercel.Extensions;
@@ -43,41 +43,47 @@ public partial class SmallestAIProvider
         OpenAITranscriptionRequest options,
         TranscriptionRequest request)
     {
-        var existing = request.GetProviderMetadata<SmallestAITranscriptionProviderMetadata>(GetIdentifier());
+        var existing = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (existing.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Object))
+            throw new JsonException("SmallestAI provider options must be a JSON object.");
+
         var wordTimestampsRequested = options.TimestampGranularities?.Any(granularity =>
             string.Equals(granularity?.Trim(), "word", StringComparison.OrdinalIgnoreCase)) == true;
 
-        var metadata = new SmallestAITranscriptionProviderMetadata
-        {
-            Language = !string.IsNullOrWhiteSpace(options.Language)
-                ? options.Language.Trim()
-                : existing?.Language,
-            WordTimestamps = wordTimestampsRequested ? true : existing?.WordTimestamps,
-            Diarize = existing?.Diarize,
-            GenderDetection = existing?.GenderDetection,
-            EmotionDetection = existing?.EmotionDetection,
-            WebhookUrl = existing?.WebhookUrl,
-            WebhookMethod = existing?.WebhookMethod,
-            WebhookExtra = existing?.WebhookExtra,
-            RedactPii = existing?.RedactPii,
-            RedactPci = existing?.RedactPci
-        };
+        var metadata = existing.ValueKind == JsonValueKind.Object
+            ? JsonNode.Parse(existing.GetRawText())!.AsObject()
+            : new JsonObject();
+        var existingLanguage = GetMetadataValue<string?>(existing, "language");
+        var language = !string.IsNullOrWhiteSpace(options.Language)
+            ? options.Language.Trim()
+            : existingLanguage;
 
-        return metadata.Language is not null
-            || metadata.WordTimestamps is not null
-            || metadata.Diarize is not null
-            || metadata.GenderDetection is not null
-            || metadata.EmotionDetection is not null
-            || metadata.WebhookUrl is not null
-            || metadata.WebhookMethod is not null
-            || metadata.WebhookExtra is not null
-            || metadata.RedactPii is not null
-            || metadata.RedactPci is not null
-            ? new Dictionary<string, JsonElement>
+        if (language is not null)
+            SetMetadataProperty(metadata, "language", JsonValue.Create(language));
+
+        if (wordTimestampsRequested)
+            SetMetadataProperty(metadata, "wordTimestamps", JsonValue.Create(true));
+
+        var hasOptions = metadata.Any(property =>
+            property.Value is not null
+            || (!KnownMetadataProperties.Contains(property.Key)
+                && !string.Equals(property.Key, "model", StringComparison.OrdinalIgnoreCase)));
+
+        return !hasOptions
+            ? null
+            : new Dictionary<string, JsonElement>
             {
                 [GetIdentifier()] = JsonSerializer.SerializeToElement(metadata, JsonSerializerOptions.Web)
-            }
-            : null;
+            };
+    }
+
+    private static void SetMetadataProperty(JsonObject metadata, string name, JsonNode? value)
+    {
+        foreach (var existingName in metadata.Select(property => property.Key)
+                     .Where(key => string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
+                     .ToArray())
+            metadata.Remove(existingName);
+
+        metadata[name] = value;
     }
 }
-
