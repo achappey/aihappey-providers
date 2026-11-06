@@ -317,6 +317,7 @@ using AIHappey.Core.Providers.AIRouter;
 using AIHappey.Core.Providers.Agentics;
 using AIHappey.Core.Providers.Ainvented;
 using AIHappey.Core.Providers.Plori;
+using AIHappey.Core.Providers.AgencyOSX;
 using AIHappey.Core.Providers.NRPNautilus;
 using AIHappey.Core.Providers.EAGM;
 using AIHappey.Core.Providers.Edgee;
@@ -1014,6 +1015,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AgenticsProvider>();
         services.AddScoped<IModelProvider, AinventedProvider>();
         services.AddScoped<IModelProvider, PloriProvider>();
+        services.AddScoped<IModelProvider, AgencyOSXProvider>();
         //services.AddScoped<IModelProvider, SovereignAPIProvider>();
         services.AddScoped<IModelProvider, NRPNautilusProvider>();
         services.AddScoped<IModelProvider, EAGMProvider>();

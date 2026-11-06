@@ -1,5 +1,9 @@
 [
   {
+    "id": "agencyosx",
+    "file": "agencyosx.json"
+  },
+  {
     "id": "openai",
     "file": "openai.json"
   },
