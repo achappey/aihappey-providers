@@ -67,9 +67,8 @@ public partial class DeAPIProvider : IModelProvider
     {
         await foreach (var streamEvent in StreamUnifiedAsync(
                            options.ToUnifiedRequest(GetIdentifier()),
-                           cancellationToken)
-                           .WithCancellation(cancellationToken))
-            yield return streamEvent.ToChatCompletionUpdate();
+                           cancellationToken).ToChatCompletionUpdates(cancellationToken))
+            yield return streamEvent;
     }
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)

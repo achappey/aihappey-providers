@@ -80,9 +80,9 @@ public partial class ResembleAIProvider : IModelProvider, IUnifiedModelProvider
     {
         await foreach (var streamEvent in StreamUnifiedAsync(
                            options.ToUnifiedRequest(GetIdentifier()),
-                           cancellationToken).WithCancellation(cancellationToken))
+                           cancellationToken).ToChatCompletionUpdates(cancellationToken))
         {
-            yield return streamEvent.ToChatCompletionUpdate();
+            yield return streamEvent;
         }
     }
 
