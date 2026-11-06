@@ -1590,6 +1590,10 @@
       "sha256": "e33cf8db3216d3555e9d7df99b57da67c792d25f79ec0a7052c97e21ede076f5"
     },
     {
+      "file": "providers/buildprint.json",
+      "sha256": "7db5b23002544fbf8bed4b072a1c29709f2d7d58dfa25809db235215adc0e78b"
+    },
+    {
       "file": "providers/byteplus.json",
       "sha256": "9a524cbde666fcf65e9db234d27acd7e68c74924e5ae26403298181bae5e21e6"
     },
