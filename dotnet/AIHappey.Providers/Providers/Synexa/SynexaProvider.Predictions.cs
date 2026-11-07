@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.Synexa;
 using AIHappey.Core.AI;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Responses;
@@ -63,14 +62,14 @@ public partial class SynexaProvider
             : model;
     }
 
-    private static (string waitType, int intervalMs, int timeoutSeconds) ResolveWaitOptions(SynexaWaitOptions? wait)
+    private static (string waitType, int intervalMs, int timeoutSeconds) ResolveWaitOptions(JsonElement? wait)
     {
-        var waitType = string.Equals(wait?.Type, "poll", StringComparison.OrdinalIgnoreCase)
+        var waitType = string.Equals(GetSynexaWaitOption<string>(wait, "type"), "poll", StringComparison.OrdinalIgnoreCase)
             ? "poll"
             : "block";
 
-        var intervalMs = Math.Clamp(wait?.IntervalMs ?? 2000, 100, 5000);
-        var timeoutSeconds = Math.Clamp(wait?.TimeoutSeconds ?? 120, 10, 600);
+        var intervalMs = Math.Clamp(GetSynexaWaitOption<int?>(wait, "intervalMs") ?? 2000, 100, 5000);
+        var timeoutSeconds = Math.Clamp(GetSynexaWaitOption<int?>(wait, "timeoutSeconds") ?? 120, 10, 600);
         return (waitType, intervalMs, timeoutSeconds);
     }
 
@@ -116,7 +115,7 @@ public partial class SynexaProvider
 
     private async Task<SynexaPredictionResponse> WaitPredictionAsync(
         SynexaPredictionResponse prediction,
-        SynexaWaitOptions? wait,
+        JsonElement? wait,
         CancellationToken cancellationToken)
     {
         var (waitType, intervalMs, timeoutSeconds) = ResolveWaitOptions(wait);
@@ -224,14 +223,33 @@ public partial class SynexaProvider
         }
     }
 
-    private static SynexaWaitOptions? GetSynexaWaitOptions(JsonElement metadata)
+    private static JsonElement? GetSynexaWaitOptions(JsonElement metadata)
     {
         if (metadata.ValueKind != JsonValueKind.Object
             || !metadata.TryGetProperty("wait", out var wait)
             || wait.ValueKind != JsonValueKind.Object)
             return null;
 
-        return wait.Deserialize<SynexaWaitOptions>(SynexaJson);
+        return wait.Clone();
+    }
+
+    private static T? GetSynexaWaitOption<T>(JsonElement? wait, string name)
+    {
+        if (wait is not { ValueKind: JsonValueKind.Object } waitObject)
+            return default;
+
+        JsonElement value = default;
+        var found = false;
+        foreach (var property in waitObject.EnumerateObject())
+        {
+            if (!string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            value = property.Value;
+            found = true;
+        }
+
+        return found ? value.Deserialize<T>(SynexaJson) : default;
     }
 
     private Dictionary<string, object?> CreateSynexaPredictionMetadata(SynexaPredictionResponse prediction)
@@ -466,4 +484,3 @@ public partial class SynexaProvider
         return string.Join("\n\n", lines);
     }
 }
-
