@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.DeepInfra;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
@@ -30,6 +29,100 @@ public sealed partial class DeepInfraProvider
         }
 
         return null;
+    }
+
+    private static void MergeImageProviderOptions(
+        Dictionary<string, object?> payload,
+        ImageRequest request,
+        string? selectedOptions)
+    {
+        if (request.ProviderOptions?.TryGetValue("deepinfra", out var options) != true ||
+            options.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return;
+
+        if (options.ValueKind != JsonValueKind.Object)
+            throw new JsonException("Provider options for 'deepinfra' must be an object.");
+
+        foreach (var property in options.EnumerateObject())
+        {
+            if (IsBriaOptions(property.Name))
+            {
+                if (property.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+                    continue;
+
+                if (property.Value.ValueKind != JsonValueKind.Object)
+                    throw new JsonException($"Provider options for 'deepinfra.{property.Name}' must be an object.");
+
+                continue;
+            }
+
+            payload[property.Name] = property.Value;
+        }
+
+        foreach (var property in options.EnumerateObject())
+        {
+            if (!IsBriaOptions(property.Name) || property.Value.ValueKind != JsonValueKind.Object)
+                continue;
+
+            var target = string.Equals(property.Name, selectedOptions, StringComparison.OrdinalIgnoreCase)
+                ? payload
+                : new Dictionary<string, object?>();
+            foreach (var option in property.Value.EnumerateObject())
+                MergeBriaOption(target, option);
+        }
+    }
+
+    private static bool IsBriaOptions(string name)
+        => string.Equals(name, "bria", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "bria_enhance", StringComparison.OrdinalIgnoreCase);
+
+    private static void MergeBriaOption(
+        Dictionary<string, object?> payload,
+        JsonProperty option)
+    {
+        switch (option.Name.ToLowerInvariant())
+        {
+            case "speed":
+                MergeKnownBriaOption<string?>(payload, "speed", option.Value, omitEmptyString: true);
+                break;
+            case "structured_prompt":
+                MergeKnownBriaOption<string?>(payload, "structured_prompt", option.Value, omitEmptyString: true);
+                break;
+            case "resolution":
+                MergeKnownBriaOption<string?>(payload, "resolution", option.Value, omitEmptyString: true);
+                break;
+            case "preserve_alpha":
+                MergeKnownBriaOption<bool?>(payload, "preserve_alpha", option.Value);
+                break;
+            case "visual_input_content_moderation":
+                MergeKnownBriaOption<bool?>(payload, "visual_input_content_moderation", option.Value);
+                break;
+            case "visual_output_content_moderation":
+                MergeKnownBriaOption<bool?>(payload, "visual_output_content_moderation", option.Value);
+                break;
+            case "steps_num":
+                MergeKnownBriaOption<int?>(payload, "steps_num", option.Value);
+                break;
+            default:
+                payload[option.Name] = option.Value;
+                break;
+        }
+    }
+
+    private static void MergeKnownBriaOption<T>(
+        Dictionary<string, object?> payload,
+        string name,
+        JsonElement element,
+        bool omitEmptyString = false)
+    {
+        var value = element.Deserialize<T>(ImageJson);
+        if (value is null || omitEmptyString && value is string { Length: 0 })
+        {
+            payload.Remove(name);
+            return;
+        }
+
+        payload[name] = value;
     }
 
     private static ByteArrayContent ToImageContent(ImageFile file)
@@ -113,13 +206,12 @@ public sealed partial class DeepInfraProvider
         ApplyAuthHeader();
 
         var now = DateTime.UtcNow;
-        var metadata = req.GetProviderMetadata<DeepInfraImageProviderMetadata>(GetIdentifier());
-
         var payload = new Dictionary<string, object?>
         {
-            ["prompt"] = req.Prompt,
-            ["num_results"] = req.N ?? 1,
         };
+        MergeImageProviderOptions(payload, req, "bria");
+        payload["prompt"] = req.Prompt;
+        payload["num_results"] = req.N ?? 1;
 
         if (!string.IsNullOrEmpty(req.AspectRatio))
         {
@@ -134,16 +226,6 @@ public sealed partial class DeepInfraProvider
         if (req.Seed is not null)
         {
             payload["seed"] = req.Seed;
-        }
-
-        if (!string.IsNullOrEmpty(metadata?.Bria?.Speed))
-        {
-            payload["speed"] = metadata?.Bria?.Speed;
-        }
-
-        if (!string.IsNullOrEmpty(metadata?.Bria?.StructuredPrompt))
-        {
-            payload["structured_prompt"] = metadata?.Bria?.StructuredPrompt;
         }
 
         if (req.Files?.Any() == true)
@@ -185,30 +267,14 @@ public sealed partial class DeepInfraProvider
         ApplyAuthHeader();
 
         var now = DateTime.UtcNow;
-        var metadata = req.GetProviderMetadata<DeepInfraImageProviderMetadata>(GetIdentifier());
-
         var payload = new Dictionary<string, object?>
         {
         };
-
-        if (!string.IsNullOrEmpty(metadata?.BriaEnhance?.Resolution))
-        {
-            payload["resolution"] = metadata?.BriaEnhance?.Resolution;
-        }
+        MergeImageProviderOptions(payload, req, "bria_enhance");
 
         if (req.Seed is not null)
         {
             payload["seed"] = req.Seed;
-        }
-
-        if (metadata?.BriaEnhance?.PreserveAlpha is not null)
-        {
-            payload["preserve_alpha"] = metadata?.BriaEnhance?.PreserveAlpha;
-        }
-
-        if (metadata?.BriaEnhance?.StepsNum is not null)
-        {
-            payload["steps_num"] = metadata?.BriaEnhance?.StepsNum;
         }
 
         if (req.Files?.Any() == true)
@@ -259,7 +325,7 @@ public sealed partial class DeepInfraProvider
         var payload = new Dictionary<string, object?>
         {
         };
-
+        MergeImageProviderOptions(payload, req, selectedOptions: null);
 
         if (req.Files?.Any() == true)
         {
@@ -308,7 +374,7 @@ public sealed partial class DeepInfraProvider
         var payload = new Dictionary<string, object?>
         {
         };
-
+        MergeImageProviderOptions(payload, req, selectedOptions: null);
 
         if (req.Files?.Any() == true)
         {
@@ -354,11 +420,10 @@ public sealed partial class DeepInfraProvider
         ApplyAuthHeader();
 
         var now = DateTime.UtcNow;
-        var metadata = req.GetProviderMetadata<DeepInfraImageProviderMetadata>(GetIdentifier());
-
         var payload = new Dictionary<string, object?>
         {
         };
+        MergeImageProviderOptions(payload, req, selectedOptions: null);
 
         if (!string.IsNullOrEmpty(req.Prompt))
         {
