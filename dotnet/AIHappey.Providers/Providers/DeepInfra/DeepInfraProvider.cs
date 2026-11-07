@@ -309,9 +309,10 @@ public sealed partial class DeepInfraProvider(IApiKeyResolver keyResolver, IHttp
 
         var payload = new Dictionary<string, object?>
         {
-            ["prompt"] = req.Prompt,
-            ["num_results"] = req.N ?? 1,
         };
+        MergeImageProviderOptions(payload, req, selectedOptions: null);
+        payload["prompt"] = req.Prompt;
+        payload["num_results"] = req.N ?? 1;
 
         if (!string.IsNullOrEmpty(req.AspectRatio))
         {
@@ -402,4 +403,3 @@ public sealed partial class DeepInfraProvider(IApiKeyResolver keyResolver, IHttp
         throw new NotImplementedException();
     }
 }
-
