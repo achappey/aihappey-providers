@@ -16,6 +16,7 @@ public partial class NanoGPTProvider
             {
                 var models = new List<Model>();
                 await AddNanoGPTModelsAsync(models, "v1/models?detailed=true", null, null, ct);
+                await AddNanoGPTModelsAsync(models, "v1/decision-models", "decisions", null, ct);
                 await AddNanoGPTModelsAsync(models, "v1/images/models", "image", null, ct);
                 await AddNanoGPTModelsAsync(models, "v1/audio-models?detailed=true&type=all", null, "audio", ct);
                 await AddNanoGPTModelsAsync(models, "v1/video-models?detailed=true", "video", null, ct);
