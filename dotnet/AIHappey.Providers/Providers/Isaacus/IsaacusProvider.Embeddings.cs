@@ -9,6 +9,8 @@ namespace AIHappey.Core.Providers.Isaacus;
 
 public partial class IsaacusProvider
 {
+    private const int MaxTextsPerEmbeddingRequest = 128;
+
     public async Task<OpenAIEmbeddingResponse> OpenAIEmbeddingRequestAsync(
         OpenAIEmbeddingRequest request, CancellationToken cancellationToken = default)
         => (await SendEmbeddingAsync(request, cancellationToken)).Response;
@@ -69,49 +71,74 @@ public partial class IsaacusProvider
             throw new NotSupportedException("Isaacus text embeddings require strings, not token IDs.");
 
         var model = NativeModel(request.Model);
-        var payload = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
-        foreach (var property in request.AdditionalProperties ?? [])
-            payload[property.Key] = property.Value.Clone();
-        payload["model"] = JsonSerializer.SerializeToElement(model);
-        payload["texts"] = JsonSerializer.SerializeToElement(texts);
-        if (request.Dimensions is not null)
-            payload["dimensions"] = JsonSerializer.SerializeToElement(request.Dimensions.Value);
-
-        var native = await SendAsync("embeddings", payload, cancellationToken);
-        try
+        var data = new List<OpenAIEmbeddingData>(texts.Length);
+        var nativeEmbeddings = new List<object>(texts.Length);
+        var totalTokens = 0;
+        NativeResult? lastNative = null;
+        for (var offset = 0; offset < texts.Length; offset += MaxTextsPerEmbeddingRequest)
         {
-            var root = native.Root;
-            if (!root.TryGetProperty("embeddings", out var embeddings) || embeddings.ValueKind != JsonValueKind.Array
-                || embeddings.GetArrayLength() != texts.Length)
-                throw new JsonException("Expected one embedding per input text.");
+            cancellationToken.ThrowIfCancellationRequested();
+            var batch = texts.Skip(offset).Take(MaxTextsPerEmbeddingRequest).ToArray();
+            var payload = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+            foreach (var property in request.AdditionalProperties ?? [])
+                payload[property.Key] = property.Value.Clone();
+            payload["model"] = JsonSerializer.SerializeToElement(model);
+            payload["texts"] = JsonSerializer.SerializeToElement(batch);
+            if (request.Dimensions is not null)
+                payload["dimensions"] = JsonSerializer.SerializeToElement(request.Dimensions.Value);
 
-            var seen = new HashSet<int>();
-            var data = embeddings.EnumerateArray().Select(item =>
+            var native = await SendAsync("embeddings", payload, cancellationToken);
+            lastNative = native;
+            try
             {
-                var index = ReadIndex(item, texts.Length, seen);
-                if (!item.TryGetProperty("embedding", out var embedding)
-                    || embedding.ValueKind != JsonValueKind.Array || embedding.GetArrayLength() == 0)
-                    throw new JsonException("Expected a non-empty embedding vector.");
-                var values = embedding.EnumerateArray().Select(ReadFloat).ToArray();
-                return new OpenAIEmbeddingData
+                var root = native.Root;
+                if (!root.TryGetProperty("embeddings", out var embeddings) || embeddings.ValueKind != JsonValueKind.Array
+                    || embeddings.GetArrayLength() != batch.Length)
+                    throw new JsonException("Expected one embedding per input text.");
+
+                var seen = new HashSet<int>();
+                foreach (var item in embeddings.EnumerateArray())
                 {
-                    Index = index,
-                    Embedding = string.Equals(request.EncodingFormat, "base64", StringComparison.OrdinalIgnoreCase)
-                        ? JsonSerializer.SerializeToElement(EncodeBase64(values)) : embedding.Clone()
-                };
-            }).ToArray();
-            var tokens = InputTokens(root);
-            return (new OpenAIEmbeddingResponse
+                    var index = ReadIndex(item, batch.Length, seen);
+                    if (!item.TryGetProperty("embedding", out var embedding)
+                        || embedding.ValueKind != JsonValueKind.Array || embedding.GetArrayLength() == 0)
+                        throw new JsonException("Expected a non-empty embedding vector.");
+                    var globalIndex = offset + index;
+                    var values = embedding.EnumerateArray().Select(ReadFloat).ToArray();
+                    data.Add(new OpenAIEmbeddingData
+                    {
+                        Index = globalIndex,
+                        Embedding = string.Equals(request.EncodingFormat, "base64", StringComparison.OrdinalIgnoreCase)
+                            ? JsonSerializer.SerializeToElement(EncodeBase64(values)) : embedding.Clone()
+                    });
+                    nativeEmbeddings.Add(new { index = globalIndex, embedding = embedding.Clone() });
+                }
+
+                totalTokens += InputTokens(root);
+            }
+            catch (JsonException exception)
             {
-                Model = $"{GetIdentifier()}/{model}",
-                Data = data,
-                Usage = new OpenAIEmbeddingUsage { PromptTokens = tokens, TotalTokens = tokens }
-            }, native);
+                throw InvalidResponse("embeddings", exception);
+            }
         }
-        catch (JsonException exception)
+
+        var response = new OpenAIEmbeddingResponse
         {
-            throw InvalidResponse("embeddings", exception);
-        }
+            Model = $"{GetIdentifier()}/{model}",
+            Data = data.ToArray(),
+            Usage = new OpenAIEmbeddingUsage { PromptTokens = totalTokens, TotalTokens = totalTokens }
+        };
+        var finalNative = lastNative
+            ?? throw new InvalidOperationException("Isaacus embedding request produced no batches.");
+        if (texts.Length <= MaxTextsPerEmbeddingRequest)
+            return (response, finalNative);
+
+        var aggregate = JsonSerializer.SerializeToElement(new
+        {
+            embeddings = nativeEmbeddings,
+            usage = new { input_tokens = totalTokens }
+        });
+        return (response, new NativeResult(aggregate, finalNative.Headers));
     }
 
     private static string EncodeBase64(float[] values)
