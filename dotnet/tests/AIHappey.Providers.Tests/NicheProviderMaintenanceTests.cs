@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Contracts;
+using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
 using AIHappey.Core.Providers.JigsawStack;
 using AIHappey.Core.Providers.MurfAI;
@@ -137,6 +138,39 @@ public sealed class NicheProviderMaintenanceTests
         }, CancellationToken.None);
 
         Assert.Equal("A summary", Assert.Single(response.Choices).Message.Content);
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Brave_answers_authentication_is_request_scoped()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("/res/v1/chat/completions", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.GetValues("x-subscription-token").Single());
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            var messages = payload.RootElement.GetProperty("messages");
+            Assert.Equal(1, messages.GetArrayLength());
+            Assert.Equal("user", messages[0].GetProperty("role").GetString());
+            Assert.Equal("What is Brave Search?", messages[0].GetProperty("content").GetString());
+            return JsonResponse("""{"id":"answer-1","object":"chat.completion","created":1,"model":"brave","choices":[{"index":0,"message":{"role":"assistant","content":"A search engine."},"finish_reason":"stop"}]}""");
+        });
+        var provider = new BraveProvider(
+            new TestKeyResolver(),
+            new AIHappey.Core.AI.AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        var response = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "brave/answers",
+            Messages =
+            [
+                new() { Role = "system", Content = "Answer concisely." },
+                new() { Role = "user", Content = "What is Brave Search?" }
+            ]
+        });
+
+        Assert.Equal("A search engine.", Assert.Single(response.Choices).Message.Content);
         Assert.Empty(client.DefaultRequestHeaders);
     }
 
