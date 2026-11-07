@@ -183,6 +183,40 @@ public sealed class ProviderStreamingSpeechTests
     }
 
     [Fact]
+    public async Task Together_streaming_keeps_root_voice_precedence_over_family_metadata()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"type\":\"conversation.item.audio_output.delta\",\"delta\":\"AQI=\"}\n\n" +
+                    "data: [DONE]\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+        });
+        var request = new StreamingSpeechRequest
+        {
+            Model = "together/canopylabs/orpheus-3b-0.1-ft",
+            Text = [new() { Text = "Hello" }],
+            ProviderOptions = new()
+            {
+                ["together"] = ParseElement("""{"voice":"root-voice","canopylabs":{"voice":"family-voice"}}""")
+            }
+        };
+        var before = JsonSerializer.Serialize(request);
+
+        var parts = await CollectAsync(CreateTogetherProvider(client).SpeechStreamingAsync(request));
+
+        Assert.Equal("root-voice", payload.GetProperty("voice").GetString());
+        Assert.Equal("AQI=", Assert.Single(parts.OfType<SpeechAudioPart>()).Audio);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Fact]
     public async Task AssemblyAI_streams_SSE_TTS_audio_and_preserves_event_metadata()
     {
         JsonElement payload = default;

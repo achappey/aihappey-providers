@@ -61,6 +61,13 @@ public partial class TogetherProvider
         payload["sample_rate"] = GetTogetherSpeechOption<int?>(metadata, "sample_rate");
         payload["stream"] = false;
 
+        // Null-ignore settings do not omit dictionary entries. Keep unknown metadata nulls intact.
+        foreach (var name in new[] { "language", "response_encoding", "sample_rate" })
+        {
+            if (payload[name] is null)
+                payload.Remove(name);
+        }
+
         if (!string.IsNullOrWhiteSpace(responseFormat))
             payload["response_format"] = responseFormat;
         else
@@ -136,21 +143,20 @@ public partial class TogetherProvider
         if (!string.IsNullOrWhiteSpace(request.Voice))
             return request.Voice;
 
-        var voice = GetTogetherSpeechOption<string?>(metadata, "voice");
-        if (!string.IsNullOrWhiteSpace(voice))
-            return voice;
-
         var modelFamily = modelName.Split('/', 2)[0];
-        if (metadata is not { ValueKind: JsonValueKind.Object } || !TryGetTogetherSpeechOption(
-                metadata.Value, modelFamily, out var familyOptions))
-            return null;
+        if (metadata is { ValueKind: JsonValueKind.Object }
+            && TryGetTogetherSpeechOption(metadata.Value, modelFamily, out var familyOptions)
+            && familyOptions.ValueKind is not (JsonValueKind.Null or JsonValueKind.Undefined))
+        {
+            if (familyOptions.ValueKind != JsonValueKind.Object)
+                throw new JsonException($"Together speech option '{modelFamily}' must be an object.");
 
-        if (familyOptions.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
-            return null;
-        if (familyOptions.ValueKind != JsonValueKind.Object)
-            throw new JsonException($"Together speech option '{modelFamily}' must be an object.");
+            var voice = GetTogetherSpeechOption<string?>(familyOptions, "voice");
+            if (!string.IsNullOrWhiteSpace(voice))
+                return voice;
+        }
 
-        return GetTogetherSpeechOption<string?>(familyOptions, "voice");
+        return GetTogetherSpeechOption<string?>(metadata, "voice");
     }
 
     private static Dictionary<string, object?> CopyTogetherSpeechOptions(JsonElement? metadata)

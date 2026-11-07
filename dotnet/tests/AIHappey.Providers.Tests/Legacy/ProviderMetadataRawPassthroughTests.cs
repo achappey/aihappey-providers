@@ -794,6 +794,77 @@ public sealed class ProviderMetadataRawPassthroughTests
         Assert.False(payload.TryGetProperty("response_encoding", out _));
     }
 
+    [Theory]
+    [InlineData("request-voice", "family-voice", "root-voice", "request-voice")]
+    [InlineData(null, "family-voice", "root-voice", "family-voice")]
+    [InlineData(" ", "family-voice", "root-voice", "family-voice")]
+    [InlineData(null, "family-voice", null, "family-voice")]
+    [InlineData(null, null, "root-voice", "root-voice")]
+    [InlineData(null, " ", "root-voice", "root-voice")]
+    public async Task Together_speech_voice_prefers_request_then_family_then_root(
+        string? requestVoice, string? familyVoice, string? rootVoice, string expectedVoice)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) };
+        });
+        var request = new SpeechRequest
+        {
+            Model = "together/cartesia/sonic-english",
+            Text = "Hello",
+            Voice = requestVoice,
+            ProviderOptions = new()
+            {
+                ["together"] = JsonSerializer.SerializeToElement(new
+                {
+                    cartesia = new { voice = familyVoice },
+                    voice = rootVoice
+                })
+            }
+        };
+        var before = JsonSerializer.Serialize(request);
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .SpeechRequest(request);
+
+        Assert.Equal(expectedVoice, payload.GetProperty("voice").GetString());
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData("""{"voice":"root-voice","future_null":null}""")]
+    [InlineData("""{"voice":"root-voice","language":null,"response_encoding":null,"sample_rate":null,"future_null":null}""")]
+    public async Task Together_speech_omits_absent_or_null_known_options_but_preserves_unknown_nulls(string metadataJson)
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) };
+        });
+        var request = new SpeechRequest
+        {
+            Model = "together/cartesia/sonic-english",
+            Text = "Hello",
+            ProviderOptions = new() { ["together"] = ParseElement(metadataJson) }
+        };
+        var before = JsonSerializer.Serialize(request);
+
+        var response = await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .SpeechRequest(request);
+
+        Assert.Equal("root-voice", payload.GetProperty("voice").GetString());
+        Assert.Equal("wav", payload.GetProperty("response_format").GetString());
+        Assert.False(payload.TryGetProperty("language", out _));
+        Assert.False(payload.TryGetProperty("response_encoding", out _));
+        Assert.False(payload.TryGetProperty("sample_rate", out _));
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+        Assert.Equal("AQID", response.Audio.Base64);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
     [Fact]
     public async Task Together_speech_options_preserve_validation_and_upstream_error_behavior()
     {
