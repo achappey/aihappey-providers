@@ -34,6 +34,8 @@ public sealed class SynexaMetadataPassthroughTests
               "size": "square",
               "future_object": {"nested": [{"value": true}, [null, 1]]},
               "future_array": [1, {"value": "kept"}],
+              "future_string": "unchanged",
+              "future_number": 12345678901234567890.123456789,
               "future_boolean": false,
               "future_null": null,
               "wait": {"type": "block"}
@@ -54,22 +56,91 @@ public sealed class SynexaMetadataPassthroughTests
         Assert.True(JsonElement.DeepEquals(metadata,
             clientRequest.GetProperty("providerOptions").GetProperty("synexa")));
 
-        await CreateProvider(client).ImageRequest(request, CancellationToken.None);
+        var response = await CreateProvider(client).ImageRequest(request, CancellationToken.None);
 
+        Assert.NotNull(response.Images);
+        Assert.Equal("data:image/png;base64,AQID", Assert.Single(response.Images));
         var createPayload = Assert.Single(payloads);
         var input = createPayload.GetProperty("input");
         Assert.Equal("image-model", createPayload.GetProperty("model").GetString());
         Assert.Equal("request prompt", input.GetProperty("prompt").GetString());
         Assert.Equal("square", input.GetProperty("size").GetString());
-        foreach (var name in new[] { "future_object", "future_array", "future_boolean", "future_null" })
+        foreach (var name in new[]
+                 {
+                     "future_object", "future_array", "future_string", "future_number", "future_boolean", "future_null"
+                 })
             Assert.True(JsonElement.DeepEquals(metadata.GetProperty(name), input.GetProperty(name)), name);
         Assert.Equal(JsonValueKind.Null, input.GetProperty("future_null").ValueKind);
         Assert.False(input.TryGetProperty("wait", out _));
-        Assert.Equal(new[] { "prompt", "size", "future_object", "future_array", "future_boolean", "future_null" }.Order(),
+        Assert.Equal(new[]
+            {
+                "prompt", "size", "future_object", "future_array", "future_string", "future_number", "future_boolean", "future_null"
+            }.Order(),
             input.EnumerateObject().Select(property => property.Name).Order());
         Assert.Equal(120, Assert.Single(waitTimeouts).GetProperty("timeout").GetInt32());
         Assert.Equal(new[] { "model", "input" }.Order(),
             createPayload.EnumerateObject().Select(property => property.Name).Order());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Image_metadata_fills_omitted_optional_fields_but_explicit_request_fields_win(bool supplyRequestFields)
+    {
+        JsonElement input = default;
+        using var client = CreateClient(message =>
+        {
+            if (message.RequestUri!.AbsolutePath == "/v1/predictions")
+            {
+                var body = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+                input = body.GetProperty("input").Clone();
+                return PredictionResponse("starting");
+            }
+
+            Assert.Equal("/v1/predictions/prediction-id/wait", message.RequestUri.AbsolutePath);
+            return PredictionResponse("succeeded", """["data:image/png;base64,AQID"]""");
+        });
+        var request = new ImageRequest
+        {
+            Model = "image-model",
+            Prompt = "request prompt",
+            ProviderOptions = new()
+            {
+                ["synexa"] = ParseElement("""
+                    {
+                      "prompt": "metadata prompt",
+                      "size": "square",
+                      "aspect_ratio": "1:1",
+                      "seed": 42,
+                      "image": "data:image/png;base64,BwgJ",
+                      "mask": "data:image/png;base64,CgsM",
+                      "wait": {"type": "block"}
+                    }
+                    """)
+            }
+        };
+        if (supplyRequestFields)
+        {
+            request.Size = "1024x1024";
+            request.AspectRatio = "16:9";
+            request.Seed = 0;
+            request.Files = [new ImageFile { MediaType = "image/png", Data = "AQID" }];
+            request.Mask = new() { MediaType = "image/png", Data = "BAUG" };
+        }
+
+        var response = await CreateProvider(client).ImageRequest(request, CancellationToken.None);
+
+        Assert.Equal("request prompt", input.GetProperty("prompt").GetString());
+        Assert.Equal(supplyRequestFields ? "1024x1024" : "square", input.GetProperty("size").GetString());
+        Assert.Equal(supplyRequestFields ? "16:9" : "1:1", input.GetProperty("aspect_ratio").GetString());
+        Assert.Equal(supplyRequestFields ? 0 : 42, input.GetProperty("seed").GetInt32());
+        Assert.Equal(supplyRequestFields ? "data:image/png;base64,AQID" : "data:image/png;base64,BwgJ",
+            input.GetProperty("image").GetString());
+        Assert.Equal(supplyRequestFields ? "data:image/png;base64,BAUG" : "data:image/png;base64,CgsM",
+            input.GetProperty("mask").GetString());
+        Assert.False(input.TryGetProperty("wait", out _));
+        Assert.NotNull(response.Images);
+        Assert.Equal("data:image/png;base64,AQID", Assert.Single(response.Images));
     }
 
     [Fact]

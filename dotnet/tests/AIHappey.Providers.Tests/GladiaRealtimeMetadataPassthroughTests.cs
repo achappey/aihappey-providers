@@ -115,8 +115,14 @@ public sealed class GladiaRealtimeMetadataPassthroughTests
         Assert.False(payload.TryGetProperty("must_not_forward", out _));
     }
 
-    [Fact]
-    public async Task Realtime_defaults_and_known_null_omission_remain_compatible()
+    [Theory]
+    [InlineData("missing-options")]
+    [InlineData("empty-options")]
+    [InlineData("other-provider")]
+    [InlineData("undefined")]
+    [InlineData("null")]
+    [InlineData("empty-object")]
+    public async Task Realtime_defaults_and_known_null_omission_remain_compatible(string metadataCase)
     {
         JsonElement payload = default;
         using var client = CreateClient(message =>
@@ -126,7 +132,25 @@ public sealed class GladiaRealtimeMetadataPassthroughTests
         });
         var provider = CreateProvider(client);
 
-        await provider.GetRealtimeToken(new RealtimeRequest { Model = "solaria-1" }, CancellationToken.None);
+        await provider.GetRealtimeToken(new RealtimeRequest
+        {
+            Model = "solaria-1",
+            ProviderOptions = metadataCase switch
+            {
+                "missing-options" => null,
+                "empty-options" => new(),
+                "other-provider" => new() { ["another-provider"] = ParseElement("""{"must_not_forward":true}""") },
+                _ => new()
+                {
+                    ["gladia"] = metadataCase switch
+                    {
+                        "undefined" => default,
+                        "null" => ParseElement("null"),
+                        _ => ParseElement("{}")
+                    }
+                }
+            }
+        }, CancellationToken.None);
 
         Assert.Equal("solaria-1", payload.GetProperty("model").GetString());
         Assert.Equal("wav/pcm", payload.GetProperty("encoding").GetString());
@@ -175,6 +199,31 @@ public sealed class GladiaRealtimeMetadataPassthroughTests
                 Model = "solaria-1",
                 ProviderOptions = new() { ["gladia"] = ParseElement("""{"sample_rate":"invalid"}""") }
             }, CancellationToken.None));
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("\"invalid\"")]
+    [InlineData("42")]
+    [InlineData("true")]
+    [InlineData("""{"sample_rate":"invalid"}""")]
+    public async Task Realtime_invalid_supplied_metadata_is_rejected_before_sending_http(string metadata)
+    {
+        var requestsSent = 0;
+        using var client = CreateClient(_ =>
+        {
+            requestsSent++;
+            return JsonResponse("""{"id":"session-1","url":"wss://gladia.example/session"}""");
+        });
+        var provider = CreateProvider(client);
+
+        await Assert.ThrowsAsync<JsonException>(() => provider.GetRealtimeToken(new RealtimeRequest
+        {
+            Model = "solaria-1",
+            ProviderOptions = new() { ["gladia"] = ParseElement(metadata) }
+        }, CancellationToken.None));
+
+        Assert.Equal(0, requestsSent);
     }
 
     private static GladiaProvider CreateProvider(HttpClient client)

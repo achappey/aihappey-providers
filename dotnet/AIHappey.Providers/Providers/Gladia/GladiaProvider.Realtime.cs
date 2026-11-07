@@ -28,6 +28,9 @@ public partial class GladiaProvider
 
     private static JsonElement BuildRealtimePayload(JsonElement? metadata, string? model)
     {
+        if (metadata is { ValueKind: JsonValueKind.Undefined or JsonValueKind.Null })
+            metadata = null;
+
         if (metadata is { } suppliedMetadata)
             ValidateMetadata(suppliedMetadata);
 

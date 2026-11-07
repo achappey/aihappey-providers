@@ -52,7 +52,7 @@ public partial class SynexaProvider
         if (request.Mask is not null)
             input["mask"] = $"data:{request.Mask.MediaType};base64,{request.Mask.Data}";
 
-        MergeSynexaInputMetadata(input, metadata, "prompt", "size", "aspect_ratio", "seed", "image", "mask");
+        MergeSynexaInputMetadata(input, metadata);
 
         var prediction = await CreatePredictionAsync(request.Model, input, cancellationToken);
         var completed = await WaitPredictionAsync(prediction, GetSynexaWaitOptions(metadata), cancellationToken);

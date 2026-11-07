@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Runway;
 using AIHappey.Vercel.Models;
 
@@ -44,7 +45,8 @@ public sealed class RunwaySpeechMetadataPassthroughTests
         var boundary = JsonSerializer.SerializeToElement(speechRequest, JsonSerializerOptions.Web);
         Assert.True(JsonElement.DeepEquals(metadata, boundary.GetProperty("providerOptions").GetProperty("runway")));
 
-        await CreateProvider(client).SpeechRequest(speechRequest, CancellationToken.None);
+        var provider = CreateProvider(client);
+        await provider.SpeechRequest(speechRequest, CancellationToken.None);
 
         Assert.Equal("tts", payload.GetProperty("model").GetString());
         Assert.Equal("Hello", payload.GetProperty("promptText").GetString());
@@ -60,7 +62,7 @@ public sealed class RunwaySpeechMetadataPassthroughTests
         Assert.False(payload.TryGetProperty("must_not_leak", out _));
         Assert.False(payload.TryGetProperty("soundEffects", out _));
 
-        await CreateProvider(client).SpeechRequest(CreateRequest("tts", metadata), CancellationToken.None);
+        await provider.SpeechRequest(CreateRequest("tts", metadata), CancellationToken.None);
         Assert.Equal("metadata-voice", payload.GetProperty("voice").GetProperty("presetId").GetString());
     }
 
@@ -162,7 +164,6 @@ public sealed class RunwaySpeechMetadataPassthroughTests
 
         Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
     }
-
     private static SpeechRequest CreateRequest(string model, JsonElement metadata, string? voice = null)
         => new()
         {

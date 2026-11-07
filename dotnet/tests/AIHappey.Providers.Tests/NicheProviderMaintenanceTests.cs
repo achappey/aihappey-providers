@@ -15,6 +15,7 @@ using AIHappey.Core.Models;
 using AIHappey.Responses;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
+using AIHappey.ChatCompletions.Models;
 
 namespace AIHappey.Tests;
 
