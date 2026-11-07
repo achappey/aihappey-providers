@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using AIHappey.Common.Model.Providers.Runway;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.AI;
@@ -34,25 +33,25 @@ public partial class RunwayProvider
         if (!string.IsNullOrWhiteSpace(request.OutputFormat))
             warnings.Add(new { type = "unsupported", feature = "outputFormat" });
 
-        var metadata = request.GetProviderMetadata<RunwaySpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var voiceOptions = GetObjectProperty(metadata, "voice");
 
         // Required: presetId
-        var presetId = (request.Voice ?? metadata?.Voice?.PresetId)?.Trim();
+        _ = DeserializeProperty<string?>(GetProperty(voiceOptions, "type"));
+        var metadataPresetId = GetStringProperty(voiceOptions, "presetId");
+        var presetId = (request.Voice ?? metadataPresetId)?.Trim();
         if (string.IsNullOrWhiteSpace(presetId))
             throw new ArgumentException(
                 "Runway Text-to-Speech requires a voice presetId. Provide SpeechRequest.voice or providerOptions.runway.voice.",
                 nameof(request));
 
-        var payload = new
-        {
-            model = request.Model,
-            promptText = request.Text,
-            voice = new
-            {
-                type = RunwayPresetVoiceType,
-                presetId
-            }
-        };
+        var payload = CreateRawMetadataObject(metadata, "voice", "soundEffects");
+        var voice = CreateRawMetadataObject(voiceOptions, "type", "presetId");
+        voice["type"] = RunwayPresetVoiceType;
+        voice["presetId"] = presetId;
+        payload["model"] = JsonValue.Create(request.Model);
+        payload["promptText"] = JsonValue.Create(request.Text);
+        payload["voice"] = voice;
 
         var json = JsonSerializer.Serialize(payload, JsonOpts);
         using var resp = await _client.PostAsync(
@@ -122,27 +121,29 @@ public partial class RunwayProvider
         if (!string.IsNullOrWhiteSpace(request.OutputFormat))
             warnings.Add(new { type = "unsupported", feature = "outputFormat" });
 
-        var metadata = request.GetProviderMetadata<RunwaySpeechProviderMetadata>(GetIdentifier());
-        var se = metadata?.SoundEffects;
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var soundEffects = GetObjectProperty(metadata, "soundEffects");
+        var durationValue = GetProperty(soundEffects, "duration");
+        var duration = DeserializeProperty<double?>(durationValue);
+        var loop = DeserializeProperty<bool?>(GetProperty(soundEffects, "loop"));
 
-        if (se?.Duration is { } duration)
+        if (duration is { } specifiedDuration)
         {
-            if (duration < 0.5 || duration > 30)
-                throw new ArgumentOutOfRangeException(nameof(RunwaySpeechProviderMetadata.SoundEffects), "soundEffects.duration must be between 0.5 and 30 seconds.");
+            if (specifiedDuration < 0.5 || specifiedDuration > 30)
+                throw new ArgumentOutOfRangeException("SoundEffects", "soundEffects.duration must be between 0.5 and 30 seconds.");
         }
 
-        var payload = new Dictionary<string, object?>
-        {
-            // Runway requires a fixed model id for this endpoint.
-            ["model"] = RunwaySoundEffectsModel,
-            ["promptText"] = request.Text,
-        };
+        var payload = CreateRawMetadataObject(metadata, "soundEffects", "voice");
+        AddRawProperties(payload, soundEffects, "duration", "loop");
+        // Runway requires a fixed model id for this endpoint.
+        payload["model"] = RunwaySoundEffectsModel;
+        payload["promptText"] = request.Text;
 
-        if (se?.Duration is not null)
-            payload["duration"] = se?.Duration;
+        if (duration is not null)
+            payload["duration"] = duration.Value;
 
-        if (se?.Loop is not null)
-            payload["loop"] = se?.Loop;
+        if (loop is not null)
+            payload["loop"] = loop.Value;
 
         var json = JsonSerializer.Serialize(payload, JsonOpts);
         using var resp = await _client.PostAsync(
@@ -296,6 +297,62 @@ public partial class RunwayProvider
         };
     }
 
+    private static JsonElement GetObjectProperty(JsonElement element, string propertyName)
+    {
+        var property = GetProperty(element, propertyName);
+        if (property.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return default;
+
+        if (property.ValueKind != JsonValueKind.Object)
+            throw new JsonException($"The JSON value for '{propertyName}' must be an object.");
+
+        return property;
+    }
+
+    private static JsonElement GetProperty(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+            return default;
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                return property.Value;
+        }
+
+        return default;
+    }
+
+    private static string? GetStringProperty(JsonElement element, string propertyName)
+        => DeserializeProperty<string?>(GetProperty(element, propertyName));
+
+    private static T? DeserializeProperty<T>(JsonElement element)
+        => element.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null
+            ? default
+            : JsonSerializer.Deserialize<T>(element.GetRawText(), JsonOpts);
+
+    private static JsonObject CreateRawMetadataObject(JsonElement metadata, params string[] excludedProperties)
+    {
+        var result = new JsonObject();
+        AddRawProperties(result, metadata, excludedProperties);
+        return result;
+    }
+
+    private static void AddRawProperties(
+        JsonObject destination,
+        JsonElement source,
+        params string[] excludedProperties)
+    {
+        if (source.ValueKind != JsonValueKind.Object)
+            return;
+
+        foreach (var property in source.EnumerateObject())
+        {
+            if (!excludedProperties.Contains(property.Name, StringComparer.OrdinalIgnoreCase))
+                destination[property.Name] = JsonNode.Parse(property.Value.GetRawText());
+        }
+    }
+
     private static string? GuessMimeFromUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))
@@ -313,4 +370,3 @@ public partial class RunwayProvider
         return null;
     }
 }
-
