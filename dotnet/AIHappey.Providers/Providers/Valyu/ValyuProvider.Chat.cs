@@ -9,8 +9,6 @@ public partial class ValyuProvider
     public async IAsyncEnumerable<UIMessagePart> StreamAsync(ChatRequest chatRequest,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         var model = chatRequest.Model;
         if (IsAnswerModel(model))
         {
