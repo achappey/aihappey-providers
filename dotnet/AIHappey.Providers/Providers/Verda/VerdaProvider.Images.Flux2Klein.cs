@@ -1,7 +1,6 @@
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
 using AIHappey.Common.Model.Providers.Verda;
 using AIHappey.Vercel.Models;
@@ -31,6 +30,14 @@ public partial class VerdaProvider
 
         var providerMetadata = imageRequest.GetProviderMetadata<VerdaImageProviderMetadata>(GetIdentifier());
         var flux2Klein = providerMetadata?.Flux2Klein;
+        EnsureVerdaMetadataObject(flux2Klein);
+        var payload = CreateVerdaImagePayload(providerMetadata?.AdditionalProperties, flux2Klein);
+
+        ApplyVerdaMetadataOption<int?>(payload, flux2Klein, "num_steps");
+        ApplyVerdaMetadataOption<float?>(payload, flux2Klein, "guidance");
+        ApplyVerdaMetadataOption<bool?>(payload, flux2Klein, "enable_safety_checker");
+        ApplyVerdaMetadataOption<string?>(payload, flux2Klein, "output_format");
+        ApplyVerdaMetadataOption<int?>(payload, flux2Klein, "output_quality");
 
         if (imageRequest.N is > 1)
         {
@@ -69,10 +76,10 @@ public partial class VerdaProvider
 
         var (width, height) = ResolveFlux2KleinWidthHeight(imageRequest, warnings);
 
-        var outputFormat = flux2Klein?.OutputFormat ?? "jpeg";
+        var outputFormat = GetVerdaMetadataString(payload, "output_format") ?? "jpeg";
         var isFixedGuidance = imageRequest.Model.Equals("flux2-klein-4b", StringComparison.OrdinalIgnoreCase);
-        var numSteps = flux2Klein?.NumSteps;
-        var guidance = flux2Klein?.Guidance;
+        var numSteps = ReadVerdaMetadataOption<int?>(flux2Klein, "num_steps");
+        var guidance = ReadVerdaMetadataOption<float?>(flux2Klein, "guidance");
 
         if (isFixedGuidance)
         {
@@ -98,6 +105,8 @@ public partial class VerdaProvider
 
             numSteps = null;
             guidance = null;
+            payload.Remove("num_steps");
+            payload.Remove("guidance");
         }
 
         var endpoint = imageRequest.Model switch
@@ -108,20 +117,13 @@ public partial class VerdaProvider
             _ => throw new NotSupportedException($"Verda image model '{imageRequest.Model}' is not supported.")
         };
 
-        var payload = new Flux2KleinRequest
-        {
-            Prompt = imageRequest.Prompt,
-            Width = width,
-            Height = height,
-            NumSteps = numSteps,
-            Guidance = guidance,
-            Seed = imageRequest.Seed,
-            InputImages = inputImages,
-            EnableSafetyChecker = flux2Klein?.EnableSafetyChecker,
-            OutputFormat = flux2Klein?.OutputFormat,
-            OutputQuality = flux2Klein?.OutputQuality,
-            EnableBase64Output = true
-        };
+        payload["prompt"] = imageRequest.Prompt;
+        AddVerdaValue(payload, "width", width);
+        AddVerdaValue(payload, "height", height);
+        AddVerdaValue(payload, "seed", imageRequest.Seed);
+        if (inputImages is not null)
+            payload["input_images"] = inputImages;
+        payload["enable_base64_output"] = true;
 
         var json = JsonSerializer.Serialize(payload, Flux1Json);
 
@@ -203,40 +205,15 @@ public partial class VerdaProvider
         return normalized;
     }
 
-    private sealed class Flux2KleinRequest
+    private static void AddVerdaValue<T>(
+        Dictionary<string, object?> payload,
+        string propertyName,
+        T? value)
+        where T : struct
     {
-        [JsonPropertyName("prompt")]
-        public string Prompt { get; set; } = null!;
-
-        [JsonPropertyName("width")]
-        public int? Width { get; set; }
-
-        [JsonPropertyName("height")]
-        public int? Height { get; set; }
-
-        [JsonPropertyName("num_steps")]
-        public int? NumSteps { get; set; }
-
-        [JsonPropertyName("guidance")]
-        public float? Guidance { get; set; }
-
-        [JsonPropertyName("seed")]
-        public int? Seed { get; set; }
-
-        [JsonPropertyName("input_images")]
-        public List<string>? InputImages { get; set; }
-
-        [JsonPropertyName("enable_safety_checker")]
-        public bool? EnableSafetyChecker { get; set; }
-
-        [JsonPropertyName("output_format")]
-        public string? OutputFormat { get; set; }
-
-        [JsonPropertyName("output_quality")]
-        public int? OutputQuality { get; set; }
-
-        [JsonPropertyName("enable_base64_output")]
-        public bool EnableBase64Output { get; set; }
+        if (value is null)
+            payload.Remove(propertyName);
+        else
+            payload[propertyName] = value.Value;
     }
 }
-

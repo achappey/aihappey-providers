@@ -30,6 +30,7 @@ public partial class VerdaProvider
 
         var providerMetadata = imageRequest.GetProviderMetadata<VerdaImageProviderMetadata>(GetIdentifier());
         var flux2 = providerMetadata?.Flux2;
+        EnsureVerdaMetadataObject(flux2);
 
         if (!string.IsNullOrWhiteSpace(imageRequest.Size) || !string.IsNullOrWhiteSpace(imageRequest.AspectRatio))
         {
@@ -75,7 +76,16 @@ public partial class VerdaProvider
         if (referenceImages?.Count == 0)
             referenceImages = null;
 
-        var outputFormat = "jpeg";
+        var payload = CreateVerdaImagePayload(providerMetadata?.AdditionalProperties, flux2);
+        ApplyVerdaMetadataOption<int?>(payload, flux2, "steps");
+        ApplyVerdaMetadataOption<float?>(payload, flux2, "guidance");
+        var outputFormat = GetVerdaMetadataString(payload, "output_format") ?? "jpeg";
+        payload["prompt"] = imageRequest.Prompt;
+        payload["output_format"] = payload.TryGetValue("output_format", out var requestedFormat)
+            ? requestedFormat
+            : outputFormat;
+        payload["enable_base64_output"] = true;
+
         var endpoint = imageRequest.Model switch
         {
             "flux2-dev" => Flux2DevEndpoint,
@@ -84,15 +94,8 @@ public partial class VerdaProvider
             _ => throw new NotSupportedException($"Verda image model '{imageRequest.Model}' is not supported.")
         };
 
-        var payload = new Flux2Request
-        {
-            Prompt = imageRequest.Prompt,
-            OutputFormat = outputFormat,
-            ReferenceImages = referenceImages,
-            Steps = flux2?.Steps,
-            Guidance = flux2?.Guidance,
-            EnableBase64Output = true
-        };
+        if (referenceImages is not null)
+            payload["reference_images"] = referenceImages;
 
         var json = JsonSerializer.Serialize(payload, Flux1Json);
 
@@ -122,25 +125,68 @@ public partial class VerdaProvider
         };
     }
 
-    private sealed class Flux2Request
+    private static void EnsureVerdaMetadataObject(JsonElement? metadata)
     {
-        [JsonPropertyName("prompt")]
-        public string Prompt { get; set; } = null!;
+        if (metadata is { ValueKind: not JsonValueKind.Object and not JsonValueKind.Null })
+            throw new JsonException("Verda model metadata must be a JSON object.");
+    }
 
-        [JsonPropertyName("output_format")]
-        public string? OutputFormat { get; set; }
+    private static Dictionary<string, object?> CreateVerdaImagePayload(
+        Dictionary<string, JsonElement>? providerOptions,
+        JsonElement? modelOptions)
+    {
+        var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
 
-        [JsonPropertyName("reference_images")]
-        public List<string>? ReferenceImages { get; set; }
+        if (providerOptions is not null)
+        {
+            foreach (var (name, value) in providerOptions)
+                payload[name] = value.Clone();
+        }
 
-        [JsonPropertyName("steps")]
-        public int? Steps { get; set; }
+        if (modelOptions is { ValueKind: JsonValueKind.Object } options)
+        {
+            foreach (var property in options.EnumerateObject())
+                payload[property.Name] = property.Value.Clone();
+        }
 
-        [JsonPropertyName("guidance")]
-        public float? Guidance { get; set; }
+        return payload;
+    }
 
-        [JsonPropertyName("enable_base64_output")]
-        public bool EnableBase64Output { get; set; }
+    private static void ApplyVerdaMetadataOption<T>(
+        Dictionary<string, object?> payload,
+        JsonElement? modelOptions,
+        string propertyName)
+    {
+        if (modelOptions is not { ValueKind: JsonValueKind.Object } options
+            || !options.TryGetProperty(propertyName, out var value))
+            return;
+
+        var parsed = value.Deserialize<T>(JsonSerializerOptions.Web);
+        if (parsed is null)
+            payload.Remove(propertyName);
+        else
+            payload[propertyName] = parsed;
+    }
+
+    private static T? ReadVerdaMetadataOption<T>(JsonElement? modelOptions, string propertyName)
+    {
+        if (modelOptions is not { ValueKind: JsonValueKind.Object } options
+            || !options.TryGetProperty(propertyName, out var value))
+            return default;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static string? GetVerdaMetadataString(
+        Dictionary<string, object?> payload,
+        string propertyName)
+    {
+        if (!payload.TryGetValue(propertyName, out var value))
+            return null;
+
+        if (value is JsonElement { ValueKind: JsonValueKind.String } element)
+            return element.GetString();
+
+        return value as string;
     }
 }
-
