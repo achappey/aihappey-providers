@@ -99,6 +99,7 @@ public partial class ValyuProvider
         {
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
         req.Headers.Accept.Clear();
         req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
@@ -112,12 +113,16 @@ public partial class ValyuProvider
         await using var stream = await resp.Content.ReadAsStreamAsync(cancellationToken);
         using var reader = new StreamReader(stream);
 
-         string? line;
+        string? line;
+        string? eventType = null;
         while (!cancellationToken.IsCancellationRequested &&
                (line = await reader.ReadLineAsync(cancellationToken)) != null)
         {
-            if (line is null)
-                yield break;
+            if (line.StartsWith("event:", StringComparison.OrdinalIgnoreCase))
+            {
+                eventType = line["event:".Length..].Trim();
+                continue;
+            }
 
             if (!line.StartsWith("data:", StringComparison.OrdinalIgnoreCase))
                 continue;
@@ -133,29 +138,48 @@ public partial class ValyuProvider
             ValyuAnswerStreamEvent? evt;
             try
             {
-                evt = ParseAnswerStreamEvent(data);
+                evt = ParseAnswerStreamEvent(data, eventType);
             }
             catch
             {
+                eventType = null;
                 continue;
             }
+
+            eventType = null;
+            if (!string.IsNullOrWhiteSpace(evt?.Error))
+                throw new HttpRequestException($"Valyu answer stream failed: {evt.Error}");
 
             if (evt is not null)
                 yield return evt;
         }
     }
 
-    private static ValyuAnswerStreamEvent? ParseAnswerStreamEvent(string json)
+    private static ValyuAnswerStreamEvent? ParseAnswerStreamEvent(string json, string? eventType)
     {
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
         var evt = new ValyuAnswerStreamEvent();
 
-        if (root.TryGetProperty("search_results", out var resultsEl) && resultsEl.ValueKind == JsonValueKind.Array)
+        if (root.ValueKind == JsonValueKind.Object
+            && root.TryGetProperty("search_results", out var resultsEl)
+            && resultsEl.ValueKind == JsonValueKind.Array)
             evt.Sources.AddRange(ParseSources(resultsEl));
 
-        if (root.TryGetProperty("choices", out var choicesEl)
+        if (root.ValueKind == JsonValueKind.String
+            && string.Equals(eventType, "content", StringComparison.OrdinalIgnoreCase))
+        {
+            evt.Delta = root.GetString();
+        }
+        else if (root.ValueKind == JsonValueKind.Object
+            && root.TryGetProperty("content", out var contentEl)
+            && contentEl.ValueKind == JsonValueKind.String)
+        {
+            evt.Delta = contentEl.GetString();
+        }
+        else if (root.ValueKind == JsonValueKind.Object
+            && root.TryGetProperty("choices", out var choicesEl)
             && choicesEl.ValueKind == JsonValueKind.Array
             && choicesEl.GetArrayLength() > 0)
         {
@@ -163,23 +187,35 @@ public partial class ValyuProvider
             if (choice.ValueKind == JsonValueKind.Object
                 && choice.TryGetProperty("delta", out var deltaEl)
                 && deltaEl.ValueKind == JsonValueKind.Object
-                && deltaEl.TryGetProperty("content", out var contentEl)
-                && contentEl.ValueKind == JsonValueKind.String)
+                && deltaEl.TryGetProperty("content", out var deltaContentEl)
+                && deltaContentEl.ValueKind == JsonValueKind.String)
             {
-                evt.Delta = contentEl.GetString();
+                evt.Delta = deltaContentEl.GetString();
             }
         }
 
-        if (root.TryGetProperty("success", out _)
-            || root.TryGetProperty("metadata", out _)
-            || root.TryGetProperty("cost", out _)
-            || root.TryGetProperty("ai_usage", out _)
-            || root.TryGetProperty("search_metadata", out _))
+        if (root.ValueKind == JsonValueKind.Object
+            && root.TryGetProperty("error", out var errorEl)
+            && errorEl.ValueKind == JsonValueKind.String)
+        {
+            evt.Error = errorEl.GetString();
+        }
+
+        if (root.ValueKind == JsonValueKind.Object
+            && (string.Equals(eventType, "error", StringComparison.OrdinalIgnoreCase)
+                || root.TryGetProperty("success", out _)
+                || root.TryGetProperty("metadata", out _)
+                || root.TryGetProperty("cost", out _)
+                || root.TryGetProperty("ai_usage", out _)
+                || root.TryGetProperty("search_metadata", out _)))
         {
             evt.Metadata = JsonSerializer.Deserialize<Dictionary<string, object?>>(root.GetRawText(), JsonWeb);
         }
 
-        return string.IsNullOrWhiteSpace(evt.Delta) && evt.Sources.Count == 0 && evt.Metadata is null
+        return string.IsNullOrWhiteSpace(evt.Delta)
+               && evt.Sources.Count == 0
+               && evt.Metadata is null
+               && string.IsNullOrWhiteSpace(evt.Error)
             ? null
             : evt;
     }
@@ -263,6 +299,7 @@ public partial class ValyuProvider
         {
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var raw = await resp.Content.ReadAsStringAsync(cancellationToken);
@@ -281,6 +318,7 @@ public partial class ValyuProvider
     private async Task<ValyuDeepResearchStatusResponse> GetDeepResearchStatusAsync(string taskId, CancellationToken cancellationToken)
     {
         using var req = new HttpRequestMessage(HttpMethod.Get, $"v1/deepresearch/tasks/{Uri.EscapeDataString(taskId)}/status");
+        ApplyAuthHeader(req);
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var raw = await resp.Content.ReadAsStringAsync(cancellationToken);
         if (!resp.IsSuccessStatusCode)
@@ -295,6 +333,7 @@ public partial class ValyuProvider
         try
         {
             using var req = new HttpRequestMessage(HttpMethod.Delete, $"v1/deepresearch/tasks/{Uri.EscapeDataString(taskId)}/delete");
+            ApplyAuthHeader(req);
             using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             _ = await resp.Content.ReadAsStringAsync(cancellationToken);
         }
@@ -700,6 +739,7 @@ public partial class ValyuProvider
     private sealed class ValyuAnswerStreamEvent
     {
         public string? Delta { get; set; }
+        public string? Error { get; set; }
         public List<ValyuSource> Sources { get; } = [];
         public Dictionary<string, object?>? Metadata { get; set; }
     }
@@ -801,4 +841,3 @@ public partial class ValyuProvider
         public string? Url { get; init; }
     }
 }
-

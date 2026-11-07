@@ -16,36 +16,53 @@ public partial class NovitaProvider
     {
         var metadata =
             request.GetProviderMetadata<NovitaSpeechProviderMetadata>(GetIdentifier());
+        var glmMetadata = metadata?.Glm is { ValueKind: JsonValueKind.Object } options
+            ? options
+            : default;
+
+        if (metadata?.Glm is { ValueKind: not (JsonValueKind.Object or JsonValueKind.Null) })
+            throw new JsonException("Novita provider metadata 'glm' must be an object or null.");
+
+        var payload = new Dictionary<string, object?>();
+        if (glmMetadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in glmMetadata.EnumerateObject())
+                payload[property.Name] = property.Value.Clone();
+        }
 
         var voice =
             request.Voice
-            ?? metadata?.Glm?.Voice
+            ?? GetNovitaGlmMetadataValue<string>(glmMetadata, "voice")
             ?? "tongtong"; // docs default :contentReference[oaicite:1]{index=1}
 
         var responseFormat =
-            (request.OutputFormat ?? metadata?.Glm?.ResponseFormat ?? "pcm").ToLowerInvariant();
+            (request.OutputFormat
+                ?? GetNovitaGlmMetadataValue<string>(glmMetadata, "response_format")
+                ?? "pcm").ToLowerInvariant();
 
         // GLM endpoint only supports wav|pcm :contentReference[oaicite:2]{index=2}
         if (responseFormat is not ("wav" or "pcm"))
             responseFormat = "pcm";
 
-        var speed = request.Speed ?? metadata?.Glm?.Speed ?? 1.0;
+        var speed = request.Speed
+            ?? GetNovitaGlmMetadataValue<double?>(glmMetadata, "speed")
+            ?? 1.0;
         if (speed < 0.5) speed = 0.5;
         if (speed > 2.0) speed = 2.0; // docs range :contentReference[oaicite:3]{index=3}
 
-        var volume = metadata?.Glm?.Volume ?? 1.0;
+        var volume = GetNovitaGlmMetadataValue<double?>(glmMetadata, "volume") ?? 1.0;
         if (volume <= 0) volume = 1.0;
         if (volume > 10) volume = 10; // docs range :contentReference[oaicite:4]{index=4}
 
-        var payload = new Dictionary<string, object?>
-        {
-            ["input"] = request.Text ?? "",
-            ["voice"] = voice,
-            ["speed"] = speed,
-            ["volume"] = volume,
-            ["response_format"] = responseFormat,
-            ["watermark_enabled"] = metadata?.Glm?.WatermarkEnabled
-        };
+        SetNovitaGlmPayloadValue(payload, "input", request.Text ?? "");
+        SetNovitaGlmPayloadValue(payload, "voice", voice);
+        SetNovitaGlmPayloadValue(payload, "speed", speed);
+        SetNovitaGlmPayloadValue(payload, "volume", volume);
+        SetNovitaGlmPayloadValue(payload, "response_format", responseFormat);
+        SetNovitaGlmPayloadValue(
+            payload,
+            "watermark_enabled",
+            GetNovitaGlmMetadataValue<bool?>(glmMetadata, "watermark_enabled"));
 
         using var content = new StringContent(
             JsonSerializer.Serialize(payload),
@@ -108,5 +125,40 @@ public partial class NovitaProvider
 
     private static bool IsGlmTtsModel(string? model)
            => string.Equals(model, "glm-tts", StringComparison.OrdinalIgnoreCase);
+
+    private static T? GetNovitaGlmMetadataValue<T>(JsonElement metadata, string name)
+    {
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return default;
+
+        JsonElement value = default;
+        var found = false;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (!string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            value = property.Value;
+            found = true;
+        }
+
+        return found
+            ? value.Deserialize<T>(JsonSerializerOptions.Web)
+            : default;
+    }
+
+    private static void SetNovitaGlmPayloadValue(
+        Dictionary<string, object?> payload,
+        string name,
+        object? value)
+    {
+        var existingName = payload.Keys.FirstOrDefault(
+            key => string.Equals(key, name, StringComparison.OrdinalIgnoreCase));
+        if (existingName is not null)
+            payload.Remove(existingName);
+
+        payload[name] = value;
+    }
 
 }
