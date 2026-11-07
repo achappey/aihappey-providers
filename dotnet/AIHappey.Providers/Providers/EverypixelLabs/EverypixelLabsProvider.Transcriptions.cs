@@ -12,7 +12,6 @@ public partial class EverypixelLabsProvider
 {
     public async Task<TranscriptionResponse> TranscriptionRequest(TranscriptionRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model)) throw new ArgumentException("Model is required.", nameof(request));
         if (string.IsNullOrWhiteSpace(request.MediaType)) throw new ArgumentException("MediaType is required.", nameof(request));
@@ -27,10 +26,8 @@ public partial class EverypixelLabsProvider
         var payload = new Dictionary<string, object?> { ["audio_url"] = audio };
         CopyEverypixelProviderOptions(request.ProviderOptions, payload, "language", "hints", "denoise", "callback_url");
         var requestBody = JsonSerializer.Serialize(payload, JsonSerializerOptions.Web);
-        using var createRequest = new HttpRequestMessage(HttpMethod.Post, "v1/transcribe")
-        {
-            Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-        };
+        using var createRequest = CreateAuthenticatedRequest(HttpMethod.Post, "v1/transcribe");
+        createRequest.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
         using var createResponse = await _client.SendAsync(createRequest, cancellationToken);
         var createRaw = await createResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!createResponse.IsSuccessStatusCode)

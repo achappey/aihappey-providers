@@ -12,7 +12,6 @@ public partial class EverypixelLabsProvider
 
     public async Task<VideoOperationStartResult> StartVideoOperation(VideoRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model)) throw new ArgumentException("Model is required.", nameof(request));
         if (string.IsNullOrWhiteSpace(request.Prompt)) throw new ArgumentException("Prompt is required.", nameof(request));
@@ -37,10 +36,8 @@ public partial class EverypixelLabsProvider
         CopyEverypixelProviderOptions(request.ProviderOptions, payload, "callback_url", "lora_high_url", "lora_low_url", "reference_image_urls", "reference_video_urls");
 
         var rawBody = JsonSerializer.Serialize(payload, JsonSerializerOptions.Web);
-        using var createRequest = new HttpRequestMessage(HttpMethod.Post, "v1/video_generate")
-        {
-            Content = new StringContent(rawBody, Encoding.UTF8, "application/json")
-        };
+        using var createRequest = CreateAuthenticatedRequest(HttpMethod.Post, "v1/video_generate");
+        createRequest.Content = new StringContent(rawBody, Encoding.UTF8, "application/json");
         using var response = await _client.SendAsync(createRequest, cancellationToken);
         var raw = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -66,7 +63,6 @@ public partial class EverypixelLabsProvider
     public async Task<VideoOperationStatusResult> GetVideoOperationStatus(string operation, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(operation)) throw new ArgumentException("A video operation is required.", nameof(operation));
-        ApplyAuthHeader();
         var data = DecodeEverypixelVideoOperation(operation);
         var status = await GetTaskStatusAsync(data.TaskId, cancellationToken);
         var response = new HeaderResponseData
