@@ -27,13 +27,28 @@ public partial class BriaProvider
         return "image/" + m;
     }
 
-    private static string? GetSingleImageInputDataUrl(ImageRequest imageRequest)
-        => imageRequest.Files?.FirstOrDefault() is { } f
-            ? f.ToDataUrl()
+    private static string? GetSingleImageInput(ImageRequest imageRequest)
+        => imageRequest.Files?.FirstOrDefault() is { } file
+            ? ToBriaImageValue(file)
             : null;
 
-    private static string? GetMaskInputDataUrl(ImageRequest imageRequest)
-        => imageRequest.Mask?.ToDataUrl();
+    private static string? GetMaskInput(ImageRequest imageRequest)
+        => imageRequest.Mask is { } mask
+            ? ToBriaImageValue(mask)
+            : null;
+
+    private static string ToBriaImageValue(ImageFile file)
+    {
+        ArgumentNullException.ThrowIfNull(file);
+        ArgumentException.ThrowIfNullOrWhiteSpace(file.Data);
+
+        if (Uri.TryCreate(file.Data, UriKind.Absolute, out var uri)
+            && (uri.Scheme.Equals(Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase)
+                || uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)))
+            return file.Data;
+
+        return file.Data.RemoveDataUrlPrefix();
+    }
 
     private async Task<BriaResultEnvelope> PostBriaAsync<T>(
         string endpoint,
@@ -171,7 +186,7 @@ public partial class BriaProvider
             case "image/generate":
             case "image/generate/lite":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest);
+                    var inputImage = GetSingleImageInput(imageRequest);
                     var payload = new BriaGenerateRequest
                     {
                         Prompt = imageRequest.Prompt,
@@ -195,7 +210,7 @@ public partial class BriaProvider
 
             case "image/edit":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException("Bria image/edit requires exactly one input image.");
 
                     var payload = new BriaEditRequest
@@ -203,7 +218,7 @@ public partial class BriaProvider
                         Images = [inputImage],
                         Instruction = imageRequest.Prompt,
                         StructuredInstruction = briaOptions?.ImageEdit?.StructuredInstructions,
-                        Mask = GetMaskInputDataUrl(imageRequest),
+                        Mask = GetMaskInput(imageRequest),
                         NegativePrompt = briaOptions?.ImageEdit?.NegativePrompt,
                         GuidanceScale = briaOptions?.ImageEdit?.GuidanceScale,
                         StepsNum = briaOptions?.ImageEdit?.StepsNum,
@@ -226,7 +241,7 @@ public partial class BriaProvider
             case "image/edit/add_object_by_text":
             case "image/edit/replace_object_by_text":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaEditByTextRequest
@@ -241,7 +256,7 @@ public partial class BriaProvider
 
             case "image/edit/erase_by_text":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     if (string.IsNullOrWhiteSpace(imageRequest.Prompt))
@@ -259,7 +274,7 @@ public partial class BriaProvider
 
             case "image/edit/blend":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     if (string.IsNullOrWhiteSpace(imageRequest.Prompt))
@@ -277,7 +292,7 @@ public partial class BriaProvider
 
             case "image/edit/reseason":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var season = briaOptions?.ReseasonImage?.Season;
@@ -299,7 +314,7 @@ public partial class BriaProvider
 
             case "image/edit/replace_text":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     if (string.IsNullOrWhiteSpace(imageRequest.Prompt))
@@ -317,7 +332,7 @@ public partial class BriaProvider
 
             case "image/edit/sketch_to_image":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaSketchToImageRequest
@@ -331,7 +346,7 @@ public partial class BriaProvider
 
             case "image/edit/restore":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaRestoreRequest
@@ -346,7 +361,7 @@ public partial class BriaProvider
 
             case "image/edit/colorize":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var style = briaOptions?.Colorize?.Style;
@@ -369,7 +384,7 @@ public partial class BriaProvider
 
             case "image/edit/restyle":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var style = briaOptions?.RestyleImage?.Style;
@@ -392,7 +407,7 @@ public partial class BriaProvider
 
             case "image/edit/relight":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var lightType = briaOptions?.RelightImage?.LightType;
@@ -416,10 +431,10 @@ public partial class BriaProvider
 
             case "image/edit/erase":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
-                    var mask = GetMaskInputDataUrl(imageRequest)
+                    var mask = GetMaskInput(imageRequest)
                         ?? throw new InvalidOperationException("Bria image/edit/erase requires ImageRequest.Mask to be provided.");
 
                     var payload = new BriaEraseRequest
@@ -439,10 +454,10 @@ public partial class BriaProvider
 
             case "image/edit/gen_fill":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
-                    var mask = GetMaskInputDataUrl(imageRequest)
+                    var mask = GetMaskInput(imageRequest)
                         ?? throw new InvalidOperationException("Bria image/edit/gen_fill requires ImageRequest.Mask to be provided.");
 
                     if (string.IsNullOrWhiteSpace(imageRequest.Prompt))
@@ -472,7 +487,7 @@ public partial class BriaProvider
 
             case "image/edit/remove_background":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaRemoveBackgroundRequest
@@ -490,7 +505,7 @@ public partial class BriaProvider
 
             case "image/edit/replace_background":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaReplaceBackgroundRequest
@@ -516,7 +531,7 @@ public partial class BriaProvider
 
             case "image/edit/erase_foreground":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaEraseForegroundRequest
@@ -534,7 +549,7 @@ public partial class BriaProvider
 
             case "image/edit/blur_background":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaBlurBackgroundRequest
@@ -553,7 +568,7 @@ public partial class BriaProvider
 
             case "image/edit/expand":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaExpandImageRequest
@@ -579,7 +594,7 @@ public partial class BriaProvider
 
             case "image/edit/enhance":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaEnhanceImageRequest
@@ -600,7 +615,7 @@ public partial class BriaProvider
 
             case "image/edit/increase_resolution":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaIncreaseResolutionRequest
@@ -619,7 +634,7 @@ public partial class BriaProvider
 
             case "image/edit/crop_foreground":
                 {
-                    var inputImage = GetSingleImageInputDataUrl(imageRequest)
+                    var inputImage = GetSingleImageInput(imageRequest)
                         ?? throw new InvalidOperationException($"Bria {endpoint} requires exactly one input image.");
 
                     var payload = new BriaCropForegroundRequest
