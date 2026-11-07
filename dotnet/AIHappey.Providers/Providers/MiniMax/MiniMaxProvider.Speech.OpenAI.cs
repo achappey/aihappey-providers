@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.MiniMax;
 using AIHappey.Core.AI;
 using AIHappey.Core.Models;
 using AIHappey.Core.Extensions;
@@ -28,7 +27,7 @@ public partial class MiniMaxProvider
         ApplyAuthHeader();
 
         var request = options.ToSpeechRequest();
-        var metadata = request.GetProviderMetadata<MiniMaxSpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
         var payload = BuildSpeechPayload(request, metadata, stream: true);
 
         using var httpRequest = new HttpRequestMessage(

@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.MiniMax;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
@@ -33,7 +32,7 @@ public partial class MiniMaxProvider
         if (!string.IsNullOrWhiteSpace(request.Instructions))
             warnings.Add(new { type = "unsupported", feature = "instructions" });
 
-        var metadata = request.GetProviderMetadata<MiniMaxSpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
 
         // ---- voice_setting ----
         var payload = BuildSpeechPayload(request, metadata, stream: false);
@@ -209,45 +208,205 @@ public partial class MiniMaxProvider
 
     private static Dictionary<string, object?> BuildSpeechPayload(
         SpeechRequest request,
-        MiniMaxSpeechProviderMetadata? metadata,
+        JsonElement metadata,
         bool stream)
     {
-        var voiceId = request.Voice ?? metadata?.VoiceSetting?.VoiceId ?? "English_Insightful_Speaker";
-        var speed = Math.Clamp(request.Speed ?? metadata?.VoiceSetting?.Speed ?? 1.0f, 0.5f, 2.0f);
-        var volume = Math.Clamp(metadata?.VoiceSetting?.Vol ?? 1.0, double.Epsilon, 10);
-        var pitch = Math.Clamp(metadata?.VoiceSetting?.Pitch ?? 0, -12, 12);
-        var format = (request.OutputFormat ?? metadata?.AudioSetting?.Format ?? "mp3").Trim().ToLowerInvariant();
+        ValidateMetadata(metadata);
+
+        var voiceSetting = GetObject(metadata, "voice_setting");
+        var audioSetting = GetObject(metadata, "audio_setting");
+        var voiceId = request.Voice ?? GetValue<string>(voiceSetting, "voice_id") ?? "English_Insightful_Speaker";
+        var speed = Math.Clamp(request.Speed ?? GetValue<float?>(voiceSetting, "speed") ?? 1.0f, 0.5f, 2.0f);
+        var volume = Math.Clamp(GetValue<double?>(voiceSetting, "vol") ?? 1.0, double.Epsilon, 10);
+        var pitch = Math.Clamp(GetValue<int?>(voiceSetting, "pitch") ?? 0, -12, 12);
+        var format = (request.OutputFormat ?? GetValue<string>(audioSetting, "format") ?? "mp3").Trim().ToLowerInvariant();
         format = format is "mp3" or "wav" or "flac" or "pcm" ? format : "mp3";
 
-        return new Dictionary<string, object?>
+        var payload = CopyObjectProperties(metadata);
+        RemoveNullProperties(
+            payload,
+            metadata,
+            "language_boost",
+            "subtitle_enable",
+            "pronunciation_dict",
+            "voice_modify",
+            "lyrics",
+            "lyrics_optimizer",
+            "is_instrumental",
+            "audio_base64",
+            "audio_url",
+            "cover_feature_id");
+        payload["model"] = request.Model;
+        payload["text"] = request.Text;
+        payload["stream"] = stream;
+        payload["output_format"] = "hex";
+        payload["language_boost"] = GetValue<string>(metadata, "language_boost") ?? MapLanguageToLanguageBoost(request.Language);
+        payload["subtitle_enable"] = GetValue<bool?>(metadata, "subtitle_enable");
+        payload["pronunciation_dict"] = BuildRawObject(metadata, "pronunciation_dict", "tone");
+        payload["voice_modify"] = BuildRawObject(metadata, "voice_modify", "pitch", "intensity", "timbre", "sound_effects");
+        payload["voice_setting"] = BuildVoiceSetting(voiceSetting, voiceId, speed, volume, pitch);
+        payload["audio_setting"] = BuildAudioSetting(audioSetting, format);
+        return payload;
+    }
+
+    private static Dictionary<string, object?> BuildVoiceSetting(
+        JsonElement metadata,
+        string voiceId,
+        float speed,
+        double volume,
+        int pitch)
+    {
+        var payload = CopyObjectProperties(metadata);
+        payload["voice_id"] = voiceId;
+        payload["speed"] = speed;
+        payload["vol"] = volume;
+        payload["pitch"] = pitch;
+        payload["emotion"] = GetValue<string>(metadata, "emotion");
+        payload["text_normalization"] = GetValue<bool?>(metadata, "text_normalization");
+        payload["latex_read"] = GetValue<bool?>(metadata, "latex_read");
+        return payload;
+    }
+
+    private static Dictionary<string, object?> BuildAudioSetting(JsonElement metadata, string format)
+    {
+        var payload = CopyObjectProperties(metadata);
+        payload["format"] = format;
+        payload["sample_rate"] = GetValue<long?>(metadata, "sample_rate");
+        payload["bitrate"] = GetValue<long?>(metadata, "bitrate");
+        payload["channel"] = GetValue<long?>(metadata, "channel");
+        payload["force_cbr"] = GetValue<bool?>(metadata, "force_cbr");
+        return payload;
+    }
+
+    private static Dictionary<string, object?> CopyObjectProperties(JsonElement element)
+    {
+        var properties = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (element.ValueKind != JsonValueKind.Object)
+            return properties;
+
+        foreach (var property in element.EnumerateObject())
+            properties[property.Name] = property.Value.Clone();
+
+        return properties;
+    }
+
+    private static object? BuildRawObject(JsonElement metadata, string propertyName, params string[] nullableProperties)
+    {
+        var element = GetObject(metadata, propertyName);
+        if (element.ValueKind != JsonValueKind.Object)
+            return null;
+
+        var payload = CopyObjectProperties(element);
+        RemoveNullProperties(payload, element, nullableProperties);
+        return payload;
+    }
+
+    private static void RemoveNullProperties(
+        Dictionary<string, object?> payload,
+        JsonElement element,
+        params string[] propertyNames)
+    {
+        foreach (var name in propertyNames)
         {
-            ["model"] = request.Model,
-            ["text"] = request.Text,
-            ["stream"] = stream,
-            ["output_format"] = "hex",
-            ["language_boost"] = metadata?.LanguageBoost ?? MapLanguageToLanguageBoost(request.Language),
-            ["subtitle_enable"] = metadata?.SubtitleEnable,
-            ["pronunciation_dict"] = metadata?.PronunciationDict,
-            ["voice_modify"] = metadata?.VoiceModify,
-            ["voice_setting"] = new Dictionary<string, object?>
+            if (element.TryGetProperty(name, out var property)
+                && property.ValueKind == JsonValueKind.Null)
             {
-                ["voice_id"] = voiceId,
-                ["speed"] = speed,
-                ["vol"] = volume,
-                ["pitch"] = pitch,
-                ["emotion"] = metadata?.VoiceSetting?.Emotion,
-                ["text_normalization"] = metadata?.VoiceSetting?.TextNormalization,
-                ["latex_read"] = metadata?.VoiceSetting?.LatexRead
-            },
-            ["audio_setting"] = new Dictionary<string, object?>
-            {
-                ["format"] = format,
-                ["sample_rate"] = metadata?.AudioSetting?.SampleRate,
-                ["bitrate"] = metadata?.AudioSetting?.Bitrate,
-                ["channel"] = metadata?.AudioSetting?.Channel,
-                ["force_cbr"] = metadata?.AudioSetting?.ForceCbr
+                payload.Remove(name);
             }
-        };
+        }
+    }
+
+    private static JsonElement GetObject(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+            return default;
+
+        if (!element.TryGetProperty(propertyName, out var value)
+            || value.ValueKind == JsonValueKind.Null)
+        {
+            return default;
+        }
+
+        if (value.ValueKind != JsonValueKind.Object)
+            throw new JsonException($"The JSON value for '{propertyName}' must be an object.");
+
+        return value;
+    }
+
+    private static T? GetValue<T>(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Object
+            || !element.TryGetProperty(propertyName, out var value)
+            || value.ValueKind == JsonValueKind.Null)
+        {
+            return default;
+        }
+
+        return value.Deserialize<T>(SpeechJson);
+    }
+
+    private static void ValidateMetadata(JsonElement metadata)
+    {
+        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return;
+
+        if (metadata.ValueKind != JsonValueKind.Object)
+            throw new JsonException("MiniMax provider options must be a JSON object.");
+
+        var voiceSetting = GetObject(metadata, "voice_setting");
+        _ = GetValue<string>(voiceSetting, "voice_id");
+        _ = GetValue<float?>(voiceSetting, "speed");
+        _ = GetValue<double?>(voiceSetting, "vol");
+        _ = GetValue<int?>(voiceSetting, "pitch");
+        _ = GetValue<string>(voiceSetting, "emotion");
+        _ = GetValue<bool?>(voiceSetting, "text_normalization");
+        _ = GetValue<bool?>(voiceSetting, "latex_read");
+
+        var audioSetting = GetObject(metadata, "audio_setting");
+        _ = GetValue<long?>(audioSetting, "sample_rate");
+        _ = GetValue<long?>(audioSetting, "bitrate");
+        _ = GetValue<string>(audioSetting, "format");
+        _ = GetValue<long?>(audioSetting, "channel");
+        _ = GetValue<bool?>(audioSetting, "force_cbr");
+
+        var pronunciationDict = default(JsonElement);
+        if (metadata.TryGetProperty("pronunciation_dict", out pronunciationDict)
+            && pronunciationDict.ValueKind is not (JsonValueKind.Null or JsonValueKind.Object))
+        {
+            throw new JsonException("The JSON value for 'pronunciation_dict' must be an object.");
+        }
+
+        var tone = default(JsonElement);
+        if (pronunciationDict.ValueKind == JsonValueKind.Object
+            && pronunciationDict.TryGetProperty("tone", out tone)
+            && tone.ValueKind is not (JsonValueKind.Null or JsonValueKind.Array))
+        {
+            throw new JsonException("The JSON value for 'tone' must be an array.");
+        }
+
+        if (tone.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in tone.EnumerateArray())
+            {
+                if (item.ValueKind is not (JsonValueKind.Null or JsonValueKind.String))
+                    throw new JsonException("Values in 'tone' must be strings.");
+            }
+        }
+
+        var voiceModify = GetObject(metadata, "voice_modify");
+        _ = GetValue<int?>(voiceModify, "pitch");
+        _ = GetValue<int?>(voiceModify, "intensity");
+        _ = GetValue<int?>(voiceModify, "timbre");
+        _ = GetValue<string>(voiceModify, "sound_effects");
+
+        _ = GetValue<string>(metadata, "language_boost");
+        _ = GetValue<bool?>(metadata, "subtitle_enable");
+        _ = GetValue<string>(metadata, "lyrics");
+        _ = GetValue<bool?>(metadata, "lyrics_optimizer");
+        _ = GetValue<bool?>(metadata, "is_instrumental");
+        _ = GetValue<string>(metadata, "audio_base64");
+        _ = GetValue<string>(metadata, "audio_url");
+        _ = GetValue<string>(metadata, "cover_feature_id");
     }
 
     private static string GuessAudioMimeType(string? format)
