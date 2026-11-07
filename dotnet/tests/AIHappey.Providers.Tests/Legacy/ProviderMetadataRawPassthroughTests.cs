@@ -662,6 +662,176 @@ public sealed class ProviderMetadataRawPassthroughTests
     }
 
     [Fact]
+    public async Task Together_speech_options_merge_at_root_preserve_unknown_json_and_map_family_voice()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            Assert.Equal("/v1/audio/speech", message.RequestUri!.AbsolutePath);
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+        });
+        var metadata = ParseElement("""
+            {
+              "cartesia": {"voice": "metadata-voice"},
+              "response_format": "mp3",
+              "response_encoding": "pcm_s16le",
+              "sample_rate": 24000,
+              "language": "en",
+              "future_object": {"nested": [{"value": 1}, [true, null, "text"]]},
+              "future_array": [1, {"more": [false, 2.5]}, []],
+              "future_string": "unchanged",
+              "future_number": 12345678901234567890.123456789,
+              "future_boolean": false,
+              "future_null": null,
+              "model": "metadata-model",
+              "input": "metadata-input",
+              "voice": "metadata-root-voice",
+              "stream": true
+            }
+            """);
+        var request = new SpeechRequest
+        {
+            Model = "together/cartesia/sonic-english",
+            Text = "Hello",
+            ProviderOptions = new()
+            {
+                ["together"] = metadata,
+                ["another-provider"] = ParseElement("""{"secret":"not-forwarded"}""")
+            }
+        };
+        var before = JsonSerializer.Serialize(request);
+        var serialized = JsonSerializer.SerializeToElement(request, JsonSerializerOptions.Web);
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .SpeechRequest(request);
+
+        Assert.True(JsonElement.DeepEquals(
+            metadata,
+            serialized.GetProperty("providerOptions").GetProperty("together")));
+        Assert.Equal("cartesia/sonic-english", payload.GetProperty("model").GetString());
+        Assert.Equal("Hello", payload.GetProperty("input").GetString());
+        Assert.Equal("metadata-voice", payload.GetProperty("voice").GetString());
+        Assert.False(payload.GetProperty("stream").GetBoolean());
+        Assert.Equal("mp3", payload.GetProperty("response_format").GetString());
+        Assert.Equal("pcm_s16le", payload.GetProperty("response_encoding").GetString());
+        Assert.Equal(24000, payload.GetProperty("sample_rate").GetInt32());
+        Assert.Equal("en", payload.GetProperty("language").GetString());
+        foreach (var name in new[]
+                 {
+                     "cartesia", "future_object", "future_array", "future_string", "future_number",
+                     "future_boolean", "future_null"
+                 })
+        {
+            Assert.True(JsonElement.DeepEquals(metadata.GetProperty(name), payload.GetProperty(name)), name);
+        }
+
+        Assert.False(payload.TryGetProperty("providerOptions", out _));
+        Assert.False(payload.TryGetProperty("together", out _));
+        Assert.False(payload.TryGetProperty("another-provider", out _));
+        Assert.False(payload.TryGetProperty("secret", out _));
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Fact]
+    public async Task Together_speech_options_keep_request_precedence_defaults_and_known_null_omission()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+        });
+
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client))
+            .SpeechRequest(new SpeechRequest
+            {
+                Model = "together/hexgrad/model",
+                Text = "Hello",
+                Voice = "request-voice",
+                Language = "request-language",
+                OutputFormat = "wav",
+                ProviderOptions = new()
+                {
+                    ["together"] = ParseElement(
+                        """{"hexgrad":{"voice":"metadata-voice"},"response_format":"mp3","response_encoding":null,"sample_rate":null,"language":"metadata-language","future_null":null}""")
+                }
+            });
+
+        Assert.Equal("request-voice", payload.GetProperty("voice").GetString());
+        Assert.Equal("request-language", payload.GetProperty("language").GetString());
+        Assert.Equal("wav", payload.GetProperty("response_format").GetString());
+        Assert.False(payload.TryGetProperty("response_encoding", out _));
+        Assert.False(payload.TryGetProperty("sample_rate", out _));
+        Assert.Equal(JsonValueKind.Null, payload.GetProperty("future_null").ValueKind);
+
+        payload = default;
+        using var defaultClient = CreateClient(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+        });
+        await new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(defaultClient))
+            .SpeechRequest(new SpeechRequest
+            {
+                Model = "together/tts-model",
+                Text = "Hello",
+                Voice = "voice"
+            });
+
+        Assert.Equal("wav", payload.GetProperty("response_format").GetString());
+        Assert.False(payload.TryGetProperty("language", out _));
+        Assert.False(payload.TryGetProperty("sample_rate", out _));
+        Assert.False(payload.TryGetProperty("response_encoding", out _));
+    }
+
+    [Fact]
+    public async Task Together_speech_options_preserve_validation_and_upstream_error_behavior()
+    {
+        using var client = CreateClient(_ => new(HttpStatusCode.OK)
+        {
+            Content = new ByteArrayContent([1, 2, 3])
+        });
+        var provider = new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(client));
+        var invalidOptions = new SpeechRequest
+        {
+            Model = "together/tts-model",
+            Text = "Hello",
+            Voice = "voice",
+            ProviderOptions = new()
+            {
+                ["together"] = ParseElement("""{"response_format":42}""")
+            }
+        };
+
+        await Assert.ThrowsAsync<JsonException>(() => provider.SpeechRequest(invalidOptions));
+
+        using var failedClient = CreateClient(_ => new(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent("upstream failure")
+        });
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            new TogetherProvider(new StaticApiKeyResolver(), new StaticHttpClientFactory(failedClient))
+                .SpeechRequest(new SpeechRequest
+                {
+                    Model = "together/tts-model",
+                    Text = "Hello",
+                    Voice = "voice"
+                }));
+
+        Assert.Equal("Together TTS failed (400): upstream failure", error.Message);
+    }
+
+    [Fact]
     public async Task Together_image_options_preserve_nulls_omit_null_known_fields_and_default_dimensions()
     {
         JsonElement payload = default;
