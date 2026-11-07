@@ -37,15 +37,17 @@ public partial class BraveProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.search.brave.com/res/");
     }
 
-    private void ApplyAuthHeader()
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Brave)} API key.");
 
-        _client.DefaultRequestHeaders.Remove("x-subscription-token");
-        _client.DefaultRequestHeaders.Add("x-subscription-token", key);
+        return new Dictionary<string, string>
+        {
+            ["x-subscription-token"] = key
+        };
     }
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
@@ -53,18 +55,18 @@ public partial class BraveProvider : IModelProvider
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        var headers = GetAuthHeaders();
 
         options.Messages = [options.Messages.Last(a => a.Role == "user")];
 
         return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
+             options, headers, cancellationToken: cancellationToken);
     }
 
     public virtual async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        var headers = GetAuthHeaders();
 
         options.Messages = [options.Messages.Last(a => a.Role == "user")];
 
@@ -72,6 +74,7 @@ public partial class BraveProvider : IModelProvider
 
         await foreach (var update in this.GetChatCompletions(_client,
             options,
+            headers,
             cancellationToken: cancellationToken))
         {
             if (TryCaptureUsageCost(update, out var cost))
