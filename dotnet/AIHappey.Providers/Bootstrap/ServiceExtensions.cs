@@ -637,6 +637,7 @@ using AIHappey.Core.Providers.Upivia;
 using AIHappey.Core.Providers.Kiosapi;
 using AIHappey.Core.Providers.Dust;
 using AIHappey.Core.Providers.AgentDiscuss;
+using AIHappey.Core.Providers.SundayPyjamas;
 using AIHappey.Core.Providers.BaguetteBot;
 using AIHappey.Core.Providers.Jenova;
 using AIHappey.Core.Providers.ResearchAgent;
@@ -1354,6 +1355,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, KiosapiProvider>();
         services.AddScoped<IModelProvider, DustProvider>();
         services.AddScoped<IModelProvider, AgentDiscussProvider>();
+        services.AddScoped<IModelProvider, SundayPyjamasProvider>();
         services.AddScoped<IModelProvider, BaguetteBotProvider>();
         services.AddScoped<IModelProvider, JenovaProvider>();
         services.AddScoped<IModelProvider, ResearchAgentProvider>();

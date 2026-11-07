@@ -3574,6 +3574,10 @@
       "sha256": "67feced2279e22a654d793b04b1581d3fa16cbfd30d1daa7b3878a2e3001be9a"
     },
     {
+      "file": "providers/sundaypyjamas.json",
+      "sha256": "92f5f23ea0f8fddeb2a82635d18b1cc6864655ceff604ecb88280eac49a295ed"
+    },
+    {
       "file": "providers/sunoapi.json",
       "sha256": "14e5509bcc638beefba86e96c77258a902446d80b6a3cf5727f159791d0d32ec"
     },
