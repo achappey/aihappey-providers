@@ -73,27 +73,22 @@ public partial class AIHordeProvider : IModelProvider
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        var response = await ExecuteUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
 
-        var response = await this.GetResponse(_client,
-                   options, cancellationToken: cancellationToken);
-
-        return response;
+        return response.ToResponseResult();
     }
 
     public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(
         ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        await foreach (var update in this.GetResponses(_client,
-           options,
-           cancellationToken: cancellationToken))
-        {
-
-            yield return update;
-        }
+        await foreach (var part in StreamUnifiedAsync(
+                options.ToUnifiedRequest(GetIdentifier()),
+                cancellationToken)
+            .ToResponseStreamParts(cancellationToken))
+            yield return part;
     }
 
     public Task<RealtimeResponse> GetRealtimeToken(RealtimeRequest realtimeRequest, CancellationToken cancellationToken)
