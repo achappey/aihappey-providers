@@ -161,7 +161,8 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
         if (metadataJson is not null)
             request.ProviderOptions = new() { ["minimax"] = ParseElement(metadataJson) };
 
-        var response = await CreateProvider(client).SpeechRequest(request);
+        var provider = CreateProvider(client);
+        var response = await provider.SpeechRequest(request);
 
         Assert.NotNull(payload);
         AssertDefaultSpeechPayload(payload.Value, stream: false);
@@ -169,7 +170,7 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
         Assert.Equal("audio/mpeg", response.Audio.MimeType);
 
         payload = null;
-        await CreateProvider(client).SpeechRequest(new SpeechRequest
+        await provider.SpeechRequest(new SpeechRequest
         {
             Model = "speech-01",
             Text = "Hello",
