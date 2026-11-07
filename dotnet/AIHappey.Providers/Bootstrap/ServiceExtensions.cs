@@ -641,6 +641,7 @@ using AIHappey.Core.Providers.SundayPyjamas;
 using AIHappey.Core.Providers.BaguetteBot;
 using AIHappey.Core.Providers.Jenova;
 using AIHappey.Core.Providers.ResearchAgent;
+using AIHappey.Core.Providers.Athena;
 using AIHappey.Core.Providers.Amnt;
 using AIHappey.Core.Providers.Waslo;
 using AIHappey.Core.Providers.Founden;
@@ -1359,6 +1360,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, BaguetteBotProvider>();
         services.AddScoped<IModelProvider, JenovaProvider>();
         services.AddScoped<IModelProvider, ResearchAgentProvider>();
+        services.AddScoped<IModelProvider, AthenaProvider>();
         services.AddScoped<IModelProvider, AmntProvider>();
         services.AddScoped<IModelProvider, AntimatterProvider>();
         services.AddScoped<IModelProvider, WasloProvider>();

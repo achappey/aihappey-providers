@@ -3,7 +3,6 @@ using System.Net.ServerSentEvents;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.Together;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Models;
@@ -141,17 +140,14 @@ public partial class TogetherProvider
             throw new ArgumentException("Together speech provider options must be an object.");
 
         var model = NormalizeTogetherModelName(request.Model);
-        var typedMetadata = metadata.Deserialize<TogetherSpeechProviderMetadata>(SpeechSettings);
         var voice = partVoice ?? request.Voice;
         if (string.IsNullOrWhiteSpace(voice))
             voice = ReadTogetherSpeechString(metadata, "voice")
-                    ?? ResolveVoice(model, new SpeechRequest(), typedMetadata);
+                    ?? ResolveVoice(model, new SpeechRequest(), metadata);
         if (string.IsNullOrWhiteSpace(voice))
             throw new ArgumentException("'voice' is required for Together TTS.", nameof(request));
 
-        var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
-        foreach (var property in metadata.EnumerateObject())
-            payload[property.Name] = property.Value.Clone();
+        var payload = CopyTogetherSpeechOptions(metadata);
 
         var encoding = ReadTogetherSpeechString(metadata, "response_encoding") ?? "pcm_s16le";
         var format = request.OutputFormat?.Type?.Trim().ToLowerInvariant();
@@ -162,7 +158,7 @@ public partial class TogetherProvider
             throw new NotSupportedException($"Together streaming speech does not support encoding '{encoding}'.");
 
         var sampleRate = ProviderNumericConversions.ToInt32Exact(request.OutputFormat?.Rate, "outputFormat.rate")
-                         ?? typedMetadata?.SampleRate
+                         ?? GetTogetherSpeechOption<int?>(metadata, "sample_rate")
                          ?? 24000;
         if (sampleRate <= 0)
             throw new ArgumentOutOfRangeException(nameof(request.OutputFormat), "Together sample rate must be positive.");
