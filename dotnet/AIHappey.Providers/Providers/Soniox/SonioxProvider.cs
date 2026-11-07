@@ -12,7 +12,6 @@ using AIHappey.Messages;
 using AIHappey.Unified.Models;
 using System.Runtime.CompilerServices;
 using AIHappey.Core.Models;
-using AIHappey.Common.Model.Providers.Soniox;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AIHappey.Core.Extensions;
@@ -104,13 +103,14 @@ public partial class SonioxProvider : IModelProvider
     {
         ArgumentNullException.ThrowIfNull(realtimeRequest);
 
-        SonioxRealtimeProviderMetadata? metadata = null;
+        JsonElement? metadata = null;
         var config = new JsonObject();
         if (realtimeRequest.ProviderOptions?.TryGetValue(GetIdentifier(), out var options) == true)
         {
             if (options.ValueKind is not (JsonValueKind.Object or JsonValueKind.Null))
                 throw new JsonException("Soniox realtime provider options must be a JSON object.");
-            metadata = options.Deserialize<SonioxRealtimeProviderMetadata>(SonioxJsonOptions);
+            if (options.ValueKind == JsonValueKind.Object)
+                metadata = options;
             if (options.ValueKind == JsonValueKind.Object)
             {
                 foreach (var property in options.EnumerateObject())
@@ -125,27 +125,45 @@ public partial class SonioxProvider : IModelProvider
             }
         }
 
+        JsonElement? ReadMetadataValue(string name)
+        {
+            if (metadata is not { ValueKind: JsonValueKind.Object } root)
+                return null;
+
+            JsonElement? value = null;
+            foreach (var property in root.EnumerateObject())
+            {
+                if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                    value = property.Value;
+            }
+
+            return value;
+        }
+
+        var expiresInSeconds = ReadMetadataValue("expires_in_seconds")?.Deserialize<int?>(SonioxJsonOptions) ?? 1800;
+        var maxSessionDurationSeconds = ReadMetadataValue("max_session_duration_seconds")?.Deserialize<int?>(SonioxJsonOptions);
+        var clientReferenceId = ReadMetadataValue("client_reference_id")?.Deserialize<string?>(SonioxJsonOptions);
+
         config["model"] = string.IsNullOrWhiteSpace(realtimeRequest.Model)
             ? "stt-rt-v6"
             : NormalizeSonioxModel(realtimeRequest.Model);
         if (!config.ContainsKey("audio_format"))
             config["audio_format"] = "auto";
 
-        var expiresInSeconds = metadata?.ExpiresInSeconds ?? 1800;
         if (expiresInSeconds is < 1 or > 3600)
             throw new ArgumentOutOfRangeException(nameof(realtimeRequest), "Soniox expires_in_seconds must be between 1 and 3600.");
-        if (metadata?.MaxSessionDurationSeconds is < 1 or > 18000)
+        if (maxSessionDurationSeconds is < 1 or > 18000)
             throw new ArgumentOutOfRangeException(nameof(realtimeRequest), "Soniox max_session_duration_seconds must be between 1 and 18000.");
-        if (metadata?.ClientReferenceId?.Length > 256)
+        if (clientReferenceId?.Length > 256)
             throw new ArgumentException("Soniox client_reference_id cannot exceed 256 characters.", nameof(realtimeRequest));
 
         var payload = new Dictionary<string, object?>
         {
             ["usage_type"] = "transcribe_websocket",
             ["expires_in_seconds"] = expiresInSeconds,
-            ["client_reference_id"] = metadata?.ClientReferenceId,
+            ["client_reference_id"] = clientReferenceId,
             ["single_use"] = true,
-            ["max_session_duration_seconds"] = metadata?.MaxSessionDurationSeconds
+            ["max_session_duration_seconds"] = maxSessionDurationSeconds
         };
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/auth/temporary-api-key")
         {
