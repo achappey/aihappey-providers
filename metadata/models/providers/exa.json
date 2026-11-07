@@ -37,6 +37,26 @@
       "type": "language"
     },
     {
+      "id": "exa/keyword",
+      "object": "model",
+      "owned_by": "Exa",
+      "name": "keyword",
+      "type": "language",
+      "tags": [
+        "search"
+      ]
+    },
+    {
+      "id": "exa/hybrid",
+      "object": "model",
+      "owned_by": "Exa",
+      "name": "hybrid",
+      "type": "language",
+      "tags": [
+        "search"
+      ]
+    },
+    {
       "id": "exa/fast",
       "object": "model",
       "owned_by": "Exa",
