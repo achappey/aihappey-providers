@@ -2283,7 +2283,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "4beecae4e54f772e225c18d78e5a22ea50c3c7e5b30b7ae6990fd13c1e1c2e90"
+      "sha256": "3cd7fb5e59a2278e0a92ab70ffa7ddae625c774cc368beb5b6bc2a8d8a6b675f"
     },
     {
       "file": "providers/infercom.json",
@@ -3764,6 +3764,10 @@
     {
       "file": "providers/unrealspeech.json",
       "sha256": "c146c8b9e51b6b1f0432d661541cf58a4b14cebca3e1b5231fc606ebaefedb16"
+    },
+    {
+      "file": "providers/upivia.json",
+      "sha256": "fbdec2fd6b619ef7d128d0b0e54b96f351e9edcb45aaa6f54fb6567d02c09e64"
     },
     {
       "file": "providers/upstage.json",
