@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.HumeAI;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Extensions;
@@ -95,21 +94,26 @@ public partial class HumeAIProvider
             throw new ArgumentException("Model is required.", nameof(request));
 
         var warnings = new List<object>();
-        var metadata = request.GetProviderMetadata<HumeAISpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null or JsonValueKind.Object))
+            throw new JsonException("HumeAI provider options must be a JSON object.");
+
         var (baseModelId, modelVoiceProvider, modelVoiceId) = ParseSpeechModel(request.Model);
 
         if (!string.Equals(baseModelId, BaseSpeechModel, StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException($"Unsupported {ProviderName} speech model '{baseModelId}'. Use '{BaseSpeechModel}'.", nameof(request));
 
-        var outputFormat = NormalizeOutputFormat(request.OutputFormat ?? metadata?.OutputFormat) ?? "mp3";
+        var outputFormat = NormalizeOutputFormat(request.OutputFormat ?? ReadMetadataValue<string>(metadata, "output_format")) ?? "mp3";
         if (outputFormat is not "mp3" and not "wav" and not "pcm")
             throw new NotSupportedException($"HumeAI TTS response format '{outputFormat}' is not supported.");
 
-        var voiceProvider = NormalizeVoiceProvider(modelVoiceProvider ?? metadata?.VoiceProvider);
-        var voiceId = FirstNonEmpty(modelVoiceId, request.Voice, metadata?.VoiceId);
-        var voiceName = string.IsNullOrWhiteSpace(voiceId) ? FirstNonEmpty(metadata?.VoiceName) : null;
+        var metadataVoiceProvider = ReadMetadataValue<string>(metadata, "voice_provider");
+        var metadataVoiceId = ReadMetadataValue<string>(metadata, "voice_id");
+        var voiceProvider = NormalizeVoiceProvider(modelVoiceProvider ?? metadataVoiceProvider);
+        var voiceId = FirstNonEmpty(modelVoiceId, request.Voice, metadataVoiceId);
+        var voiceName = string.IsNullOrWhiteSpace(voiceId) ? FirstNonEmpty(ReadMetadataValue<string>(metadata, "voice_name")) : null;
         var voice = BuildVoiceRef(voiceId, voiceName, voiceProvider);
-        var version = NormalizeOctaveVersion(metadata?.Version);
+        var version = NormalizeOctaveVersion(ReadMetadataValue<string>(metadata, "version"));
 
         if (!string.IsNullOrWhiteSpace(modelVoiceId))
         {
@@ -117,58 +121,119 @@ public partial class HumeAIProvider
                 && !string.Equals(request.Voice.Trim(), modelVoiceId, StringComparison.OrdinalIgnoreCase))
                 warnings.Add(new { type = "ignored", feature = "voice", reason = "voice is derived from model id" });
 
-            if (!string.IsNullOrWhiteSpace(metadata?.VoiceId)
-                && !string.Equals(metadata.VoiceId.Trim(), modelVoiceId, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(metadataVoiceId)
+                && !string.Equals(metadataVoiceId.Trim(), modelVoiceId, StringComparison.OrdinalIgnoreCase))
                 warnings.Add(new { type = "ignored", feature = "providerOptions.humeai.voice_id", reason = "voice is derived from model id" });
         }
 
         if (!string.IsNullOrWhiteSpace(modelVoiceProvider)
-            && !string.IsNullOrWhiteSpace(metadata?.VoiceProvider)
-            && !string.Equals(NormalizeVoiceProvider(metadata.VoiceProvider), modelVoiceProvider, StringComparison.OrdinalIgnoreCase))
+            && !string.IsNullOrWhiteSpace(metadataVoiceProvider)
+            && !string.Equals(NormalizeVoiceProvider(metadataVoiceProvider), modelVoiceProvider, StringComparison.OrdinalIgnoreCase))
             warnings.Add(new { type = "ignored", feature = "providerOptions.humeai.voice_provider", reason = "voice provider is derived from model id" });
 
         if (string.Equals(version, "2", StringComparison.Ordinal) && voice is null)
             throw new ArgumentException("HumeAI Octave version 2 requires a voice. Supply request.voice, providerOptions.humeai.voice_id, providerOptions.humeai.voice_name, or a voice shortcut model.", nameof(request));
-        if (streaming && metadata?.InstantMode is not false && voice is null)
+        var instantMode = ReadMetadataValue<bool?>(metadata, "instant_mode");
+        var numGenerations = ReadMetadataValue<int?>(metadata, "num_generations");
+        if (streaming && instantMode is not false && voice is null)
             throw new ArgumentException("HumeAI instant-mode streaming requires a voice. Supply request.voice or use a voice shortcut model.", nameof(request));
-        if (streaming && metadata?.InstantMode is not false && metadata?.NumGenerations is > 1)
+        if (streaming && instantMode is not false && numGenerations is > 1)
             throw new ArgumentException("HumeAI instant-mode streaming supports only one generation.", nameof(request));
 
         if (!string.IsNullOrWhiteSpace(request.Language))
             warnings.Add(new { type = "unsupported", feature = "language", reason = "HumeAI TTS language is voice-dependent" });
-        if (!streaming && metadata?.NumGenerations is > 1)
+        if (!streaming && numGenerations is > 1)
             warnings.Add(new { type = "partial", feature = "num_generations", reason = "Only the first generation is returned as the normalized audio response; all generation ids are included in provider metadata." });
-        if (!streaming && metadata?.InstantMode is true)
+        if (!streaming && instantMode is true)
             warnings.Add(new { type = "ignored", feature = "providerOptions.humeai.instant_mode", reason = "instant_mode is only supported by HumeAI streaming TTS endpoints" });
 
         var utterance = new Dictionary<string, object?>
         {
             ["text"] = request.Text
         };
-        AddIfNotNull(utterance, "description", FirstNonEmpty(request.Instructions, metadata?.Description));
+        AddIfNotNull(utterance, "description", FirstNonEmpty(request.Instructions, ReadMetadataValue<string>(metadata, "description")));
         AddIfNotNull(utterance, "speed", request.Speed is null ? null : (double?)request.Speed.Value);
-        AddIfNotNull(utterance, "trailing_silence", metadata?.TrailingSilence);
+        AddIfNotNull(utterance, "trailing_silence", ReadMetadataValue<double?>(metadata, "trailing_silence"));
         AddIfNotNull(utterance, "voice", voice);
 
-        var payload = new Dictionary<string, object?>
-        {
-            ["utterances"] = new[] { utterance },
-            ["format"] = new Dictionary<string, object?> { ["type"] = outputFormat }
-        };
+        var payload = CopyUnmappedMetadata(metadata);
+        payload["utterances"] = new[] { utterance };
+        payload["format"] = new Dictionary<string, object?> { ["type"] = outputFormat };
         AddIfNotNull(payload, "version", version);
-        AddIfNotNull(payload, "temperature", metadata?.Temperature);
-        AddIfNotNull(payload, "num_generations", metadata?.NumGenerations);
-        AddIfNotNull(payload, "split_utterances", metadata?.SplitUtterances);
-        AddIfNotNull(payload, "strip_headers", metadata?.StripHeaders);
-        AddIfNotNull(payload, "include_timestamp_types", NormalizeTimestampTypes(metadata?.IncludeTimestampTypes));
+        AddIfNotNull(payload, "temperature", ReadMetadataValue<double?>(metadata, "temperature"));
+        AddIfNotNull(payload, "num_generations", numGenerations);
+        AddIfNotNull(payload, "split_utterances", ReadMetadataValue<bool?>(metadata, "split_utterances"));
+        AddIfNotNull(payload, "strip_headers", ReadMetadataValue<bool?>(metadata, "strip_headers"));
+        AddIfNotNull(payload, "include_timestamp_types", NormalizeTimestampTypes(ReadMetadataValue<IReadOnlyList<string>>(metadata, "include_timestamp_types")));
         AddIfNotNull(payload, "context", BuildContext(metadata));
 
         if (streaming)
-            payload["instant_mode"] = metadata?.InstantMode ?? true;
-        else if (metadata?.InstantMode is false)
+            payload["instant_mode"] = instantMode ?? true;
+        else if (instantMode is false)
             payload["instant_mode"] = false;
 
         return (payload, outputFormat, warnings);
+    }
+
+    private static Dictionary<string, object?> CopyUnmappedMetadata(JsonElement metadata)
+    {
+        var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (metadata.ValueKind != JsonValueKind.Object)
+            return payload;
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (IsMappedMetadataProperty(property.Name))
+                continue;
+
+            payload[property.Name] = property.Value.Clone();
+        }
+
+        return payload;
+    }
+
+    private static bool IsMappedMetadataProperty(string name)
+        => name.Equals("voice_id", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("voice_name", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("voice_provider", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("description", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("version", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("output_format", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("temperature", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("num_generations", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("split_utterances", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("strip_headers", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("include_timestamp_types", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("context_generation_id", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("context_utterances", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("trailing_silence", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("instant_mode", StringComparison.OrdinalIgnoreCase);
+
+    private static T? ReadMetadataValue<T>(JsonElement metadata, string propertyName)
+    {
+        if (!TryGetMetadataProperty(metadata, propertyName, out var value)
+            || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return default;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static bool TryGetMetadataProperty(JsonElement metadata, string propertyName, out JsonElement value)
+    {
+        if (metadata.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    value = property.Value;
+                    return true;
+                }
+            }
+        }
+
+        value = default;
+        return false;
     }
 
     private static (string BaseModelId, string? VoiceProvider, string? VoiceId) ParseSpeechModel(string model)
@@ -269,28 +334,55 @@ public partial class HumeAIProvider
             dictionary[key] = value;
     }
 
-    private static Dictionary<string, object?>? BuildContext(HumeAISpeechProviderMetadata? metadata)
+    private static Dictionary<string, object?>? BuildContext(JsonElement metadata)
     {
-        if (!string.IsNullOrWhiteSpace(metadata?.ContextGenerationId))
-            return new Dictionary<string, object?> { ["generation_id"] = metadata.ContextGenerationId.Trim() };
+        var generationId = ReadMetadataValue<string>(metadata, "context_generation_id");
+        if (!string.IsNullOrWhiteSpace(generationId))
+            return new Dictionary<string, object?> { ["generation_id"] = generationId.Trim() };
 
-        if (metadata?.ContextUtterances is null || metadata.ContextUtterances.Count == 0)
+        if (!TryGetMetadataProperty(metadata, "context_utterances", out var contextUtterances)
+            || contextUtterances.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
             return null;
+        if (contextUtterances.ValueKind != JsonValueKind.Array)
+            throw new JsonException("HumeAI context_utterances must be a JSON array.");
 
-        var utterances = metadata.ContextUtterances
-            .Where(u => !string.IsNullOrWhiteSpace(u.Text))
-            .Select(u =>
+        var utterances = new List<Dictionary<string, object?>>();
+        foreach (var contextUtterance in contextUtterances.EnumerateArray())
+        {
+            if (contextUtterance.ValueKind != JsonValueKind.Object)
+                throw new JsonException("HumeAI context_utterances entries must be JSON objects.");
+
+            var text = ReadMetadataValue<string>(contextUtterance, "text");
+            if (string.IsNullOrWhiteSpace(text))
+                continue;
+
+            var utterance = new Dictionary<string, object?>(StringComparer.Ordinal);
+            foreach (var property in contextUtterance.EnumerateObject())
             {
-                var utterance = new Dictionary<string, object?> { ["text"] = u.Text };
-                AddIfNotNull(utterance, "description", u.Description);
-                AddIfNotNull(utterance, "speed", u.Speed);
-                AddIfNotNull(utterance, "trailing_silence", u.TrailingSilence);
-                AddIfNotNull(utterance, "voice", BuildVoiceRef(u.VoiceId, u.VoiceName, NormalizeVoiceProvider(u.VoiceProvider)));
-                return utterance;
-            })
-            .ToArray();
+                if (property.Name.Equals("text", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("description", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("speed", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("trailing_silence", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("voice_id", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("voice_name", StringComparison.OrdinalIgnoreCase)
+                    || property.Name.Equals("voice_provider", StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-        return utterances.Length == 0
+                utterance[property.Name] = property.Value.Clone();
+            }
+
+            utterance["text"] = text;
+            AddIfNotNull(utterance, "description", ReadMetadataValue<string>(contextUtterance, "description"));
+            AddIfNotNull(utterance, "speed", ReadMetadataValue<double?>(contextUtterance, "speed"));
+            AddIfNotNull(utterance, "trailing_silence", ReadMetadataValue<double?>(contextUtterance, "trailing_silence"));
+            AddIfNotNull(utterance, "voice", BuildVoiceRef(
+                ReadMetadataValue<string>(contextUtterance, "voice_id"),
+                ReadMetadataValue<string>(contextUtterance, "voice_name"),
+                NormalizeVoiceProvider(ReadMetadataValue<string>(contextUtterance, "voice_provider"))));
+            utterances.Add(utterance);
+        }
+
+        return utterances.Count == 0
             ? null
             : new Dictionary<string, object?> { ["utterances"] = utterances };
     }
