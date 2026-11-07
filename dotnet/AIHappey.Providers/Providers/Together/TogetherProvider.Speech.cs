@@ -4,7 +4,6 @@ using System.Text;
 using System.Net.Mime;
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.Together;
 using AIHappey.Vercel.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Core.Extensions;
@@ -37,7 +36,8 @@ public partial class TogetherProvider
         if (request.Speed is not null)
             warnings.Add(new { type = "unsupported", feature = "speed" });
 
-        var metadata = request.GetProviderMetadata<TogetherSpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var payload = CopyTogetherSpeechOptions(metadata);
 
         // Accept both: "together/<model>" and "<model>".
         var modelName = NormalizeTogetherModelName(request.Model);
@@ -48,24 +48,23 @@ public partial class TogetherProvider
 
         var responseFormat =
             request.OutputFormat
-            ?? metadata?.ResponseFormat
+            ?? GetTogetherSpeechOption<string?>(metadata, "response_format")
             ?? "wav";
 
-        var language = request.Language ?? metadata?.Language;
+        var language = request.Language ?? GetTogetherSpeechOption<string?>(metadata, "language");
 
-        var payload = new Dictionary<string, object?>
-        {
-            ["model"] = modelName,
-            ["input"] = request.Text,
-            ["voice"] = voice,
-            ["language"] = language,
-            ["response_encoding"] = metadata?.ResponseEncoding,
-            ["sample_rate"] = metadata?.SampleRate,
-            ["stream"] = false
-        };
+        payload["model"] = modelName;
+        payload["input"] = request.Text;
+        payload["voice"] = voice;
+        payload["language"] = language;
+        payload["response_encoding"] = GetTogetherSpeechOption<string?>(metadata, "response_encoding");
+        payload["sample_rate"] = GetTogetherSpeechOption<int?>(metadata, "sample_rate");
+        payload["stream"] = false;
 
         if (!string.IsNullOrWhiteSpace(responseFormat))
             payload["response_format"] = responseFormat;
+        else
+            payload.Remove("response_format");
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v1/audio/speech")
         {
@@ -132,24 +131,67 @@ public partial class TogetherProvider
     private static string? ResolveVoice(
         string modelName,
         SpeechRequest request,
-        TogetherSpeechProviderMetadata? metadata)
+        JsonElement? metadata)
     {
         if (!string.IsNullOrWhiteSpace(request.Voice))
             return request.Voice;
 
-        // Route to per-model-family voice settings.
-        if (modelName.StartsWith("cartesia/", StringComparison.OrdinalIgnoreCase))
-            return metadata?.Cartesia?.Voice;
+        var voice = GetTogetherSpeechOption<string?>(metadata, "voice");
+        if (!string.IsNullOrWhiteSpace(voice))
+            return voice;
 
-        if (modelName.StartsWith("hexgrad/", StringComparison.OrdinalIgnoreCase))
-            return metadata?.Hexgrad?.Voice;
+        var modelFamily = modelName.Split('/', 2)[0];
+        if (metadata is not { ValueKind: JsonValueKind.Object } || !TryGetTogetherSpeechOption(
+                metadata.Value, modelFamily, out var familyOptions))
+            return null;
 
-        if (modelName.StartsWith("canopylabs/", StringComparison.OrdinalIgnoreCase))
-            return metadata?.CanopyLabs?.Voice;
+        if (familyOptions.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return null;
+        if (familyOptions.ValueKind != JsonValueKind.Object)
+            throw new JsonException($"Together speech option '{modelFamily}' must be an object.");
 
-        // Fallback: allow a generic voice in provider metadata in case new model families appear.
-        // (Together's OpenAPI keeps voice at top-level, but our metadata stores it per-family.)
-        return null;
+        return GetTogetherSpeechOption<string?>(familyOptions, "voice");
+    }
+
+    private static Dictionary<string, object?> CopyTogetherSpeechOptions(JsonElement? metadata)
+    {
+        if (metadata is null || metadata.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return [];
+
+        if (metadata.Value.ValueKind != JsonValueKind.Object)
+            throw new JsonException("Together speech provider options must be a JSON object.");
+
+        var options = new Dictionary<string, object?>(StringComparer.Ordinal);
+        foreach (var property in metadata.Value.EnumerateObject())
+            options[property.Name] = property.Value.Clone();
+        return options;
+    }
+
+    private static T? GetTogetherSpeechOption<T>(JsonElement? metadata, string name)
+    {
+        if (metadata is not { ValueKind: JsonValueKind.Object }
+            || !TryGetTogetherSpeechOption(metadata.Value, name, out var value))
+            return default;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static bool TryGetTogetherSpeechOption(
+        JsonElement metadata,
+        string name,
+        out JsonElement value)
+    {
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
     }
 
     private static string ResolveSpeechMimeType(string? responseFormat, string? contentType)
