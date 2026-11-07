@@ -4,6 +4,7 @@ using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.NanoGPT;
+using AIHappey.Decisions;
 using AIHappey.Vercel.Models;
 
 namespace AIHappey.Tests;
