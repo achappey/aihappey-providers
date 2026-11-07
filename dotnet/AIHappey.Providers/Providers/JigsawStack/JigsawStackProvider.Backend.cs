@@ -81,13 +81,21 @@ public partial class JigsawStackProvider
         JigsawStackProviderMetadata? metadata,
         CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         if (texts.Count == 0 || texts.All(string.IsNullOrWhiteSpace))
             throw new ArgumentException("No prompt provided.", nameof(texts));
 
         var route = BuildRoute(model, texts, metadata);
-        using var response = await _client.PostAsJsonAsync(route.Endpoint, route.Payload, JsonWeb, cancellationToken);
+        var key = _keyResolver.Resolve(GetIdentifier());
+        if (string.IsNullOrWhiteSpace(key))
+            throw new InvalidOperationException($"No {nameof(JigsawStack)} API key.");
+
+        using var message = new HttpRequestMessage(HttpMethod.Post, route.Endpoint)
+        {
+            Content = JsonContent.Create(route.Payload, options: JsonWeb)
+        };
+        message.Headers.Add("x-api-key", key);
+
+        using var response = await _client.SendAsync(message, cancellationToken);
         var raw = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)

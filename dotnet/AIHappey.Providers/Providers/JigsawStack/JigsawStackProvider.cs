@@ -21,17 +21,6 @@ public partial class JigsawStackProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.jigsawstack.com/");
     }
 
-    private void ApplyAuthHeader()
-    {
-        var key = _keyResolver.Resolve(GetIdentifier());
-
-        if (string.IsNullOrWhiteSpace(key))
-            throw new InvalidOperationException($"No {nameof(JigsawStack)} API key.");
-
-        _client.DefaultRequestHeaders.Remove("x-api-key");
-        _client.DefaultRequestHeaders.Add("x-api-key", key);
-    }
-
     public string GetIdentifier() => nameof(JigsawStack).ToLowerInvariant();
 
     
