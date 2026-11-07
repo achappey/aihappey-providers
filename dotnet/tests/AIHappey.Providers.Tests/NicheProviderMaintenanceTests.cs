@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.FishAudio;
+using AIHappey.Core.Providers.JigsawStack;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.ZeroEntropy;
@@ -113,6 +114,30 @@ public sealed class NicheProviderMaintenanceTests
 
         Assert.Equal(2, requestCount);
         Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Jigsawstack_authentication_is_attached_to_each_request_not_the_shared_client()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("/v1/ai/summary", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.GetValues("x-api-key").Single());
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("Summarize this", payload.RootElement.GetProperty("text").GetString());
+            Assert.Equal("text", payload.RootElement.GetProperty("type").GetString());
+            return JsonResponse("""{"summary":"A summary"}""");
+        });
+        var provider = new JigsawStackProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var response = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "summary/text",
+            Messages = [new() { Role = "user", Content = "Summarize this" }]
+        }, CancellationToken.None);
+
+        Assert.Equal("A summary", Assert.Single(response.Choices).Message.Content);
+        Assert.Empty(client.DefaultRequestHeaders);
     }
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)
