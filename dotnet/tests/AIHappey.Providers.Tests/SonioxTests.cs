@@ -44,7 +44,8 @@ public sealed class SonioxTests
               "language_hints":["en","es"],"language_hints_strict":true,
               "enable_speaker_diarization":true,"enable_language_identification":true,
               "context":{"terms":["Faro"],"future_context_option":{"enabled":true}},
-              "translation":{"type":"one_way","target_language":"es"},"future_option":{"value":7}
+              "translation":{"type":"one_way","target_language":"es"},"future_option":{"value":7},
+              "future_number":42,"future_string":"unchanged","future_null":null
             }
             """);
 
