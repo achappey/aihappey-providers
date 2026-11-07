@@ -52,35 +52,35 @@ public partial class TextSynthProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.textsynth.com/");
     }
 
-    private void ApplyAuthHeader()
+    private AuthenticationHeaderValue GetAuthHeader()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(TextSynth)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return new AuthenticationHeaderValue("Bearer", key);
     }
+
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
+        => new Dictionary<string, string>
+        {
+            ["Authorization"] = GetAuthHeader().ToString()
+        };
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-    {
-        ApplyAuthHeader();
-
-        return await this.GetChatCompletion(_client,
-             options,
-             relativeUrl: $"v1/engines/{options.Model}/completions",
-             cancellationToken: cancellationToken);
-    }
+        => await this.GetChatCompletion(_client,
+            options,
+            requestHeaders: GetAuthHeaders(),
+            relativeUrl: $"v1/engines/{options.Model}/completions",
+            cancellationToken: cancellationToken);
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-    {
-        ApplyAuthHeader();
-
-        return this.GetChatCompletions(_client,
-                    options,
-                    relativeUrl: $"v1/engines/{options.Model}/completions",
-                    cancellationToken: cancellationToken);
-    }
+        => this.GetChatCompletions(_client,
+            options,
+            requestHeaders: GetAuthHeaders(),
+            relativeUrl: $"v1/engines/{options.Model}/completions",
+            cancellationToken: cancellationToken);
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
            => await ListModelsInternal(cancellationToken);

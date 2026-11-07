@@ -12,8 +12,6 @@ public partial class TextSynthProvider
 {
     private async Task<SpeechResponse> TextSynthSpeechRequest(SpeechRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -84,6 +82,8 @@ public partial class TextSynthProvider
             Content = new StringContent(body, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
+        httpRequest.Headers.Authorization = GetAuthHeader();
+
         using var response = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
@@ -120,4 +120,3 @@ public partial class TextSynthProvider
         };
     }
 }
-
