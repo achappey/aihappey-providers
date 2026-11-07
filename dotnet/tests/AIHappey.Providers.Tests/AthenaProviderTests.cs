@@ -32,6 +32,7 @@ public sealed class AthenaProviderTests
         var response = await provider.ExecuteUnifiedAsync(new AIRequest
         {
             Model = "athena/general",
+            ProviderId = "athena",
             Instructions = "Be concise.",
             Input = new AIInput
             {
