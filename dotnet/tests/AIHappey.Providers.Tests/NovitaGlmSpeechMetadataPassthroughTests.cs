@@ -101,8 +101,9 @@ public sealed class NovitaGlmSpeechMetadataPassthroughTests
             payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
             return AudioResponse();
         });
+        var provider = CreateProvider(client);
 
-        await CreateProvider(client).SpeechRequest(new SpeechRequest
+        await provider.SpeechRequest(new SpeechRequest
         {
             Model = "glm-tts",
             Text = "Hello"
@@ -115,7 +116,7 @@ public sealed class NovitaGlmSpeechMetadataPassthroughTests
         Assert.Equal(JsonValueKind.Null, payload.GetProperty("watermark_enabled").ValueKind);
 
         payload = default;
-        await CreateProvider(client).SpeechRequest(new SpeechRequest
+        await provider.SpeechRequest(new SpeechRequest
         {
             Model = "glm-tts",
             Text = "Hello",
