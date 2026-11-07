@@ -1015,7 +1015,7 @@
     },
     {
       "file": "pricing/providers/cohere.json",
-      "sha256": "97ef4681ee503eb3c66a6da9c4f5c1b1cd4c10310980584ef6840219893af0cf"
+      "sha256": "e0e843021024b520ff16eb2d1fafcfdf2bab6cd2bc0f5203dd229cef6079b613"
     },
     {
       "file": "pricing/providers/deepbricks.json",
@@ -1051,7 +1051,7 @@
     },
     {
       "file": "pricing/providers/google.json",
-      "sha256": "cbf1ec56037cefdcf43a8bd2955f79fe6f9ea6db70a3bb5eaf6e8403158f02be"
+      "sha256": "91065288b5666d32d149a19b7f4fcd5528af747b1d7f83f5ca070c94ec88504a"
     },
     {
       "file": "pricing/providers/google/batch.json",
@@ -1502,6 +1502,10 @@
       "sha256": "cb4e3c6fd690a467cf30bbd52174d129d61082cf9613a3177e0e5097f645102e"
     },
     {
+      "file": "providers/athena.json",
+      "sha256": "6871b436da17be4c9f29a8a3a3d659442faa84bc70027eeeded57d6018126a92"
+    },
+    {
       "file": "providers/atlascloud.json",
       "sha256": "c8a1521eb0c5bba952142bc3b7c3b5ed38a924140b26bd53a9bfa1a8d634784f"
     },
@@ -1931,7 +1935,7 @@
     },
     {
       "file": "providers/edgespeak.json",
-      "sha256": "836acc6f46c92c46920c7f05abe354a0bc18b562710c4bcc68b06b5562c4da64"
+      "sha256": "56d0b4ac1b729c640fe3f33521d1dfd8e438f017dfbe962c62b7674c128ccd5d"
     },
     {
       "file": "providers/electronhub.json",
@@ -2283,7 +2287,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "3cd7fb5e59a2278e0a92ab70ffa7ddae625c774cc368beb5b6bc2a8d8a6b675f"
+      "sha256": "2afde82fce1ba0fbd5ca3636f631f9998d684e0d18757a1413bfe0b4f93d7719"
     },
     {
       "file": "providers/infercom.json",
@@ -2626,10 +2630,6 @@
       "sha256": "8426026813d0394c8b3c0574d1082108911934279c3c63709f02202c6eddf467"
     },
     {
-      "file": "providers/mara.json",
-      "sha256": "26c0dd68f71ee2206f6271ff350ccbd6129f3575f097c5c5c16e003356f16ffc"
-    },
-    {
       "file": "providers/maritacaai.json",
       "sha256": "0d3e4eecab0973e469fd4f361a9dac8b19520098be3d5cc9ae293a53142fad60"
     },
@@ -2892,6 +2892,10 @@
     {
       "file": "providers/noiz.json",
       "sha256": "23075fcd70b5b7513a4db55155ca4fec125e89935b83f6208bb27f4cf5e09226"
+    },
+    {
+      "file": "providers/nolgia.json",
+      "sha256": "4957d95236b8a2aacc1b2e5c370b5411fce715619d1efd99ccdb4124bc2e56b5"
     },
     {
       "file": "providers/nomic.json",
@@ -3468,6 +3472,10 @@
     {
       "file": "providers/simplismart.json",
       "sha256": "9eb33f057223c4503df4b15b1e58e7fdfe7874658612741937626f9878a02e16"
+    },
+    {
+      "file": "providers/sippulseai.json",
+      "sha256": "7005b11facd5c692eead75bd4446fcf17208d91212ab8a67c9893c2ea17bb937"
     },
     {
       "file": "providers/skypooltoken.json",
