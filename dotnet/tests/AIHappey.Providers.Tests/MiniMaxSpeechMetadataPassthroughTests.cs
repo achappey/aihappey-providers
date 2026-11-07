@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
+using AIHappey.Core.Models;
 using AIHappey.Core.Providers.MiniMax;
 using AIHappey.Vercel.Models;
 
@@ -50,7 +51,7 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
             }
             """);
         JsonElement payload = default;
-        using var client = CreateClient(request =>
+        using var client = CreateSpeechClient(request =>
         {
             Assert.Equal("/v1/t2a_v2", request.RequestUri!.AbsolutePath);
             payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
@@ -76,7 +77,12 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
             metadata,
             clientBoundary.GetProperty("providerOptions").GetProperty("minimax")));
 
-        await CreateProvider(client).SpeechRequest(request);
+        var response = await CreateProvider(client).SpeechRequest(request);
+
+        Assert.Equal("AA==", response.Audio.Base64);
+        Assert.Equal("audio/wav", response.Audio.MimeType);
+        Assert.Equal(1, response.ProviderMetadata["minimax"].GetProperty("extra_info").GetProperty("usage_characters").GetInt32());
+        Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions["minimax"]));
 
         Assert.Equal("speech-01", payload.GetProperty("model").GetString());
         Assert.Equal("Hello", payload.GetProperty("text").GetString());
@@ -133,54 +139,91 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
             payload.EnumerateObject().Select(property => property.Name).Order());
     }
 
-    [Fact]
-    public async Task Defaults_validation_null_omission_and_upstream_errors_remain_compatible()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("null")]
+    [InlineData("{}")]
+    [InlineData("""{"voice_setting":null,"audio_setting":null,"pronunciation_dict":null,"voice_modify":null}""")]
+    public async Task Defaults_validation_null_omission_and_upstream_errors_remain_compatible(string? metadataJson)
     {
         JsonElement? payload = null;
-        using var client = CreateClient(request =>
+        using var client = CreateSpeechClient(request =>
         {
             payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
             return JsonResponse("""{"data":{"audio":"00"}}""");
         });
 
-        await CreateProvider(client).SpeechRequest(new SpeechRequest
+        var request = new SpeechRequest
         {
             Model = "speech-01",
             Text = "Hello"
-        });
+        };
+        if (metadataJson is not null)
+            request.ProviderOptions = new() { ["minimax"] = ParseElement(metadataJson) };
+
+        var response = await CreateProvider(client).SpeechRequest(request);
 
         Assert.NotNull(payload);
-        Assert.Equal("English_Insightful_Speaker", payload.Value.GetProperty("voice_setting").GetProperty("voice_id").GetString());
-        Assert.Equal(1, payload.Value.GetProperty("voice_setting").GetProperty("speed").GetDouble());
-        Assert.Equal(1, payload.Value.GetProperty("voice_setting").GetProperty("vol").GetDouble());
-        Assert.Equal(0, payload.Value.GetProperty("voice_setting").GetProperty("pitch").GetInt32());
-        Assert.Equal("mp3", payload.Value.GetProperty("audio_setting").GetProperty("format").GetString());
-        Assert.False(payload.Value.TryGetProperty("language_boost", out _));
-        Assert.False(payload.Value.TryGetProperty("subtitle_enable", out _));
-        Assert.False(payload.Value.TryGetProperty("pronunciation_dict", out _));
-        Assert.False(payload.Value.TryGetProperty("voice_modify", out _));
-        Assert.False(payload.Value.TryGetProperty("audio_base64", out _));
+        AssertDefaultSpeechPayload(payload.Value, stream: false);
+        Assert.Equal("AA==", response.Audio.Base64);
+        Assert.Equal("audio/mpeg", response.Audio.MimeType);
 
         payload = null;
         await CreateProvider(client).SpeechRequest(new SpeechRequest
         {
             Model = "speech-01",
             Text = "Hello",
+            Language = "en-US",
             ProviderOptions = new()
             {
-                ["minimax"] = ParseElement(
-                    """{"lyrics":null,"lyrics_optimizer":null,"audio_url":null,"pronunciation_dict":{"tone":null,"future_null":null},"voice_modify":{"sound_effects":null,"future_null":null}}""")
+                ["minimax"] = ParseElement("""
+                    {
+                      "language_boost": null,
+                      "subtitle_enable": null,
+                      "lyrics": null,
+                      "lyrics_optimizer": null,
+                      "is_instrumental": null,
+                      "audio_base64": null,
+                      "audio_url": null,
+                      "cover_feature_id": null,
+                      "future_null": null,
+                      "voice_setting": {
+                        "voice_id": null, "speed": null, "vol": null, "pitch": null,
+                        "emotion": null, "text_normalization": null, "latex_read": null,
+                        "future_null": null
+                      },
+                      "audio_setting": {
+                        "format": null, "sample_rate": null, "bitrate": null,
+                        "channel": null, "force_cbr": null, "future_null": null
+                      },
+                      "pronunciation_dict": {"tone": null, "future_null": null},
+                      "voice_modify": {
+                        "pitch": null, "intensity": null, "timbre": null,
+                        "sound_effects": null, "future_null": null
+                      }
+                    }
+                    """)
             }
         });
 
         Assert.NotNull(payload);
-        Assert.False(payload.Value.TryGetProperty("lyrics", out _));
-        Assert.False(payload.Value.TryGetProperty("lyrics_optimizer", out _));
-        Assert.False(payload.Value.TryGetProperty("audio_url", out _));
-        Assert.False(payload.Value.GetProperty("pronunciation_dict").TryGetProperty("tone", out _));
-        Assert.Equal(JsonValueKind.Null, payload.Value.GetProperty("pronunciation_dict").GetProperty("future_null").ValueKind);
-        Assert.False(payload.Value.GetProperty("voice_modify").TryGetProperty("sound_effects", out _));
-        Assert.Equal(JsonValueKind.Null, payload.Value.GetProperty("voice_modify").GetProperty("future_null").ValueKind);
+        Assert.True(JsonElement.DeepEquals(ParseElement("""
+            {
+              "model": "speech-01",
+              "text": "Hello",
+              "stream": false,
+              "output_format": "hex",
+              "language_boost": "English",
+              "future_null": null,
+              "voice_setting": {
+                "voice_id": "English_Insightful_Speaker",
+                "speed": 1, "vol": 1, "pitch": 0, "future_null": null
+              },
+              "audio_setting": {"format": "mp3", "future_null": null},
+              "pronunciation_dict": {"future_null": null},
+              "voice_modify": {"future_null": null}
+            }
+            """), payload.Value));
 
         var requestsSent = 0;
         using var invalidClient = CreateClient(_ =>
@@ -213,6 +256,62 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
         Assert.Equal("MiniMax t2a_v2 failed (400): upstream failure", error.Message);
     }
 
+    [Fact]
+    public async Task Streaming_without_metadata_uses_defaults_omits_optional_nulls_and_returns_base64_audio()
+    {
+        JsonElement? payload = null;
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("/v1/t2a_v2", request.RequestUri!.AbsolutePath);
+            Assert.Equal("text/event-stream", Assert.Single(request.Headers.Accept).MediaType);
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"data\":{\"audio\":\"000102\",\"status\":2}}\n\ndata: [DONE]\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+        });
+        var events = new List<IAudioSpeechStreamEvent>();
+
+        await foreach (var streamEvent in CreateProvider(client).OpenAISpeechStreamingAsync(new AudioSpeechRequest
+        {
+            Model = "speech-01",
+            Input = "Hello"
+        }))
+        {
+            events.Add(streamEvent);
+        }
+
+        Assert.NotNull(payload);
+        AssertDefaultSpeechPayload(payload.Value, stream: true);
+        Assert.Collection(events,
+            streamEvent => Assert.Equal("AAEC", Assert.IsType<AudioSpeechStreamDelta>(streamEvent).Audio),
+            streamEvent => Assert.IsType<AudioSpeechStreamDone>(streamEvent));
+    }
+
+    private static void AssertDefaultSpeechPayload(JsonElement payload, bool stream)
+    {
+        var expected = JsonSerializer.SerializeToElement(new
+        {
+            model = "speech-01",
+            text = "Hello",
+            stream,
+            output_format = "hex",
+            voice_setting = new
+            {
+                voice_id = "English_Insightful_Speaker",
+                speed = 1,
+                vol = 1,
+                pitch = 0
+            },
+            audio_setting = new { format = "mp3" }
+        });
+        Assert.True(JsonElement.DeepEquals(expected, payload));
+    }
+
     private static MiniMaxProvider CreateProvider(HttpClient client)
         => new(new StaticApiKeyResolver(), new AsyncCacheHelper(), new StaticHttpClientFactory(client));
 
@@ -224,6 +323,17 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
 
     private static HttpResponseMessage JsonResponse(string json)
         => new(HttpStatusCode.OK) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
+
+    private static HttpClient CreateSpeechClient(Func<HttpRequestMessage, HttpResponseMessage> responder)
+        => CreateClient(request =>
+        {
+            if (request.Method == HttpMethod.Get && request.RequestUri!.AbsolutePath == "/v1/models")
+                return JsonResponse("""{"data":[{"id":"speech-01"}]}""");
+
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("/v1/t2a_v2", request.RequestUri!.AbsolutePath);
+            return responder(request);
+        });
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, HttpResponseMessage> responder)
         => new(new DelegateHttpMessageHandler(responder));

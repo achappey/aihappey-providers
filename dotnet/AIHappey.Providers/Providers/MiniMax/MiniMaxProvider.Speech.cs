@@ -223,19 +223,6 @@ public partial class MiniMaxProvider
         format = format is "mp3" or "wav" or "flac" or "pcm" ? format : "mp3";
 
         var payload = CopyObjectProperties(metadata);
-        RemoveNullProperties(
-            payload,
-            metadata,
-            "language_boost",
-            "subtitle_enable",
-            "pronunciation_dict",
-            "voice_modify",
-            "lyrics",
-            "lyrics_optimizer",
-            "is_instrumental",
-            "audio_base64",
-            "audio_url",
-            "cover_feature_id");
         payload["model"] = request.Model;
         payload["text"] = request.Text;
         payload["stream"] = stream;
@@ -246,6 +233,18 @@ public partial class MiniMaxProvider
         payload["voice_modify"] = BuildRawObject(metadata, "voice_modify", "pitch", "intensity", "timbre", "sound_effects");
         payload["voice_setting"] = BuildVoiceSetting(voiceSetting, voiceId, (float)speed, volume, pitch);
         payload["audio_setting"] = BuildAudioSetting(audioSetting, format);
+        RemoveNullProperties(
+            payload,
+            "language_boost",
+            "subtitle_enable",
+            "pronunciation_dict",
+            "voice_modify",
+            "lyrics",
+            "lyrics_optimizer",
+            "is_instrumental",
+            "audio_base64",
+            "audio_url",
+            "cover_feature_id");
         return payload;
     }
 
@@ -264,6 +263,7 @@ public partial class MiniMaxProvider
         payload["emotion"] = GetValue<string>(metadata, "emotion");
         payload["text_normalization"] = GetValue<bool?>(metadata, "text_normalization");
         payload["latex_read"] = GetValue<bool?>(metadata, "latex_read");
+        RemoveNullProperties(payload, "emotion", "text_normalization", "latex_read");
         return payload;
     }
 
@@ -275,6 +275,7 @@ public partial class MiniMaxProvider
         payload["bitrate"] = GetValue<long?>(metadata, "bitrate");
         payload["channel"] = GetValue<long?>(metadata, "channel");
         payload["force_cbr"] = GetValue<bool?>(metadata, "force_cbr");
+        RemoveNullProperties(payload, "sample_rate", "bitrate", "channel", "force_cbr");
         return payload;
     }
 
@@ -297,19 +298,20 @@ public partial class MiniMaxProvider
             return null;
 
         var payload = CopyObjectProperties(element);
-        RemoveNullProperties(payload, element, nullableProperties);
+        RemoveNullProperties(payload, nullableProperties);
         return payload;
     }
 
     private static void RemoveNullProperties(
         Dictionary<string, object?> payload,
-        JsonElement element,
         params string[] propertyNames)
     {
+        // Null-ignore serialization does not omit dictionary entries. Only prune
+        // known optional fields; unknown raw JSON values must remain untouched.
         foreach (var name in propertyNames)
         {
-            if (element.TryGetProperty(name, out var property)
-                && property.ValueKind == JsonValueKind.Null)
+            if (payload.TryGetValue(name, out var value)
+                && (value is null || value is JsonElement { ValueKind: JsonValueKind.Null }))
             {
                 payload.Remove(name);
             }
