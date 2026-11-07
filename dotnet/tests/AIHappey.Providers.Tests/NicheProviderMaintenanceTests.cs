@@ -4,11 +4,13 @@ using System.Text.Json;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
+using AIHappey.Core.Providers.AIHorde;
 using AIHappey.Core.Providers.JigsawStack;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.ZeroEntropy;
 using AIHappey.Core.Models;
+using AIHappey.Responses;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 
@@ -172,6 +174,77 @@ public sealed class NicheProviderMaintenanceTests
 
         Assert.Equal("A search engine.", Assert.Single(response.Choices).Message.Content);
         Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task AIHorde_responses_use_the_documented_chat_completions_endpoint()
+    {
+        var requestCount = 0;
+        using var client = CreateClient(async request =>
+        {
+            requestCount++;
+            if (request.RequestUri!.AbsolutePath == "/v1/models")
+                return JsonResponse("""{"data":[{"id":"test-model"}]}""");
+
+            Assert.Equal("/v1/chat/completions", request.RequestUri.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("Hello", payload.RootElement.GetProperty("messages")[0].GetProperty("content").GetString());
+            return JsonResponse("""{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"test-model","choices":[{"index":0,"message":{"role":"assistant","content":"Hello back"},"finish_reason":"stop"}]}""");
+        });
+        var provider = new AIHordeProvider(
+            new TestKeyResolver(),
+            new AIHappey.Core.AI.AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        var response = await provider.ResponsesAsync(new ResponseRequest
+        {
+            Model = "aihorde/test-model",
+            Input = "Hello"
+        });
+
+        Assert.NotNull(response);
+        Assert.Equal(2, requestCount);
+    }
+
+    [Fact]
+    public async Task AIHorde_streaming_responses_use_the_documented_chat_completions_endpoint()
+    {
+        var requestCount = 0;
+        using var client = CreateClient(async request =>
+        {
+            requestCount++;
+            if (request.RequestUri!.AbsolutePath == "/v1/models")
+                return JsonResponse("""{"data":[{"id":"test-model"}]}""");
+
+            Assert.Equal("/v1/chat/completions", request.RequestUri.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"id\":\"chatcmpl-test\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"test-model\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hello back\"},\"finish_reason\":null}]}\n\n" +
+                    "data: [DONE]\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+        });
+        var provider = new AIHordeProvider(
+            new TestKeyResolver(),
+            new AIHappey.Core.AI.AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+        var updates = new List<AIHappey.Responses.Streaming.ResponseStreamPart>();
+
+        await foreach (var update in provider.ResponsesStreamingAsync(new ResponseRequest
+        {
+            Model = "aihorde/test-model",
+            Input = "Hello"
+        }))
+        {
+            updates.Add(update);
+        }
+
+        Assert.NotEmpty(updates);
+        Assert.Equal(2, requestCount);
     }
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)
