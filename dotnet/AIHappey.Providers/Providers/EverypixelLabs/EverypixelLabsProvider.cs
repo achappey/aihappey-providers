@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using System.Net.Http.Headers;
+using System.Text;
 using AIHappey.Common.Model;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.AI;
@@ -35,16 +37,19 @@ public partial class EverypixelLabsProvider : IModelProvider
 
     public string GetIdentifier() => ProviderId;
 
-    private void ApplyAuthHeader()
+    private HttpRequestMessage CreateAuthenticatedRequest(HttpMethod method, string requestUri)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {ProviderName} API key.");
 
-        var raw = key.Trim();
-
-        _client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", raw);
+        var credentials = key.Trim();
+        var token = credentials.Contains(':')
+            ? Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials))
+            : credentials;
+        var request = new HttpRequestMessage(method, requestUri);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", token);
+        return request;
     }
 
     public Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
@@ -169,4 +174,3 @@ public partial class EverypixelLabsProvider : IModelProvider
         throw new NotImplementedException();
     }
 }
-

@@ -12,7 +12,6 @@ public partial class EverypixelLabsProvider
 {
     public async Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model)) throw new ArgumentException("Model is required.", nameof(request));
         if (string.IsNullOrWhiteSpace(request.Prompt)) throw new ArgumentException("Prompt is required.", nameof(request));
@@ -41,10 +40,8 @@ public partial class EverypixelLabsProvider
 
         var endpoint = isEdit ? "v1/image_edit" : "v1/image_generate";
         var requestBody = JsonSerializer.Serialize(payload, JsonSerializerOptions.Web);
-        using var createRequest = new HttpRequestMessage(HttpMethod.Post, endpoint)
-        {
-            Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-        };
+        using var createRequest = CreateAuthenticatedRequest(HttpMethod.Post, endpoint);
+        createRequest.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
         using var createResponse = await _client.SendAsync(createRequest, cancellationToken);
         var createRaw = await createResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!createResponse.IsSuccessStatusCode)
