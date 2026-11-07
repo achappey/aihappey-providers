@@ -34,12 +34,11 @@ public partial class AudixaProvider : IModelProvider
         _speechWebSocketFactory = speechWebSocketFactory ?? new AudixaSpeechWebSocketFactory();
     }
 
-    private void ApplyAuthHeader()
+    private HttpRequestMessage CreateAuthenticatedRequest(HttpMethod method, string requestUri)
     {
-        var key = ResolveApiKey();
-
-        _client.DefaultRequestHeaders.Remove("x-api-key");
-        _client.DefaultRequestHeaders.Add("x-api-key", key);
+        var request = new HttpRequestMessage(method, requestUri);
+        request.Headers.Add("x-api-key", ResolveApiKey());
+        return request;
     }
 
     private string ResolveApiKey()

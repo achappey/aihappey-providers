@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Contracts;
+using AIHappey.Core.Providers.Audixa;
 using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
 using AIHappey.Core.Providers.AIHorde;
@@ -245,6 +246,54 @@ public sealed class NicheProviderMaintenanceTests
 
         Assert.NotEmpty(updates);
         Assert.Equal(2, requestCount);
+    }
+
+    [Fact]
+    public async Task Audixa_api_authentication_is_request_scoped_and_not_sent_to_the_audio_host()
+    {
+        using var client = CreateClient(async request =>
+        {
+            if (request.RequestUri!.AbsolutePath == "/v3/voices")
+            {
+                Assert.Equal("test-api-key", request.Headers.GetValues("x-api-key").Single());
+                return JsonResponse("""{"voices":[{"voice_id":"voice-1","model":"base"}],"length":1}""");
+            }
+
+            if (request.RequestUri.AbsolutePath == "/v3/tts")
+            {
+                Assert.Equal("test-api-key", request.Headers.GetValues("x-api-key").Single());
+                using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+                Assert.Equal("Hello", payload.RootElement.GetProperty("text").GetString());
+                Assert.Equal("base", payload.RootElement.GetProperty("model").GetString());
+                Assert.Equal("voice-1", payload.RootElement.GetProperty("voice_id").GetString());
+                Assert.Equal("preserved", payload.RootElement.GetProperty("future_option").GetString());
+                return JsonResponse("""{"generation_id":"generation-1","status":"COMPLETED","audio_url":"https://audio.example/generated.wav"}""");
+            }
+
+            Assert.Equal("audio.example", request.RequestUri.Host);
+            Assert.False(request.Headers.Contains("x-api-key"));
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+        });
+        var provider = new AudixaProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var models = await provider.ListModels(CancellationToken.None);
+        Assert.Contains(models, model => model.Id == "audixa/base/voice-1");
+
+        var response = await provider.SpeechRequest(new SpeechRequest
+        {
+            Model = "audixa/base/voice-1",
+            Text = "Hello",
+            ProviderOptions = new()
+            {
+                ["audixa"] = JsonDocument.Parse("""{"future_option":"preserved"}""").RootElement.Clone()
+            }
+        });
+
+        Assert.Equal(Convert.ToBase64String([1, 2, 3]), response.Audio.Base64);
+        Assert.Empty(client.DefaultRequestHeaders);
     }
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)

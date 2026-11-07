@@ -19,8 +19,6 @@ public partial class AudixaProvider
         if (string.IsNullOrWhiteSpace(key))
             return models;
 
-        ApplyAuthHeader();
-
         var voices = await GetVoicesAsync(cancellationToken);
         models.AddRange(BuildDynamicVoiceModels(voices));
 
@@ -61,7 +59,8 @@ public partial class AudixaProvider
         while (true)
         {
             var path = $"v3/voices?limit={limit}&offset={offset}";
-            using var resp = await _client.GetAsync(path, cancellationToken);
+            using var request = CreateAuthenticatedRequest(HttpMethod.Get, path);
+            using var resp = await _client.SendAsync(request, cancellationToken);
             var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
             if (!resp.IsSuccessStatusCode)
@@ -269,4 +268,3 @@ public partial class AudixaProvider
         public bool? IsFree { get; set; }
     }
 }
-

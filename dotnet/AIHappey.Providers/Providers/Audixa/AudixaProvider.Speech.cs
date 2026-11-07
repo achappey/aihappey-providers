@@ -24,8 +24,6 @@ public partial class AudixaProvider
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
 
-        ApplyAuthHeader();
-
         var (resolvedModel, modelVoice) = ResolveModelAndVoice(request.Model);
 
         var now = DateTime.UtcNow;
@@ -67,13 +65,11 @@ public partial class AudixaProvider
         if (!string.IsNullOrWhiteSpace(request.Language))
             payload["language_code"] = request.Language.Trim();
 
-        using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "v3/tts")
-        {
-            Content = new StringContent(
-                JsonSerializer.Serialize(payload, SpeechJson),
-                Encoding.UTF8,
-                MediaTypeNames.Application.Json)
-        };
+        using var httpRequest = CreateAuthenticatedRequest(HttpMethod.Post, "v3/tts");
+        httpRequest.Content = new StringContent(
+            JsonSerializer.Serialize(payload, SpeechJson),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
 
         using var resp = await _client.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
@@ -101,9 +97,10 @@ public partial class AudixaProvider
         {
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
 
-            using var pollResp = await _client.GetAsync(
-                $"v3/tts?generation_id={Uri.EscapeDataString(generationId)}",
-                cancellationToken);
+            using var pollRequest = CreateAuthenticatedRequest(
+                HttpMethod.Get,
+                $"v3/tts?generation_id={Uri.EscapeDataString(generationId)}");
+            using var pollResp = await _client.SendAsync(pollRequest, cancellationToken);
 
             var pollJson = await pollResp.Content.ReadAsStringAsync(cancellationToken);
 
@@ -311,4 +308,3 @@ public partial class AudixaProvider
         throw new ArgumentException("Audixa model must be 'base', 'advanced', 'base/{voiceId}', or 'advanced/{voiceId}'.", nameof(model));
     }
 }
-
