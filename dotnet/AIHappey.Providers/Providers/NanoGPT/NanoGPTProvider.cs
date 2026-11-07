@@ -29,14 +29,15 @@ public partial class NanoGPTProvider : IModelProvider
         _client.BaseAddress = new Uri("https://nano-gpt.com/api/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage? request = null)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(NanoGPT)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        var headers = request?.Headers ?? _client.DefaultRequestHeaders;
+        headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
@@ -137,16 +138,6 @@ public partial class NanoGPTProvider : IModelProvider
             cancellationToken: cancellationToken);
 
         return result.ToEmbeddingResponse(GetIdentifier().CreatePrimitiveProviderMetadata());
-    }
-
-    public Task<OpenAIDecisionResponse> OpenAIDecisionRequestAsync(OpenAIDecisionRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<DecisionResponse> DecisionRequestAsync(DecisionRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 
     public Task<LiveSessionResponse> CreateLiveSessionAsync(LiveSessionRequest request, CancellationToken cancellationToken = default)
