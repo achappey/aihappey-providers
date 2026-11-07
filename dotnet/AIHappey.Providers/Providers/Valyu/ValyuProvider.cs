@@ -25,16 +25,14 @@ public partial class ValyuProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.valyu.ai/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Valyu)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = null;
-        _client.DefaultRequestHeaders.Remove("X-API-Key");
-        _client.DefaultRequestHeaders.Add("X-API-Key", key);
+        request.Headers.Add("X-API-Key", key);
     }
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
@@ -42,15 +40,11 @@ public partial class ValyuProvider : IModelProvider
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return await CompleteValyuChatAsync(options, cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return CompleteValyuChatStreamingAsync(options, cancellationToken);
     }
 
@@ -69,15 +63,11 @@ public partial class ValyuProvider : IModelProvider
 
     public Task<Responses.ResponseResult> ResponsesAsync(Responses.ResponseRequest options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return CompleteValyuResponsesAsync(options, cancellationToken);
     }
 
     public IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(Responses.ResponseRequest options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return CompleteValyuResponsesStreamingAsync(options, cancellationToken);
     }
 

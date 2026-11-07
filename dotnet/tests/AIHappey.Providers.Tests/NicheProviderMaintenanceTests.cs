@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Astica;
 using AIHappey.Core.Providers.Audixa;
@@ -10,6 +11,7 @@ using AIHappey.Core.Providers.AIHorde;
 using AIHappey.Core.Providers.JigsawStack;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Tavily;
+using AIHappey.Core.Providers.Valyu;
 using AIHappey.Core.Providers.ZeroEntropy;
 using AIHappey.Core.Models;
 using AIHappey.Responses;
@@ -175,6 +177,64 @@ public sealed class NicheProviderMaintenanceTests
         });
 
         Assert.Equal("A search engine.", Assert.Single(response.Choices).Message.Content);
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Valyu_answer_parses_documented_content_events_and_uses_request_scoped_authentication()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("/v1/answer", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.GetValues("X-API-Key").Single());
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("user: What is Valyu?", payload.RootElement.GetProperty("query").GetString());
+            Assert.Equal("all", payload.RootElement.GetProperty("search_type").GetString());
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "event: content\n" +
+                    "data: {\"content\":\"Valyu answer\"}\n\n" +
+                    "event: metadata\n" +
+                    "data: {\"ai_usage\":{\"input_tokens\":3,\"output_tokens\":2}}\n\n" +
+                    "data: [DONE]\n\n",
+                    Encoding.UTF8,
+                    "text/event-stream")
+            };
+        });
+        var provider = new ValyuProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var response = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "answer/all",
+            Messages = [new() { Role = "user", Content = "What is Valyu?" }]
+        });
+
+        Assert.Equal("Valyu answer", Assert.Single(response.Choices).Message.Content);
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Valyu_answer_surfaces_documented_stream_errors()
+    {
+        using var client = CreateClient(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                "event: error\n" +
+                "data: {\"error\":\"Streaming failed\"}\n\n",
+                Encoding.UTF8,
+                "text/event-stream")
+        }));
+        var provider = new ValyuProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var error = await Assert.ThrowsAsync<HttpRequestException>(() => provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "answer/all",
+            Messages = [new() { Role = "user", Content = "What is Valyu?" }]
+        }));
+
+        Assert.Contains("Streaming failed", error.Message);
         Assert.Empty(client.DefaultRequestHeaders);
     }
 
