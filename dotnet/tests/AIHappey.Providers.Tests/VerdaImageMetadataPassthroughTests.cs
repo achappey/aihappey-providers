@@ -92,8 +92,10 @@ public sealed class VerdaImageMetadataPassthroughTests
         var metadata = ParseElement("""
             {
               "flux_2_klein": {
+                "prompt": "metadata prompt",
                 "num_steps": 12,
                 "guidance": 3.25,
+                "seed": 99,
                 "enable_safety_checker": false,
                 "output_format": "webp",
                 "output_quality": 81,
@@ -178,6 +180,22 @@ public sealed class VerdaImageMetadataPassthroughTests
         Assert.False(payload.Value.TryGetProperty("num_steps", out _));
         Assert.False(payload.Value.TryGetProperty("guidance", out _));
         Assert.False(payload.Value.TryGetProperty("output_quality", out _));
+
+        payload = null;
+        await provider.ImageRequest(new ImageRequest
+        {
+            Model = "flux2-klein-4b",
+            Prompt = "fixed-guidance model",
+            ProviderOptions = new()
+            {
+                ["verda"] = ParseElement(
+                    """{"flux_2_klein":{"num_steps":12,"guidance":3.25,"future_option":[1,null]}}""")
+            }
+        });
+        Assert.NotNull(payload);
+        Assert.False(payload.Value.TryGetProperty("num_steps", out _));
+        Assert.False(payload.Value.TryGetProperty("guidance", out _));
+        Assert.True(payload.Value.GetProperty("future_option").ValueKind == JsonValueKind.Array);
 
         await Assert.ThrowsAsync<JsonException>(() => provider.ImageRequest(new ImageRequest
         {
