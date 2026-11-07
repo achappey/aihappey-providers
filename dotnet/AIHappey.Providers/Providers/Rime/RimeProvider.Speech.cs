@@ -170,7 +170,9 @@ public partial class RimeProvider
 
         AddUnknownOptions(payload, metadata);
 
-        return new(modelId, new Uri(modelId == "coda" ? "https://coda.api.rime.ai/" : "https://mist.api.rime.ai/"),
+        return new(modelId, new Uri(modelId == "coda"
+                ? "https://coda.api.rime.ai/"
+                : "https://users.rime.ai/v1/rime-tts"),
             payload, format, ResolveAcceptMimeType(format), rate, warnings);
     }
 
