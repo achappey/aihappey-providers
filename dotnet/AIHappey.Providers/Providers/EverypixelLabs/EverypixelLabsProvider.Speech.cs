@@ -35,8 +35,6 @@ public partial class EverypixelLabsProvider
 
     public async Task<SpeechResponse> SpeechRequest(SpeechRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -84,10 +82,8 @@ public partial class EverypixelLabsProvider
 
         var requestBody = JsonSerializer.Serialize(payload, JsonSerializerOptions.Web);
 
-        using var createRequest = new HttpRequestMessage(HttpMethod.Post, "v1/tts_create")
-        {
-            Content = new StringContent(requestBody, Encoding.UTF8, "application/json")
-        };
+        using var createRequest = CreateAuthenticatedRequest(HttpMethod.Post, "v1/tts_create");
+        createRequest.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
         using var createResp = await _client.SendAsync(createRequest, cancellationToken);
         var createJson = await createResp.Content.ReadAsStringAsync(cancellationToken);
