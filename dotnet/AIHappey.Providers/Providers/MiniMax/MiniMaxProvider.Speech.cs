@@ -244,7 +244,7 @@ public partial class MiniMaxProvider
         payload["subtitle_enable"] = GetValue<bool?>(metadata, "subtitle_enable");
         payload["pronunciation_dict"] = BuildRawObject(metadata, "pronunciation_dict", "tone");
         payload["voice_modify"] = BuildRawObject(metadata, "voice_modify", "pitch", "intensity", "timbre", "sound_effects");
-        payload["voice_setting"] = BuildVoiceSetting(voiceSetting, voiceId, speed, volume, pitch);
+        payload["voice_setting"] = BuildVoiceSetting(voiceSetting, voiceId, (float)speed, volume, pitch);
         payload["audio_setting"] = BuildAudioSetting(audioSetting, format);
         return payload;
     }
