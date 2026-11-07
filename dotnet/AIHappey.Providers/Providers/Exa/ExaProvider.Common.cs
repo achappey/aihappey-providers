@@ -16,6 +16,8 @@ public partial class ExaProvider
         "auto",
         "lite",
         "neural",
+        "keyword",
+        "hybrid",
         "fast",
         "deep-lite",
         "deep",
