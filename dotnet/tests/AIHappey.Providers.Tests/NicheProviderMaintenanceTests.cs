@@ -18,7 +18,6 @@ using AIHappey.Core.Models;
 using AIHappey.Responses;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
-using AIHappey.ChatCompletions.Models;
 
 namespace AIHappey.Tests;
 
@@ -143,9 +142,11 @@ public sealed class NicheProviderMaintenanceTests
         });
 
         Assert.Equal([128, 2], batchSizes);
-        Assert.Equal(130, response.Data.Length);
-        Assert.Equal(0, response.Data[0].Index);
-        Assert.Equal(129, response.Data[^1].Index);
+        var data = response.Data.ToArray();
+
+        Assert.Equal(130, data.Length);
+        Assert.Equal(0, data[0].Index);
+        Assert.Equal(129, data[^1].Index);
         Assert.Equal(130, response.Usage.PromptTokens);
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
