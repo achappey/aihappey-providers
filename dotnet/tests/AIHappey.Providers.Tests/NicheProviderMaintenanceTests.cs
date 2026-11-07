@@ -9,6 +9,7 @@ using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
 using AIHappey.Core.Providers.AIHorde;
 using AIHappey.Core.Providers.JigsawStack;
+using AIHappey.Core.Providers.Isaacus;
 using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.Valyu;
@@ -97,6 +98,55 @@ public sealed class NicheProviderMaintenanceTests
             Input = input.RootElement.Clone()
         });
 
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Isaacus_embeddings_split_at_the_documented_batch_limit_and_preserve_options()
+    {
+        var batchSizes = new List<int>();
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("/v1/embeddings", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            var root = payload.RootElement;
+            var texts = root.GetProperty("texts");
+            batchSizes.Add(texts.GetArrayLength());
+            Assert.Equal("kanon-2-embedder", root.GetProperty("model").GetString());
+            Assert.Equal("retrieval/query", root.GetProperty("task").GetString());
+            Assert.Equal("drop_end", root.GetProperty("overflow_strategy").GetString());
+            Assert.Equal("preserved", root.GetProperty("future_option").GetString());
+
+            var embeddings = Enumerable.Range(0, texts.GetArrayLength())
+                .Select(index => new { index, embedding = new[] { (float)index } });
+            return JsonResponse(JsonSerializer.Serialize(new
+            {
+                embeddings,
+                usage = new { input_tokens = texts.GetArrayLength() }
+            }));
+        });
+        var provider = new IsaacusProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        using var input = JsonDocument.Parse(JsonSerializer.Serialize(
+            Enumerable.Range(0, 130).Select(index => $"Legal text {index}")));
+
+        var response = await provider.OpenAIEmbeddingRequestAsync(new OpenAIEmbeddingRequest
+        {
+            Model = "isaacus/kanon-2-embedder",
+            Input = input.RootElement.Clone(),
+            AdditionalProperties = new()
+            {
+                ["task"] = JsonSerializer.SerializeToElement("retrieval/query"),
+                ["overflow_strategy"] = JsonSerializer.SerializeToElement("drop_end"),
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+
+        Assert.Equal([128, 2], batchSizes);
+        Assert.Equal(130, response.Data.Length);
+        Assert.Equal(0, response.Data[0].Index);
+        Assert.Equal(129, response.Data[^1].Index);
+        Assert.Equal(130, response.Usage.PromptTokens);
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
