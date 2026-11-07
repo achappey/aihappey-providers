@@ -91,6 +91,7 @@ public sealed class DeepInfraImageMetadataPassthroughTests
             payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
             return ImageResponse();
         });
+        var provider = CreateProvider(client);
         var request = new ImageRequest
         {
             Model = "deepinfra/Bria/enhance",
@@ -115,7 +116,7 @@ public sealed class DeepInfraImageMetadataPassthroughTests
             }
         };
 
-        await CreateProvider(client).ImageRequest(request, CancellationToken.None);
+        await provider.ImageRequest(request, CancellationToken.None);
 
         Assert.Equal("2k", payload.GetProperty("resolution").GetString());
         Assert.False(payload.GetProperty("preserve_alpha").GetBoolean());
@@ -135,7 +136,7 @@ public sealed class DeepInfraImageMetadataPassthroughTests
         request.ProviderOptions["deepinfra"] = ParseElement(
             """{"bria_enhance":{"resolution":null,"preserve_alpha":null,"steps_num":null}}""");
         payload = default;
-        await CreateProvider(client).ImageRequest(request, CancellationToken.None);
+        await provider.ImageRequest(request, CancellationToken.None);
         foreach (var name in new[] { "resolution", "preserve_alpha", "steps_num" })
             Assert.False(payload.TryGetProperty(name, out _), name);
 

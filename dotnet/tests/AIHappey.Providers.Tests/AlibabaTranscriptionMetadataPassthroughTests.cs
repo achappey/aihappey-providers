@@ -35,6 +35,7 @@ public sealed class AlibabaTranscriptionMetadataPassthroughTests
               "future_boolean": false,
               "future_null": null,
               "model": "metadata-model",
+              "messages": [{"role": "user", "content": "metadata audio"}],
               "stream": true
             }
             """);
@@ -50,6 +51,11 @@ public sealed class AlibabaTranscriptionMetadataPassthroughTests
         Assert.Equal("recognized", response.Text);
         Assert.Equal("qwen3-asr-flash", payload.GetProperty("model").GetString());
         Assert.False(payload.GetProperty("stream").GetBoolean());
+        var message = Assert.Single(payload.GetProperty("messages").EnumerateArray());
+        Assert.Equal("user", message.GetProperty("role").GetString());
+        var content = Assert.Single(message.GetProperty("content").EnumerateArray());
+        Assert.Equal("input_audio", content.GetProperty("type").GetString());
+        Assert.Equal(request.Audio.ToString(), content.GetProperty("input_audio").GetProperty("data").GetString());
         Assert.Equal("en", payload.GetProperty("asr_options").GetProperty("language").GetString());
         Assert.True(payload.GetProperty("asr_options").GetProperty("enable_itn").GetBoolean());
         Assert.True(JsonElement.DeepEquals(
@@ -73,6 +79,57 @@ public sealed class AlibabaTranscriptionMetadataPassthroughTests
         Assert.False(payload.GetProperty("messages")[0].GetProperty("content")[0]
             .GetProperty("input_audio").TryGetProperty("providerOptions", out _));
         Assert.Equal(10, payload.EnumerateObject().Count());
+    }
+
+    [Fact]
+    public async Task Transcription_omits_options_for_missing_null_undefined_or_empty_provider_metadata()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"choices":[{"message":{"content":"recognized"}}]}""");
+        });
+        var provider = CreateProvider(client);
+        Dictionary<string, JsonElement>?[] optionsCases =
+        [
+            null,
+            new(),
+            new() { ["another-provider"] = ParseElement("""{"must_not_leak":true}""") },
+            new() { ["alibaba"] = default },
+            new() { ["alibaba"] = ParseElement("null") },
+            new() { ["alibaba"] = ParseElement("{}") }
+        ];
+
+        foreach (var options in optionsCases)
+        {
+            var request = CreateRequest(default);
+            request.ProviderOptions = options;
+            payload = default;
+
+            var response = await provider.TranscriptionRequest(request);
+
+            Assert.Equal("recognized", response.Text);
+            Assert.Equal("qwen3-asr-flash", payload.GetProperty("model").GetString());
+            Assert.False(payload.GetProperty("stream").GetBoolean());
+            Assert.False(payload.TryGetProperty("asr_options", out _));
+            Assert.Equal(3, payload.EnumerateObject().Count());
+        }
+    }
+
+    [Theory]
+    [InlineData("[]")]
+    [InlineData("\"invalid\"")]
+    [InlineData("42")]
+    [InlineData("true")]
+    public async Task Transcription_rejects_non_object_provider_metadata(string metadataJson)
+    {
+        using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
+
+        var error = await Assert.ThrowsAsync<JsonException>(() => CreateProvider(client)
+            .TranscriptionRequest(CreateRequest(ParseElement(metadataJson))));
+
+        Assert.Equal("Alibaba provider options must be a JSON object.", error.Message);
     }
 
     [Fact]

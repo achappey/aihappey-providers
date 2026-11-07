@@ -61,8 +61,8 @@ public partial class AlibabaProvider
             ["stream"] = false
         };
 
-        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
-        if (metadata is { } providerOptions)
+        if (request.ProviderOptions?.TryGetValue(GetIdentifier(), out var providerOptions) == true
+            && providerOptions.ValueKind is not (JsonValueKind.Null or JsonValueKind.Undefined))
         {
             if (providerOptions.ValueKind != JsonValueKind.Object)
                 throw new JsonException("Alibaba provider options must be a JSON object.");
@@ -108,7 +108,11 @@ public partial class AlibabaProvider
             {
                 if (string.Equals(property.Name, "language", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(property.Name, "enable_itn", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(property.Name, "asr_options", StringComparison.OrdinalIgnoreCase))
+                    || string.Equals(property.Name, "asr_options", StringComparison.OrdinalIgnoreCase)
+                    // These fields are owned by the transcription request, not provider options.
+                    || string.Equals(property.Name, "model", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(property.Name, "messages", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(property.Name, "stream", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 payload[property.Name] = property.Value.Clone();
