@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace AIHappey.Common.Model.Providers.Verda;
@@ -9,10 +10,12 @@ public sealed class VerdaImageProviderMetadata
     public VerdaFlux1ImageProviderMetadata? Flux1 { get; set; }
 
     [JsonPropertyName("flux_2")]
-    public VerdaFlux2ImageProviderMetadata? Flux2 { get; set; }
+    public JsonElement? Flux2 { get; set; }
 
     [JsonPropertyName("flux_2_klein")]
-    public VerdaFlux2KleinImageProviderMetadata? Flux2Klein { get; set; }
+    public JsonElement? Flux2Klein { get; set; }
 
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
 
 }
