@@ -26,7 +26,10 @@ public partial class BinericProvider
         if (string.IsNullOrWhiteSpace(request.Text))
             throw new ArgumentException("Text is required.", nameof(request));
 
-        var metadata = request.GetProviderMetadata<BinericSpeechProviderMetadata>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        if (metadata is JsonElement metadataObject && metadataObject.ValueKind != JsonValueKind.Object)
+            throw new JsonException($"Provider options for '{GetIdentifier()}' must be an object.");
+
         var warnings = new List<object>();
         var now = DateTime.UtcNow;
 
@@ -40,11 +43,13 @@ public partial class BinericProvider
             warnings.Add(new { type = "unsupported", feature = "outputFormat", details = request.OutputFormat });
         }
 
-        var language = (request.Language ?? metadata?.Language)?.Trim();
-        var voice = (request.Voice ?? metadata?.Voice)?.Trim();
-        var pitch = metadata?.Pitch?.Trim();
-        var volume = metadata?.Volume?.Trim();
-        double? rate = request.Speed is null ? metadata?.Rate : request.Speed.Value;
+        var language = (request.Language ?? GetMetadataValue<string>(metadata, "language"))?.Trim();
+        var voice = (request.Voice ?? GetMetadataValue<string>(metadata, "voice"))?.Trim();
+        var pitch = GetMetadataValue<string>(metadata, "pitch")?.Trim();
+        var volume = GetMetadataValue<string>(metadata, "volume")?.Trim();
+        double? rate = request.Speed is null
+            ? GetMetadataValue<float?>(metadata, "rate")
+            : request.Speed.Value;
 
         var payload = new Dictionary<string, object?>
         {
@@ -66,6 +71,17 @@ public partial class BinericProvider
                 ["volume"] = volume
             }
         };
+
+        if (metadata is JsonElement rawMetadata)
+        {
+            foreach (var property in rawMetadata.EnumerateObject())
+            {
+                if (IsMappedMetadataProperty(property.Name))
+                    continue;
+
+                payload[property.Name] = property.Value.Clone();
+            }
+        }
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/v1/ai/chat/completions")
         {
@@ -118,6 +134,27 @@ public partial class BinericProvider
             }
         };
     }
+
+    private static T? GetMetadataValue<T>(JsonElement? metadata, string name)
+    {
+        if (metadata is not JsonElement metadataObject || metadataObject.ValueKind != JsonValueKind.Object)
+            return default;
+
+        foreach (var property in metadataObject.EnumerateObject())
+        {
+            if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                return property.Value.Deserialize<T>(SpeechJsonOptions);
+        }
+
+        return default;
+    }
+
+    private static bool IsMappedMetadataProperty(string name)
+        => string.Equals(name, "language", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "voice", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "pitch", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "rate", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "volume", StringComparison.OrdinalIgnoreCase);
 
     private static string? ExtractAudioContent(JsonElement root)
     {
@@ -173,23 +210,4 @@ public partial class BinericProvider
 
         return "mp3";
     }
-
-    private sealed class BinericSpeechProviderMetadata
-    {
-        [JsonPropertyName("language")]
-        public string? Language { get; set; }
-
-        [JsonPropertyName("voice")]
-        public string? Voice { get; set; }
-
-        [JsonPropertyName("pitch")]
-        public string? Pitch { get; set; }
-
-        [JsonPropertyName("rate")]
-        public float? Rate { get; set; }
-
-        [JsonPropertyName("volume")]
-        public string? Volume { get; set; }
-    }
 }
-
