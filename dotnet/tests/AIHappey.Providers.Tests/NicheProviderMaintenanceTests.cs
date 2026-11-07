@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Contracts;
+using AIHappey.Core.Providers.Astica;
 using AIHappey.Core.Providers.Audixa;
 using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
@@ -293,6 +294,68 @@ public sealed class NicheProviderMaintenanceTests
         });
 
         Assert.Equal(Convert.ToBase64String([1, 2, 3]), response.Audio.Base64);
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Astica_streaming_speech_uses_documented_raw_audio_and_preserves_provider_options()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal("voice.astica.ai", request.RequestUri!.Host);
+            Assert.False(request.Headers.Contains("X-API-Key"));
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+
+            if (request.RequestUri.AbsolutePath == "/api/voice_list")
+            {
+                Assert.Equal("test-api-key", payload.RootElement.GetProperty("tkn").GetString());
+                return JsonResponse("""{"voices":[{"voice":"expressive_ava","name":"Ava"}]}""");
+            }
+
+            Assert.Equal("/api/tts", request.RequestUri.AbsolutePath);
+            Assert.Contains("*/*", request.Headers.Accept.Select(value => value.MediaType));
+            Assert.Equal("test-api-key", payload.RootElement.GetProperty("tkn").GetString());
+            Assert.Equal("Hello there", payload.RootElement.GetProperty("text").GetString());
+            Assert.Equal("expressive_ava", payload.RootElement.GetProperty("voice").GetString());
+            Assert.True(payload.RootElement.GetProperty("stream").GetBoolean());
+            Assert.True(payload.RootElement.GetProperty("timestamps").GetBoolean());
+            Assert.Equal("warm", payload.RootElement.GetProperty("prompt").GetString());
+            Assert.True(payload.RootElement.GetProperty("future_option").GetProperty("enabled").GetBoolean());
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new ByteArrayContent([1, 2, 3])
+            };
+            response.Content.Headers.ContentType = new("audio/wav");
+            return response;
+        });
+        var provider = new AsticaProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        await provider.ListModels();
+        var parts = new List<StreamingSpeechPart>();
+        await foreach (var part in provider.SpeechStreamingAsync(new StreamingSpeechRequest
+        {
+            Model = "astica/expressive_ava",
+            Text = [new() { Text = "Hello " }, new() { Text = "there" }],
+            ProviderOptions = new()
+            {
+                ["astica"] = JsonDocument.Parse("""{"timestamps":true,"prompt":"warm","future_option":{"enabled":true}}""")
+                    .RootElement.Clone()
+            },
+            IncludeRawChunks = true
+        }))
+        {
+            parts.Add(part);
+        }
+
+        Assert.Single(parts.OfType<SpeechAudioPart>());
+        Assert.Equal(Convert.ToBase64String([1, 2, 3]), Assert.Single(parts.OfType<SpeechAudioPart>()).Audio);
+        Assert.Equal("audio/wav", Assert.Single(parts.OfType<SpeechAudioPart>()).AudioFormat.Type);
+        Assert.Single(parts.OfType<SpeechRawPart>());
+        Assert.Single(parts.OfType<SpeechStreamStartPart>());
+        Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
+        Assert.Single(parts.OfType<SpeechFinishPart>());
         Assert.Empty(client.DefaultRequestHeaders);
     }
 

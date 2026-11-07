@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -25,7 +26,6 @@ public partial class AsticaProvider
             throw new ArgumentException("Text is required.", nameof(request));
 
         var apiKey = ResolveRequiredApiKey();
-        ApplyAuthHeader(apiKey);
 
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
@@ -52,19 +52,7 @@ public partial class AsticaProvider
         var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
         EnsureProviderMetadataObject(metadata);
 
-        var payload = new Dictionary<string, object?>();
-        CopyAdditionalSpeechOptions(metadata, payload);
-        payload["tkn"] = apiKey;
-        payload["text"] = request.Text;
-        payload["voice"] = voiceId;
-        payload["stream"] = false;
-
-        if (ReadMetadataBoolean(metadata, "timestamps") is { } timestamps)
-            payload["timestamps"] = timestamps;
-
-        var prompt = ReadMetadataString(metadata, "prompt");
-        if (!string.IsNullOrWhiteSpace(prompt))
-            payload["prompt"] = prompt.Trim();
+        var payload = BuildSpeechPayload(apiKey, request.Text, voiceId, metadata, stream: false);
 
         var raw = await PostJsonAndReadAsync("api/tts", payload, cancellationToken);
         using var doc = JsonDocument.Parse(raw);
@@ -104,6 +92,110 @@ public partial class AsticaProvider
         };
     }
 
+    public async IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(
+        StreamingSpeechRequest request,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (string.IsNullOrWhiteSpace(request.Model))
+            throw new ArgumentException("Model is required.", nameof(request));
+
+        if (request.Text is not { Length: > 0 })
+            throw new ArgumentException("Text is required.", nameof(request));
+
+        var apiKey = ResolveRequiredApiKey();
+        var voiceId = ParseVoiceIdFromModel(request.Model);
+        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        EnsureProviderMetadataObject(metadata);
+
+        var textBuilder = new StringBuilder();
+        var warnings = new List<object>();
+        var voiceMismatch = !string.IsNullOrWhiteSpace(request.Voice)
+            && !string.Equals(request.Voice.Trim(), voiceId, StringComparison.OrdinalIgnoreCase);
+        foreach (var part in request.Text)
+        {
+            if (part is null || !string.Equals(part.Type, "text", StringComparison.OrdinalIgnoreCase) || part.Text is null)
+                throw new ArgumentException("Astica speech parts must be text with non-null content.", nameof(request));
+
+            textBuilder.Append(part.Text);
+            if (!string.IsNullOrWhiteSpace(part.Voice)
+                && !string.Equals(part.Voice.Trim(), voiceId, StringComparison.OrdinalIgnoreCase))
+                voiceMismatch = true;
+        }
+
+        var text = textBuilder.ToString();
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Text is required.", nameof(request));
+
+        if (voiceMismatch)
+            warnings.Add(new { type = "ignored", feature = "voice", reason = "voice is derived from model id" });
+
+        if (!string.IsNullOrWhiteSpace(request.Language))
+            warnings.Add(new { type = "ignored", feature = "language", reason = "language is voice-dependent in Astica" });
+
+        if (!string.IsNullOrWhiteSpace(request.Instructions))
+            warnings.Add(new { type = "unsupported", feature = "instructions" });
+
+        if (request.Speed is not null)
+            warnings.Add(new { type = "unsupported", feature = "speed" });
+
+        if (request.OutputFormat is not null)
+            warnings.Add(new { type = "ignored", feature = "outputFormat", reason = "Astica streaming audio format depends on the voice engine." });
+
+        var payload = BuildSpeechPayload(apiKey, text, voiceId, metadata, stream: true);
+        using var req = CreateSpeechRequest("api/tts", payload, streaming: true);
+        using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+        if (!resp.IsSuccessStatusCode)
+        {
+            var error = await resp.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException($"{ProviderName} streaming TTS failed ({(int)resp.StatusCode}): {error}");
+        }
+
+        var audioFormat = resp.Content.Headers.ContentType?.MediaType;
+        if (string.IsNullOrWhiteSpace(audioFormat))
+            throw new InvalidOperationException($"{ProviderName} streaming TTS response did not include an audio content type.");
+        if (!audioFormat.StartsWith("audio/", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(audioFormat, "application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"{ProviderName} streaming TTS returned unexpected content type '{audioFormat}'.");
+
+        yield return new SpeechStreamStartPart { Warnings = warnings };
+        yield return new SpeechResponseMetadataPart
+        {
+            Timestamp = DateTime.UtcNow,
+            ModelId = request.Model.ToModelId(GetIdentifier()),
+            Headers = resp.GetHeaders()
+        };
+
+        var receivedAudio = false;
+        var buffer = new byte[16 * 1024];
+        await using var stream = await resp.Content.ReadAsStreamAsync(cancellationToken);
+        while (true)
+        {
+            var read = await stream.ReadAsync(buffer.AsMemory(), cancellationToken);
+            if (read == 0)
+                break;
+
+            cancellationToken.ThrowIfCancellationRequested();
+            receivedAudio = true;
+            var chunk = Convert.ToBase64String(buffer, 0, read);
+            if (request.IncludeRawChunks == true)
+                yield return new SpeechRawPart { RawValue = chunk };
+
+            yield return new SpeechAudioPart
+            {
+                Audio = chunk,
+                AudioFormat = new() { Type = audioFormat }
+            };
+        }
+
+        if (!receivedAudio)
+            throw new InvalidOperationException($"{ProviderName} streaming TTS returned no audio.");
+
+        cancellationToken.ThrowIfCancellationRequested();
+        yield return new SpeechFinishPart();
+    }
+
     private static string ParseVoiceIdFromModel(string model)
     {
         var trimmed = model.Trim();
@@ -119,13 +211,7 @@ public partial class AsticaProvider
 
     private async Task<string> PostJsonAndReadAsync(string path, object payload, CancellationToken cancellationToken)
     {
-        using var req = new HttpRequestMessage(HttpMethod.Post, path)
-        {
-            Content = new StringContent(JsonSerializer.Serialize(payload, SpeechJson), Encoding.UTF8, MediaTypeNames.Application.Json)
-        };
-
-        req.Headers.Accept.ParseAdd(MediaTypeNames.Application.Json);
-
+        using var req = CreateSpeechRequest(path, payload);
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
@@ -133,6 +219,40 @@ public partial class AsticaProvider
             throw new InvalidOperationException($"{ProviderName} request '{path}' failed ({(int)resp.StatusCode}): {body}");
 
         return body;
+    }
+
+    private static HttpRequestMessage CreateSpeechRequest(string path, object payload, bool streaming = false)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, path)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(payload, SpeechJson), Encoding.UTF8, MediaTypeNames.Application.Json)
+        };
+        request.Headers.Accept.ParseAdd(streaming ? "*/*" : MediaTypeNames.Application.Json);
+        return request;
+    }
+
+    private static Dictionary<string, object?> BuildSpeechPayload(
+        string apiKey,
+        string text,
+        string voiceId,
+        JsonElement metadata,
+        bool stream)
+    {
+        var payload = new Dictionary<string, object?>();
+        CopyAdditionalSpeechOptions(metadata, payload);
+        payload["tkn"] = apiKey;
+        payload["text"] = text;
+        payload["voice"] = voiceId;
+        payload["stream"] = stream;
+
+        if (ReadMetadataBoolean(metadata, "timestamps") is { } timestamps)
+            payload["timestamps"] = timestamps;
+
+        var prompt = ReadMetadataString(metadata, "prompt");
+        if (!string.IsNullOrWhiteSpace(prompt))
+            payload["prompt"] = prompt.Trim();
+
+        return payload;
     }
 
     private static string? NormalizeFormat(string? format)

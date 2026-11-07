@@ -14,8 +14,6 @@ public partial class AsticaProvider
         if (string.IsNullOrWhiteSpace(apiKey))
             return [];
 
-        ApplyAuthHeader(apiKey);
-
         var models = new List<Model>();
         models.AddRange(GetIdentifier().GetModels());
 
@@ -253,4 +251,3 @@ public partial class AsticaProvider
         public List<string> UseCases { get; set; } = [];
     }
 }
-

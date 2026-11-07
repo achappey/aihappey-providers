@@ -44,12 +44,6 @@ public partial class AsticaProvider : IModelProvider
         return key;
     }
 
-    private void ApplyAuthHeader(string apiKey)
-    {
-        _client.DefaultRequestHeaders.Remove("X-API-Key");
-        _client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
-    }
-
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
         => (await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToChatCompletion();
 
@@ -199,8 +193,4 @@ public partial class AsticaProvider : IModelProvider
         throw new NotImplementedException();
     }
 
-    public IAsyncEnumerable<StreamingSpeechPart> SpeechStreamingAsync(StreamingSpeechRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }
