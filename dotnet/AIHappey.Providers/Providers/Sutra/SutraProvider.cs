@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
@@ -26,19 +25,22 @@ public sealed class SutraProvider(
     private static HttpClient CreateClient(IHttpClientFactory factory)
     {
         var client = factory.CreateClient();
-        client.BaseAddress = new Uri("https://api.numeric.tech/");
+        client.BaseAddress = new Uri("https://api.two.ai/");
         return client;
     }
 
     public string GetIdentifier() => "sutra";
 
-    private void ApplyAuthHeader()
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
     {
         var key = keyResolver.Resolve(GetIdentifier());
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException("No SUTRA API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return new Dictionary<string, string>
+        {
+            ["Authorization"] = $"******"
+        };
     }
 
     public Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
@@ -50,17 +52,15 @@ public sealed class SutraProvider(
     public Task<ChatCompletion> CompleteChatAsync(
         ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         return this.GetChatCompletion(_client, options,
-            relativeUrl: "v2/chat/completions", cancellationToken: cancellationToken);
+            GetAuthHeaders(), relativeUrl: "v2/chat/completions", cancellationToken: cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(
         ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         return this.GetChatCompletions(_client, options,
-            relativeUrl: "v2/chat/completions", cancellationToken: cancellationToken);
+            GetAuthHeaders(), relativeUrl: "v2/chat/completions", cancellationToken: cancellationToken);
     }
 
     public Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)

@@ -15,6 +15,7 @@ using AIHappey.Core.Providers.MurfAI;
 using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.Valyu;
 using AIHappey.Core.Providers.ZeroEntropy;
+using AIHappey.Core.Providers.Sutra;
 using AIHappey.Core.Models;
 using AIHappey.Responses;
 using AIHappey.Unified.Models;
@@ -25,6 +26,36 @@ namespace AIHappey.Tests;
 
 public sealed class NicheProviderMaintenanceTests
 {
+    [Fact]
+    public async Task Sutra_uses_the_documented_endpoint_and_request_scoped_authentication()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("api.two.ai", request.RequestUri!.Host);
+            Assert.Equal("/v2/chat/completions", request.RequestUri.AbsolutePath);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("preserved", payload.RootElement.GetProperty("future_option").GetString());
+
+            return JsonResponse("""{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"sutra-v2","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}""");
+        });
+        var provider = new SutraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var response = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "sutra/sutra-v2",
+            Messages = [new() { Role = "user", Content = "Hello" }],
+            AdditionalProperties = new()
+            {
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+
+        Assert.Equal("Hello", Assert.Single(response.Choices).Message.Content);
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
     [Fact]
     public async Task Fishaudio_asr_alias_uses_the_current_transcription_model_header()
     {
