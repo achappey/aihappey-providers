@@ -18,10 +18,14 @@ public partial class JinaProvider
         OpenAIEmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        var headers = GetAuthHeaders();
         ValidateJinaEmbeddingRequest(request);
 
-        var result = await SendJinaEmbeddingAsync(request, forceFloat: false, cancellationToken);
+        var result = await SendJinaEmbeddingAsync(
+            request,
+            forceFloat: false,
+            headers: headers,
+            cancellationToken: cancellationToken);
         return ToJinaOpenAIResponse(result.Root, request.Model);
     }
 
@@ -29,10 +33,14 @@ public partial class JinaProvider
         EmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        var headers = GetAuthHeaders();
 
         var openAIRequest = request.ToOpenAIEmbeddingRequest(GetIdentifier());
-        var result = await SendJinaEmbeddingAsync(openAIRequest, forceFloat: true, cancellationToken);
+        var result = await SendJinaEmbeddingAsync(
+            openAIRequest,
+            forceFloat: true,
+            headers: headers,
+            cancellationToken: cancellationToken);
         var response = ToJinaOpenAIResponse(result.Root, openAIRequest.Model);
 
         return new OpenAICompatibleEmbeddingResult(response, result.Headers)
@@ -42,6 +50,7 @@ public partial class JinaProvider
     private async Task<JinaEmbeddingResult> SendJinaEmbeddingAsync(
         OpenAIEmbeddingRequest request,
         bool forceFloat,
+        IReadOnlyDictionary<string, string> headers,
         CancellationToken cancellationToken)
     {
         var payload = new Dictionary<string, JsonElement>(StringComparer.OrdinalIgnoreCase);
@@ -84,6 +93,7 @@ public partial class JinaProvider
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(message, headers);
         using var response = await _client.SendAsync(
             message,
             HttpCompletionOption.ResponseHeadersRead,
@@ -118,6 +128,11 @@ public partial class JinaProvider
                 exception);
         }
     }
+
+    private static void ApplyAuthHeader(
+        HttpRequestMessage request,
+        IReadOnlyDictionary<string, string> headers)
+        => request.Headers.TryAddWithoutValidation("Authorization", headers["Authorization"]);
 
     private OpenAIEmbeddingResponse ToJinaOpenAIResponse(JsonElement root, string requestedModel)
     {

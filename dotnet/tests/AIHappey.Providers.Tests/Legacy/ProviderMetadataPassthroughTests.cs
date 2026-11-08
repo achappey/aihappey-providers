@@ -115,6 +115,8 @@ public sealed class ProviderMetadataPassthroughTests
         using var client = CreateClient(message =>
         {
             Assert.Equal("/v1/rerank", message.RequestUri!.AbsolutePath);
+            Assert.Equal("Bearer", message.Headers.Authorization?.Scheme);
+            Assert.Equal("test-key", message.Headers.Authorization?.Parameter);
             payload = JsonDocument.Parse(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult()).RootElement.Clone();
             return JsonResponse("""{"results":[{"index":0,"relevance_score":0.9}],"usage":{"total_tokens":1}}""");
         });
@@ -156,6 +158,49 @@ public sealed class ProviderMetadataPassthroughTests
         Assert.Contains("jina", response.ProviderMetadata!.Keys);
         Assert.DoesNotContain("another-provider", response.ProviderMetadata.Keys);
         Assert.Equal("false", JsonSerializer.Serialize(request.ProviderOptions["jina"].GetProperty("return_documents")));
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Jina_chat_and_embedding_auth_are_attached_to_each_request()
+    {
+        using var client = CreateClient(message =>
+        {
+            Assert.Equal("Bearer", message.Headers.Authorization?.Scheme);
+            Assert.Equal("test-key", message.Headers.Authorization?.Parameter);
+            var path = message.RequestUri!.AbsolutePath;
+
+            if (path == "/v1/chat/completions")
+                return JsonResponse("""{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"jina-chat","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}""");
+
+            Assert.Equal("/v1/embeddings", path);
+            using var payload = JsonDocument.Parse(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            Assert.Equal("text-matching", payload.RootElement.GetProperty("task").GetString());
+            Assert.Equal("preserved", payload.RootElement.GetProperty("future_option").GetString());
+            return JsonResponse("""{"data":[{"embedding":[0.1,0.2],"index":0}],"model":"jina-embeddings-v3","usage":{"prompt_tokens":1,"total_tokens":1}}""");
+        });
+        var provider = new JinaProvider(new KeyResolver(), new ClientFactory(client));
+
+        var chat = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "jina/jina-chat",
+            Messages = [new() { Role = "user", Content = "Hello" }]
+        });
+        using var input = JsonDocument.Parse("""["hello"]""");
+        var embeddings = await provider.OpenAIEmbeddingRequestAsync(new OpenAIEmbeddingRequest
+        {
+            Model = "jina/jina-embeddings-v3",
+            Input = input.RootElement.Clone(),
+            AdditionalProperties = new()
+            {
+                ["task"] = JsonSerializer.SerializeToElement("text-matching"),
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+
+        Assert.Equal("Hello", Assert.Single(chat.Choices).Message.Content);
+        Assert.Single(embeddings.Data);
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
     [Fact]

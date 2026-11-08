@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using AIHappey.Common.Model;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.Contracts;
@@ -28,24 +27,31 @@ public partial class JinaProvider : IModelProvider
         _client.BaseAddress = new Uri("https://deepsearch.jina.ai/");
     }
 
-    private void ApplyAuthHeader()
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException("No Jina API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return new Dictionary<string, string>
+        {
+            ["Authorization"] = string.Concat("Bearer ", key)
+        };
+    }
+
+    private void ApplyAuthHeader(HttpRequestMessage request)
+    {
+        var headers = GetAuthHeaders();
+        request.Headers.TryAddWithoutValidation("Authorization", headers["Authorization"]);
     }
 
     public string GetIdentifier() => "jina";
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
+             options, GetAuthHeaders(), cancellationToken: cancellationToken);
     }
 
     public Task<ImageResponse> ImageRequest(ImageRequest imageRequest, CancellationToken cancellationToken = default)
@@ -65,10 +71,8 @@ public partial class JinaProvider : IModelProvider
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         return this.GetChatCompletions(_client,
-                    options, cancellationToken: cancellationToken);
+                    options, GetAuthHeaders(), cancellationToken: cancellationToken);
     }
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)

@@ -14,8 +14,6 @@ public partial class JinaProvider
     {
         var url = "https://api.jina.ai/v1/rerank";
 
-        ApplyAuthHeader();
-
         var now = DateTime.UtcNow;
 
         var metadata = GetProviderOptions(request);
@@ -26,6 +24,7 @@ public partial class JinaProvider
             Content = new StringContent(JsonSerializer.Serialize(payload, JsonOpts),
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var errText = await resp.Content.ReadAsStringAsync(cancellationToken);
