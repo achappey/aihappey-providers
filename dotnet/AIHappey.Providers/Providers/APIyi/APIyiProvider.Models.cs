@@ -1,7 +1,7 @@
 using AIHappey.Core.AI;
 using System.Text.Json;
+using System.Net.Http.Headers;
 using AIHappey.Core.Models;
-using System.Net;
 
 namespace AIHappey.Core.Providers.APIyi;
 
@@ -9,30 +9,27 @@ public partial class APIyiProvider
 {
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
     {
-        var cacheKey = this.GetCacheKey();
+        var key = _keyResolver.Resolve(GetIdentifier());
+        if (string.IsNullOrWhiteSpace(key))
+            throw new InvalidOperationException($"No {nameof(APIyi)} API key.");
 
+        var cacheKey = this.GetCacheKey(key);
         return await _memoryCache.GetOrCreateAsync(
             cacheKey,
             async ct =>
             {
-                var handler = new HttpClientHandler
-                {
-                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                };
-
-                var modelClient = new HttpClient(handler);
-
-                using var req = new HttpRequestMessage(HttpMethod.Get, "https://api.apiyi.com/api/model-info");
-                using var resp = await modelClient.SendAsync(req, cancellationToken);
+                using var req = new HttpRequestMessage(HttpMethod.Get, "v1/models");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+                using var resp = await _client.SendAsync(req, ct);
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    var err = await resp.Content.ReadAsStringAsync(cancellationToken);
-                    throw new Exception($"APIyi API error: {err}");
+                    var err = await resp.Content.ReadAsStringAsync(ct);
+                    throw new InvalidOperationException($"APIyi model listing failed ({(int)resp.StatusCode}): {err}");
                 }
 
-                await using var stream = await resp.Content.ReadAsStreamAsync(cancellationToken);
-                using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+                using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
                 var models = new List<Model>();
                 var root = doc.RootElement;
@@ -43,16 +40,21 @@ public partial class APIyiProvider
 
                 foreach (var el in arr)
                 {
-                    Model model = new();
+                    if (!el.TryGetProperty("id", out var idElement)
+                        || idElement.ValueKind != JsonValueKind.String
+                        || string.IsNullOrWhiteSpace(idElement.GetString()))
+                        continue;
 
-                    if (el.TryGetProperty("model_name", out var idEl))
+                    var id = idElement.GetString()!;
+                    models.Add(new Model
                     {
-                        model.Id = idEl.GetString()?.ToModelId(GetIdentifier()) ?? "";
-                        model.Name = idEl.GetString() ?? "";
-                    }
-
-                    if (!string.IsNullOrEmpty(model.Id))
-                        models.Add(model);
+                        Id = id.ToModelId(GetIdentifier()),
+                        Name = id,
+                        OwnedBy = el.TryGetProperty("owned_by", out var ownerElement)
+                                  && ownerElement.ValueKind == JsonValueKind.String
+                            ? ownerElement.GetString()
+                            : null
+                    });
                 }
 
                 return models;
