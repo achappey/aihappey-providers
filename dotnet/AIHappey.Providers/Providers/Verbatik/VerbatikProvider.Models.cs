@@ -19,8 +19,6 @@ public partial class VerbatikProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 var baseModels = GetIdentifier().GetModels();
 
                 var voices = await GetVoicesAsync(cancellationToken);
@@ -42,7 +40,9 @@ public partial class VerbatikProvider
             .Where(IsValidVoice)
             .ToArray();
 
-        return baseModels.SelectMany(baseModel =>
+        return baseModels
+            .Where(IsVoiceModel)
+            .SelectMany(baseModel =>
             validVoices.Select(voice => CreateVoiceModel(baseModel, voice)));
     }   
 
@@ -70,6 +70,11 @@ public partial class VerbatikProvider
         => !string.IsNullOrWhiteSpace(model.Id)
            && string.Equals(model.Type, "speech", StringComparison.OrdinalIgnoreCase);
 
+    private static bool IsVoiceModel(Model model)
+        => IsValidBaseModel(model)
+            && (model.Id.EndsWith("/tts", StringComparison.OrdinalIgnoreCase)
+                || model.Id.EndsWith("/speech-lite", StringComparison.OrdinalIgnoreCase));
+
     private Model CreateVoiceModel(
         Model baseModel,
         VerbatikVoice voice)
@@ -91,7 +96,10 @@ public partial class VerbatikProvider
 
     private async Task<IReadOnlyList<VerbatikVoice>> GetVoicesAsync(CancellationToken cancellationToken)
     {
-        using var resp = await _client.GetAsync("api/v1/voices", cancellationToken);
+        using var request = CreateApiRequest(
+            HttpMethod.Get,
+            "voices/catalog?model=verbatik%2Fspeech-lite");
+        using var resp = await _client.SendAsync(request, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)
@@ -142,9 +150,11 @@ public partial class VerbatikProvider
             voices.Add(new VerbatikVoice
             {
                 Id = id.Trim(),
-                Name = ReadString(item, "name"),
+                Name = ReadString(item, "label") ?? ReadString(item, "name"),
                 Gender = ReadString(item, "gender"),
-                LanguageCode = ReadString(item, "language_code") ?? ReadString(item, "languageCode"),
+                LanguageCode = ReadString(item, "language_code")
+                    ?? ReadString(item, "languageCode")
+                    ?? ReadString(item, "language"),
                 LanguageName = ReadString(item, "language_name") ?? ReadString(item, "languageName")
             });
         }
@@ -185,6 +195,12 @@ public partial class VerbatikProvider
 
     private static bool TryGetPropertyIgnoreCase(JsonElement obj, string propertyName, out JsonElement value)
     {
+        if (obj.ValueKind != JsonValueKind.Object)
+        {
+            value = default;
+            return false;
+        }
+
         foreach (var prop in obj.EnumerateObject())
         {
             if (string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
@@ -211,4 +227,3 @@ public partial class VerbatikProvider
         public string? LanguageName { get; set; }
     }
 }
-
