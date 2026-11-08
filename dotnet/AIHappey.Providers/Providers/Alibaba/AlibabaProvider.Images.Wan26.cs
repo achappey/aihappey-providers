@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.Alibaba;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Models;
 
@@ -37,12 +36,16 @@ public partial class AlibabaProvider
 
     private async Task<ImageResponse> Wan26ImageRequest(
         ImageRequest imageRequest,
-        AlibabaWanImageOptions? wan,
+        JsonElement metadata,
         string modelName,
         List<object> warnings,
         DateTime now,
         CancellationToken cancellationToken)
     {
+        ValidateProviderMetadata(metadata);
+        var wan = GetObjectProperty(metadata, "wan");
+        var requestedEnableInterleave = TryGetOption(wan, "enableInterleave");
+
         // Singapore/intl only for now.
         var baseUrl = DefaultDashScopeBaseUrl;
 
@@ -76,7 +79,7 @@ public partial class AlibabaProvider
                 enableInterleave = false;
             }
 
-            if (wan?.EnableInterleave is not null && wan.EnableInterleave.Value != enableInterleave)
+            if (requestedEnableInterleave is not null && requestedEnableInterleave.Value != enableInterleave)
             {
                 warnings.Add(new { type = "ignored", feature = "enable_interleave", details = "enable_interleave was inferred from input images and provider option was ignored." });
             }
@@ -128,21 +131,26 @@ public partial class AlibabaProvider
         foreach (var img in inputImages)
             userContent.Add(new { image = ToDashScopeImageDataUrl(img) });
 
-        var parameters = new Dictionary<string, object?>
+        var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (metadata.ValueKind == JsonValueKind.Object)
         {
-            ["prompt_extend"] = wan?.PromptExtend,
-            ["watermark"] = wan?.Watermark,
-            ["negative_prompt"] = wan?.NegativePrompt,
-            ["size"] = dashScopeSize,
-            ["seed"] = imageRequest.Seed,
-            ["n"] = n
-        };
+            foreach (var property in metadata.EnumerateObject())
+            {
+                if (!IsImageOptionNamespace(property.Name))
+                    parameters[property.Name] = property.Value;
+            }
+        }
+
+        AddImageOptionProperties(parameters, wan, "wan", includeMaxImages: enableInterleave);
+        if (dashScopeSize is not null)
+            parameters["size"] = dashScopeSize;
+        if (imageRequest.Seed is not null)
+            parameters["seed"] = imageRequest.Seed;
+        parameters["n"] = n;
 
         if (IsWan26Image(modelName))
         {
             parameters["enable_interleave"] = enableInterleave;
-            if (enableInterleave)
-                parameters["max_images"] = wan?.MaxImages;
         }
 
         var payload = new
