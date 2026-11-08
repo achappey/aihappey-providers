@@ -1,9 +1,11 @@
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using AIHappey.Common.Model;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.AI;
 using AIHappey.Responses;
+using AIHappey.Responses.Extensions;
 using AIHappey.Responses.Streaming;
 using AIHappey.Vercel.Models;
 using AIHappey.Core.Contracts;
@@ -30,33 +32,73 @@ public partial class VerdaProvider
     {
         _keyResolver = keyResolver;
         _client = httpClientFactory.CreateClient();
-        _client.BaseAddress = new Uri("https://inference.datacrunch.io/");
+        _client.BaseAddress = new Uri("https://inference.verda.com/v1/");
     }
 
-    private void ApplyAuthHeader()
+    private Dictionary<string, string> CreateRequestHeaders(
+        IReadOnlyDictionary<string, string>? headers = null)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Verda)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        var requestHeaders = headers is null
+            ? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, string>(headers, StringComparer.OrdinalIgnoreCase);
+        requestHeaders["Authorization"] = new AuthenticationHeaderValue("Bearer", key).ToString();
+        return requestHeaders;
     }
 
     public string GetIdentifier() => nameof(Verda).ToLowerInvariant();
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
-        => await this.ListModels(_keyResolver.Resolve(GetIdentifier()));
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, "models");
+        foreach (var (name, value) in CreateRequestHeaders())
+            request.Headers.TryAddWithoutValidation(name, value);
+
+        using var response = await _client.SendAsync(request, cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException(
+                $"Verda model discovery failed ({(int)response.StatusCode}): {body}",
+                null,
+                response.StatusCode);
+
+        var modelResponse = JsonSerializer.Deserialize<ModelResponse>(body, JsonSerializerOptions.Web);
+        return (modelResponse?.Data ?? [])
+            .Select(model =>
+            {
+                if (!model.Id.StartsWith($"{GetIdentifier()}/", StringComparison.OrdinalIgnoreCase))
+                    model.Id = model.Id.ToModelId(GetIdentifier());
+                model.Type ??= "language";
+                return model;
+            })
+            .ToArray();
+    }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToChatCompletion();
+        => await this.GetChatCompletion(
+            _client,
+            options,
+            CreateRequestHeaders(options.Headers),
+            relativeUrl: "chat/completions",
+            cancellationToken: cancellationToken);
+
+    public Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
+        => throw new NotSupportedException();
 
     public async IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var stream = StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
-        await foreach (var update in stream.ToChatCompletionUpdates(cancellationToken))
+        await foreach (var update in this.GetChatCompletions(
+            _client,
+            options,
+            CreateRequestHeaders(options.Headers),
+            relativeUrl: "chat/completions",
+            cancellationToken: cancellationToken))
             yield return update;
     }
 
@@ -65,16 +107,24 @@ public partial class VerdaProvider
     public Task<SpeechResponse> SpeechRequest(SpeechRequest imageRequest, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
 
-    public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToResponseResult();
+    public Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
+        => _client.GetResponses(
+            options,
+            GetIdentifier(),
+            relativeUrl: "responses",
+            headers: CreateRequestHeaders(options.Headers),
+            ct: cancellationToken);
 
     public async IAsyncEnumerable<ResponseStreamPart> ResponsesStreamingAsync(
         ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(
-            options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-            .ToResponseStreamParts(cancellationToken))
+        await foreach (var part in _client.GetResponsesUpdates(
+            options,
+            GetIdentifier(),
+            relativeUrl: "responses",
+            headers: CreateRequestHeaders(options.Headers),
+            ct: cancellationToken))
             yield return part;
     }
 
@@ -90,7 +140,7 @@ public partial class VerdaProvider
     }
 
     public Task<TranscriptionResponse> TranscriptionRequest(TranscriptionRequest request, CancellationToken cancellationToken = default)
-        => VerdaTranscriptionRequest(request, cancellationToken);
+        => throw new NotSupportedException();
 
     public Task<RerankingResponse> RerankingRequest(RerankingRequest request, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
@@ -114,22 +164,13 @@ public partial class VerdaProvider
             yield return part;
     }
 
-    public async Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)
-        => await this.IsTranscriptionModelAsync(request.Model, cancellationToken)
-            ? await this.ExecuteUnifiedTranscriptionAsync(request, cancellationToken)
-            : await this.ExecuteUnifiedImageAsync(request, cancellationToken);
+    public Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)
+        => this.ExecuteUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken);
 
-    public async IAsyncEnumerable<AIStreamEvent> StreamUnifiedAsync(
+    public IAsyncEnumerable<AIStreamEvent> StreamUnifiedAsync(
         AIRequest request,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        var stream = await this.IsTranscriptionModelAsync(request.Model, cancellationToken)
-            ? this.StreamUnifiedTranscriptionAsync(request, cancellationToken)
-            : this.StreamUnifiedImageAsync(request, cancellationToken);
-
-        await foreach (var streamEvent in stream.WithCancellation(cancellationToken))
-            yield return streamEvent;
-    }
+        => this.StreamUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken);
 
     public Task<(byte[] Audio, string MimeType)> OpenAISpeechRequestAsync(AudioSpeechRequest options, CancellationToken cancellationToken = default)
     {
@@ -143,34 +184,34 @@ public partial class VerdaProvider
 
     public Task<OpenAIImagesResponse> OpenAIImageGenerationRequestAsync(OpenAIImageGenerationRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAIImageStreamEvent> OpenAIImageGenerationStreamingAsync(OpenAIImageGenerationRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<OpenAIImagesResponse> OpenAIImageEditRequestAsync(OpenAIImageEditRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAIImageStreamEvent> OpenAIImageEditStreamingAsync(OpenAIImageEditRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     
 
     public Task<IOpenAITranscriptionResponse> OpenAITranscriptionRequestAsync(OpenAITranscriptionRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAITranscriptionStreamEvent> OpenAITranscriptionStreamingAsync(OpenAITranscriptionRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<VideoOperationStartResult> StartVideoOperation(VideoRequest request, CancellationToken cancellationToken = default)
@@ -195,7 +236,7 @@ public partial class VerdaProvider
 
     public IAsyncEnumerable<StreamingTranscriptionPart> TranscriptionStreamingAsync(StreamingTranscriptionRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<OpenAIDecisionResponse> OpenAIDecisionRequestAsync(OpenAIDecisionRequest request, CancellationToken cancellationToken = default)
