@@ -26,7 +26,7 @@ public partial class BinericProvider
         if (string.IsNullOrWhiteSpace(request.Text))
             throw new ArgumentException("Text is required.", nameof(request));
 
-        var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var metadata = request.GetProviderMetadata<JsonElement?>(GetIdentifier());
         if (metadata is JsonElement metadataObject && metadataObject.ValueKind != JsonValueKind.Object)
             throw new JsonException($"Provider options for '{GetIdentifier()}' must be an object.");
 

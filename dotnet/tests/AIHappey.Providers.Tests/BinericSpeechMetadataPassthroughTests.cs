@@ -135,6 +135,40 @@ public sealed class BinericSpeechMetadataPassthroughTests
         Assert.Equal("Bineric TTS failed (400): upstream failure", error.Message);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("{}")]
+    [InlineData("""{"other":{}}""")]
+    [InlineData("""{"bineric":null}""")]
+    [InlineData("""{"bineric":{}}""")]
+    public async Task Speech_accepts_absent_or_empty_provider_options(string? providerOptionsJson)
+    {
+        JsonElement payload = default;
+        var provider = CreateProvider(message =>
+        {
+            payload = ParseElement(message.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return SpeechResponse();
+        });
+
+        var response = await provider.SpeechRequest(new SpeechRequest
+        {
+            Model = "text-to-speech",
+            Text = "Hello",
+            ProviderOptions = providerOptionsJson is null
+                ? null
+                : JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(providerOptionsJson)
+        });
+
+        Assert.Equal("AQID", response.Audio.Base64);
+        Assert.Equal("text-to-speech", payload.GetProperty("model").GetString());
+        Assert.Equal("Hello", payload.GetProperty("messages")[0].GetProperty("content").GetString());
+        Assert.All(payload.GetProperty("options").EnumerateObject(),
+            property => Assert.Equal(JsonValueKind.Null, property.Value.ValueKind));
+        Assert.Equal(
+            new[] { "model", "messages", "options" }.Order(),
+            payload.EnumerateObject().Select(property => property.Name).Order());
+    }
+
     private static BinericProvider CreateProvider(Func<HttpRequestMessage, HttpResponseMessage> responder)
         => new(new StaticApiKeyResolver(), new AsyncCacheHelper(new MemoryCache(new MemoryCacheOptions())),
             new StaticHttpClientFactory(new HttpClient(new CapturingHandler(responder))));

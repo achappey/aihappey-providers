@@ -36,7 +36,7 @@ public sealed class BriaImageInputTests
         var provider = new BriaProvider(new TestApiKeyResolver(), new TestHttpClientFactory(client));
         var request = new ImageRequest
         {
-            Model = "image/edit/erase",
+            Model = "edit/erase",
             Files = [new ImageFile { Data = input, MediaType = "image/png" }],
             Mask = new ImageFile { Data = input, MediaType = "image/png" }
         };
