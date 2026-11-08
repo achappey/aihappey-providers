@@ -28,15 +28,14 @@ public partial class JSON2VideoProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.json2video.com/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(JSON2Video)} API key.");
 
-        _client.DefaultRequestHeaders.Remove("x-api-key");
-        _client.DefaultRequestHeaders.Add("x-api-key", key);
+        request.Headers.Add("x-api-key", key);
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
