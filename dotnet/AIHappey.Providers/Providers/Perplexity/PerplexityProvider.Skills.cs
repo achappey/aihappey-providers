@@ -121,6 +121,8 @@ public partial class PerplexityProvider
         var downloadUri = Uri.TryCreate(downloadUrl, UriKind.Absolute, out var absoluteUri)
             ? absoluteUri
             : new Uri(_client.BaseAddress!, downloadUrl);
+        if (downloadUri.Scheme != Uri.UriSchemeHttps)
+            throw new JsonException("Perplexity skill download URL must use HTTPS.");
 
         using var downloadRequest = new HttpRequestMessage(HttpMethod.Get, downloadUri);
         using var downloadResponse = await _skillDownloadClient.SendAsync(

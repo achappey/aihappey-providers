@@ -749,6 +749,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, JinaProvider>();
         services.AddScoped<IModelProvider, GroqProvider>();
         services.AddScoped<IModelProvider, PerplexityProvider>();
+        services.AddScoped<ISkillProvider, PerplexityProvider>();
         services.AddScoped<IModelProvider, TogetherProvider>();
         services.AddScoped<IModelProvider, PollinationsProvider>();
         services.AddScoped<IModelProvider, SpaceXAIProvider>();
