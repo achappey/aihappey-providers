@@ -5,6 +5,7 @@ using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Astica;
 using AIHappey.Core.Providers.Abliteration;
+using AIHappey.Core.Providers.ARWriter;
 using AIHappey.Core.Providers.Audixa;
 using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
@@ -564,6 +565,67 @@ public sealed class NicheProviderMaintenanceTests
         Assert.Single(parts.OfType<SpeechStreamStartPart>());
         Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
         Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task ARWriter_embeddings_use_the_documented_endpoint_request_scoped_auth_and_preserve_raw_parameters()
+    {
+        var requestCount = 0;
+        using var client = CreateClient(async request =>
+        {
+            requestCount++;
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+
+            if (request.RequestUri!.AbsolutePath == "/v1/chat/completions")
+            {
+                return JsonResponse(
+                    """{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"test-model","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}""");
+            }
+
+            Assert.Equal("/v1/embeddings", request.RequestUri.AbsolutePath);
+            using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("preserved", payload.RootElement.GetProperty("future_option").GetString());
+
+            return JsonResponse(
+                """{"object":"list","data":[{"object":"embedding","index":0,"embedding":[0.125,0.25]}],"model":"test-model","usage":{"prompt_tokens":2,"total_tokens":2}}""");
+        });
+        var provider = new ARWriterProvider(
+            new TestKeyResolver(),
+            new AIHappey.Core.AI.AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        var chatResponse = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "test-model",
+            Messages = [new() { Role = "user", Content = "Hello" }]
+        });
+        using var input = JsonDocument.Parse("\"hello\"");
+        var openAIResponse = await provider.OpenAIEmbeddingRequestAsync(new OpenAIEmbeddingRequest
+        {
+            Model = "test-model",
+            Input = input.RootElement.Clone(),
+            AdditionalProperties = new()
+            {
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+
+        var response = await provider.EmbeddingRequestAsync(new EmbeddingRequest
+        {
+            Model = "test-model",
+            Values = ["hello"],
+            ProviderOptions = new()
+            {
+                ["arwriter"] = JsonDocument.Parse("""{"future_option":"preserved"}""").RootElement.Clone()
+            }
+        });
+
+        Assert.Equal("Hello", Assert.Single(chatResponse.Choices).Message.Content);
+        Assert.Single(openAIResponse.Data);
+        Assert.Equal(new double[] { 0.125, 0.25 }, Assert.Single(response.Embeddings));
+        Assert.Equal(3, requestCount);
         Assert.Empty(client.DefaultRequestHeaders);
     }
 
