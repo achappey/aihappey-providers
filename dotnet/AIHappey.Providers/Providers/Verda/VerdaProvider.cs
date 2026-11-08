@@ -79,12 +79,16 @@ public partial class VerdaProvider
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-        => await this.GetChatCompletion(
+    {
+        options.Stream = false;
+
+        return await this.GetChatCompletion(
             _client,
             options,
             CreateRequestHeaders(options.Headers),
             relativeUrl: "chat/completions",
             cancellationToken: cancellationToken);
+    }
 
     public Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
@@ -93,6 +97,10 @@ public partial class VerdaProvider
         ChatCompletionOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        options.Stream = true;
+        options.StreamOptions ??= new StreamOptions();
+        options.StreamOptions.IncludeUsage ??= true;
+
         await foreach (var update in this.GetChatCompletions(
             _client,
             options,
@@ -108,17 +116,23 @@ public partial class VerdaProvider
         => throw new NotSupportedException();
 
     public Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
-        => _client.GetResponses(
+    {
+        options.Stream = false;
+
+        return _client.GetResponses(
             options,
             GetIdentifier(),
             relativeUrl: "responses",
             headers: CreateRequestHeaders(options.Headers),
             ct: cancellationToken);
+    }
 
     public async IAsyncEnumerable<ResponseStreamPart> ResponsesStreamingAsync(
         ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        options.Stream = true;
+
         await foreach (var part in _client.GetResponsesUpdates(
             options,
             GetIdentifier(),
