@@ -29,34 +29,30 @@ public partial class AIBramhaProvider : IModelProvider
         _keyResolver = keyResolver;
          _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
-        _client.BaseAddress = new Uri("https://aibramha.in/api/");
+        _client.BaseAddress = new Uri("https://www.aibramha.in/api/");
     }
 
-    private void ApplyAuthHeader()
+    private string GetApiKey()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(AIBramha)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return key;
     }
+
+    private IReadOnlyDictionary<string, string> GetRequestHeaders()
+        => new Dictionary<string, string>
+        {
+            ["Authorization"] = new AuthenticationHeaderValue("Bearer", GetApiKey()).ToString()
+        };
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-    {
-        ApplyAuthHeader();
-
-        return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
-    }
+        => await this.GetChatCompletion(_client, options, GetRequestHeaders(), cancellationToken: cancellationToken);
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
-    {
-        ApplyAuthHeader();
-
-        return this.GetChatCompletions(_client,
-                    options, cancellationToken: cancellationToken);
-    }
+        => this.GetChatCompletions(_client, options, GetRequestHeaders(), cancellationToken: cancellationToken);
 
     public string GetIdentifier() => nameof(AIBramha).ToLowerInvariant();
 

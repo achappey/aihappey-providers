@@ -1,5 +1,7 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.AIBramha;
@@ -13,9 +15,11 @@ public sealed class AIBramhaModelCatalogTests
     {
         using var client = CreateClient(request =>
         {
+            Assert.Equal("www.aibramha.in", request.RequestUri!.Host);
             Assert.Equal("/api/v1/models", request.RequestUri!.AbsolutePath);
             Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
             Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            Assert.Empty(client.DefaultRequestHeaders);
             return Task.FromResult(JsonResponse(
                 """{"success":true,"models":[{"id":"gpt-4o","name":"GPT-4o","category":"text","provider":"OpenAI","context_length":128000},{"id":"dall-e-3","name":"DALL-E 3","category":"image","provider":"OpenAI","context_length":4000}]}"""));
         });
@@ -35,6 +39,71 @@ public sealed class AIBramhaModelCatalogTests
         Assert.Equal("image", imageModel.Type);
         Assert.Equal("OpenAI", imageModel.OwnedBy);
         Assert.Equal(4000, imageModel.ContextWindow);
+    }
+
+    [Fact]
+    public async Task Chat_completion_uses_the_documented_host_with_request_scoped_auth_and_raw_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("www.aibramha.in", request.RequestUri!.Host);
+            Assert.Equal("/api/v1/chat/completions", request.RequestUri.AbsolutePath);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            Assert.Empty(client.DefaultRequestHeaders);
+            payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync()).RootElement.Clone();
+            return JsonResponse(
+                """{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"gpt-4o","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}""");
+        });
+        var provider = new AIBramhaProvider(
+            new TestKeyResolver(),
+            new AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        var response = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "aibramha/gpt-4o",
+            Messages = [new() { Role = "user", Content = "Hello" }],
+            AdditionalProperties = new()
+            {
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+
+        Assert.Equal("Hello", Assert.Single(response.Choices).Message.Content);
+        Assert.Equal("preserved", payload.GetProperty("future_option").GetString());
+        Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Streaming_chat_authentication_is_attached_to_the_request()
+    {
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal("www.aibramha.in", request.RequestUri!.Host);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            Assert.Empty(client.DefaultRequestHeaders);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("data: [DONE]\n\n", Encoding.UTF8, "text/event-stream")
+            });
+        });
+        var provider = new AIBramhaProvider(
+            new TestKeyResolver(),
+            new AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        await foreach (var _ in provider.CompleteChatStreamingAsync(new ChatCompletionOptions
+        {
+            Model = "aibramha/gpt-4o",
+            Messages = [new() { Role = "user", Content = "Hello" }]
+        }))
+        {
+        }
+
+        Assert.Empty(client.DefaultRequestHeaders);
     }
 
     private static HttpClient CreateClient(Func<HttpRequestMessage, Task<HttpResponseMessage>> responder)
