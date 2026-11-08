@@ -19,8 +19,6 @@ public partial class VerbatikProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 var baseModels = GetIdentifier().GetModels();
 
                 var voices = await GetVoicesAsync(cancellationToken);
@@ -91,7 +89,9 @@ public partial class VerbatikProvider
 
     private async Task<IReadOnlyList<VerbatikVoice>> GetVoicesAsync(CancellationToken cancellationToken)
     {
-        using var resp = await _client.GetAsync("api/v1/voices", cancellationToken);
+        using var request = new HttpRequestMessage(HttpMethod.Get, "api/v1/voices");
+        ApplyAuthHeader(request);
+        using var resp = await _client.SendAsync(request, cancellationToken);
         var body = await resp.Content.ReadAsStringAsync(cancellationToken);
 
         if (!resp.IsSuccessStatusCode)
@@ -211,4 +211,3 @@ public partial class VerbatikProvider
         public string? LanguageName { get; set; }
     }
 }
-

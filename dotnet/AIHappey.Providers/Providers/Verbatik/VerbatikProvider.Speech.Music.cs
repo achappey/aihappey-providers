@@ -30,7 +30,15 @@ public partial class VerbatikProvider
         var outputFormat = NormalizeMusicOutputFormat(request.OutputFormat ?? metadata?.Format ?? "mp3");
         var payload = BuildMusicPayload(request, metadata, prompt, tags, lyrics, outputFormat);
 
-        using var resp = await _client.PostAsJsonAsync("api/v1/text-to-music", payload, JsonSerializerOptions.Web, cancellationToken);
+        using var musicRequest = new HttpRequestMessage(HttpMethod.Post, "api/v1/text-to-music")
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(payload, JsonSerializerOptions.Web),
+                Encoding.UTF8,
+                "application/json")
+        };
+        ApplyAuthHeader(musicRequest);
+        using var resp = await _client.SendAsync(musicRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!resp.IsSuccessStatusCode)
             throw new InvalidOperationException($"{ProviderName} text-to-music failed ({(int)resp.StatusCode}): {Encoding.UTF8.GetString(bytes)}");
@@ -301,4 +309,3 @@ public partial class VerbatikProvider
         string? Format,
         int? Seed);
 }
-
