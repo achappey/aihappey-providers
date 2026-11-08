@@ -5,6 +5,7 @@ using AIHappey.Common.Model;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.AI;
 using AIHappey.Responses;
+using AIHappey.Responses.Extensions;
 using AIHappey.Responses.Streaming;
 using AIHappey.Vercel.Models;
 using AIHappey.Core.Contracts;
@@ -183,34 +184,34 @@ public partial class VerdaProvider
 
     public Task<OpenAIImagesResponse> OpenAIImageGenerationRequestAsync(OpenAIImageGenerationRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAIImageStreamEvent> OpenAIImageGenerationStreamingAsync(OpenAIImageGenerationRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<OpenAIImagesResponse> OpenAIImageEditRequestAsync(OpenAIImageEditRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAIImageStreamEvent> OpenAIImageEditStreamingAsync(OpenAIImageEditRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     
 
     public Task<IOpenAITranscriptionResponse> OpenAITranscriptionRequestAsync(OpenAITranscriptionRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public IAsyncEnumerable<IOpenAITranscriptionStreamEvent> OpenAITranscriptionStreamingAsync(OpenAITranscriptionRequest options, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<VideoOperationStartResult> StartVideoOperation(VideoRequest request, CancellationToken cancellationToken = default)
@@ -235,7 +236,7 @@ public partial class VerdaProvider
 
     public IAsyncEnumerable<StreamingTranscriptionPart> TranscriptionStreamingAsync(StreamingTranscriptionRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public Task<OpenAIDecisionResponse> OpenAIDecisionRequestAsync(OpenAIDecisionRequest request, CancellationToken cancellationToken = default)

@@ -109,6 +109,12 @@ public sealed class VerdaInferenceTests
 
         var response = await provider.ResponsesAsync(new ResponseRequest { Model = "model-one", Input = "Say hello" });
         Assert.Equal("resp-1", response.Id);
+        var chat = await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "model-one",
+            Messages = [new() { Role = "user", Content = "Say hello" }]
+        });
+        Assert.NotNull(chat);
 
         var messages = await provider.MessagesAsync(new MessagesRequest
         {
