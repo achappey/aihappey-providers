@@ -1,5 +1,5 @@
 using AIHappey.Core.AI;
-using System.Net.Http.Headers;
+using AIHappey.Core.Extensions;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Vercel.Models;
@@ -31,30 +31,29 @@ public partial class ARWriterProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.arwriter.ai/");
     }
 
-    private void ApplyAuthHeader()
+    private IReadOnlyDictionary<string, string> GetAuthHeaders()
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(ARWriter)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return new Dictionary<string, string>
+        {
+            ["Authorization"] = string.Concat("Bearer ", key)
+        };
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
+             options, GetAuthHeaders(), cancellationToken: cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         return this.GetChatCompletions(_client,
-                    options, cancellationToken: cancellationToken);
+                    options, GetAuthHeaders(), cancellationToken: cancellationToken);
     }
 
     public string GetIdentifier() => nameof(ARWriter).ToLowerInvariant();
@@ -181,14 +180,31 @@ public partial class ARWriterProvider : IModelProvider
         throw new NotImplementedException();
     }
 
-    public Task<OpenAIEmbeddingResponse> OpenAIEmbeddingRequestAsync(OpenAIEmbeddingRequest request, CancellationToken cancellationToken = default)
+    public async Task<OpenAIEmbeddingResponse> OpenAIEmbeddingRequestAsync(OpenAIEmbeddingRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var result = await this.OpenAICompatibleEmbeddingRequestAsync(
+            _client,
+            request,
+            GetAuthHeaders(),
+            cancellationToken: cancellationToken);
+
+        return result.Response;
     }
 
-    public Task<EmbeddingResponse> EmbeddingRequestAsync(EmbeddingRequest request, CancellationToken cancellationToken = default)
+    public async Task<EmbeddingResponse> EmbeddingRequestAsync(EmbeddingRequest request, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var openAIRequest = request.ToOpenAIEmbeddingRequest(GetIdentifier());
+        var result = await this.OpenAICompatibleEmbeddingRequestAsync(
+            _client,
+            openAIRequest,
+            GetAuthHeaders(),
+            cancellationToken: cancellationToken);
+
+        var response = result.ToEmbeddingResponse(GetIdentifier().CreatePrimitiveProviderMetadata(result.Response));
+        if (response.Response is not null)
+            response.Response.Body = result.Response;
+
+        return response;
     }
 
     public IAsyncEnumerable<StreamingTranscriptionPart> TranscriptionStreamingAsync(StreamingTranscriptionRequest request, CancellationToken cancellationToken = default)

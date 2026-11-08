@@ -1,5 +1,6 @@
-using AIHappey.Core.AI;
+using System.Net.Http.Headers;
 using System.Text.Json;
+using AIHappey.Core.AI;
 using AIHappey.Core.Models;
 
 namespace AIHappey.Core.Providers.ARWriter;
@@ -19,9 +20,8 @@ public partial class ARWriterProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 using var req = new HttpRequestMessage(HttpMethod.Get, "v1/models");
+                req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
                 using var resp = await _client.SendAsync(req, cancellationToken);
 
                 if (!resp.IsSuccessStatusCode)
