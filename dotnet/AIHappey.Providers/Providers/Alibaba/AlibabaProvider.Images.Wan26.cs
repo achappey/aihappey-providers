@@ -42,9 +42,6 @@ public partial class AlibabaProvider
         DateTime now,
         CancellationToken cancellationToken)
     {
-        ValidateProviderMetadata(metadata, ImageApiContract.Wan26);
-        var requestedEnableInterleave = TryGetOption(metadata, "enableInterleave");
-
         // Singapore/intl only for now.
         var baseUrl = DefaultDashScopeBaseUrl;
 
@@ -60,92 +57,24 @@ public partial class AlibabaProvider
             inputImages = [];
         }
 
-        bool enableInterleave;
-        if (IsWan26T2i(modelName))
-        {
-            enableInterleave = false;
-        }
-        else if (IsWan26Image(modelName))
-        {
-            // Auto-switch based on presence of input images.
-            if (inputImages.Count == 0)
-            {
-                enableInterleave = true;
-                warnings.Add(new { type = "mode_auto_selected", enable_interleave = true, details = "No input images provided; switched to mixed text-and-image mode (text-to-image)." });
-            }
-            else
-            {
-                enableInterleave = false;
-            }
-
-            if (requestedEnableInterleave is not null && requestedEnableInterleave.Value != enableInterleave)
-            {
-                warnings.Add(new { type = "ignored", feature = "enable_interleave", details = "enable_interleave was inferred from input images and provider option was ignored." });
-            }
-        }
-        else
-        {
+        if (!IsWan26T2i(modelName) && !IsWan26Image(modelName))
             throw new ArgumentOutOfRangeException(nameof(modelName), modelName, "Unsupported Wan model.");
-        }
-
-        // Validate image count vs mode.
-        if (!enableInterleave)
-        {
-            if (IsWan26Image(modelName) && (inputImages.Count < 1 || inputImages.Count > 4))
-                throw new ArgumentException("wan2.6-image edit mode requires 1 to 4 input images.", nameof(imageRequest));
-        }
-        else
-        {
-            if (inputImages.Count > 1)
-                throw new ArgumentException("wan2.6-image mixed mode supports at most 1 input image.", nameof(imageRequest));
-        }
-
-        // n semantics.
-        int? n = imageRequest.N;
-        if (enableInterleave)
-        {
-            if (n is > 1)
-                throw new ArgumentException("In mixed mode (enable_interleave=true), n must be 1.", nameof(imageRequest));
-
-            n = 1;
-        }
-        else
-        {
-            if (IsWan26Image(modelName))
-            {
-                n ??= 1;
-                if (n is < 1 or > 4)
-                    throw new ArgumentException("n must be between 1 and 4 for wan2.6-image edit mode.", nameof(imageRequest));
-            }
-            else if (IsWan26T2i(modelName))
-            {
-                n ??= 1;
-                if (n is < 1 or > 4)
-                    throw new ArgumentException("n must be between 1 and 4 for wan2.6-t2i.", nameof(imageRequest));
-            }
-        }
 
         // Build message content.
         var userContent = new List<object> { new { text = imageRequest.Prompt } };
         foreach (var img in inputImages)
             userContent.Add(new { image = ToDashScopeImageDataUrl(img) });
 
-        var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
-        if (metadata.ValueKind == JsonValueKind.Object)
-        {
-            foreach (var property in metadata.EnumerateObject())
-                AddImageOption(parameters, property, ImageApiContract.Wan26, includeMaxImages: enableInterleave);
-        }
-
-        if (dashScopeSize is not null)
-            parameters["size"] = dashScopeSize;
-        if (imageRequest.Seed is not null)
-            parameters["seed"] = imageRequest.Seed;
-        parameters["n"] = n;
+        var parameters = BuildImageParameters(metadata, dashScopeSize, imageRequest.Seed, imageRequest.N);
+        parameters.TryAdd("n", 1);
 
         if (IsWan26Image(modelName))
         {
-            parameters["enable_interleave"] = enableInterleave;
+            // Preserve automatic mode selection only as a default. Explicit native
+            // options and their mode/count constraints are the upstream API's concern.
+            var enableInterleave = inputImages.Count == 0;
+            if (parameters.TryAdd("enable_interleave", enableInterleave) && enableInterleave)
+                warnings.Add(new { type = "mode_auto_selected", enable_interleave = true, details = "No input images provided; switched to mixed text-and-image mode (text-to-image)." });
         }
 
         var payload = new

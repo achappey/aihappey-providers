@@ -76,7 +76,6 @@ public partial class AlibabaProvider
             },
             parameters = BuildImageParameters(
                 providerMetadata,
-                GetImageApiContract(imageRequest.Model),
                 dashScopeSize,
                 imageRequest.Seed,
                 imageRequest.N)
@@ -130,152 +129,31 @@ public partial class AlibabaProvider
 
     private static Dictionary<string, object?> BuildImageParameters(
         JsonElement metadata,
-        ImageApiContract apiContract,
         string? size,
         int? seed,
         int? count)
     {
-        ValidateProviderMetadata(metadata, apiContract);
-
         var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
-        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+        if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null))
         {
-            if (size is not null)
-                parameters["size"] = size;
-            if (seed is not null)
-                parameters["seed"] = seed;
-            if (count is not null)
-                parameters["n"] = count;
-            return parameters;
-        }
+            if (metadata.ValueKind != JsonValueKind.Object)
+                throw new JsonException("Alibaba provider options must be a JSON object.");
 
-        foreach (var property in metadata.EnumerateObject())
-            AddImageOption(parameters, property, apiContract, includeMaxImages: false);
-
-        parameters["size"] = size;
-        parameters["seed"] = seed;
-        parameters["n"] = count;
-        return parameters;
-    }
-
-    private enum ImageApiContract
-    {
-        Qwen,
-        ZImage,
-        Wan26
-    }
-
-    private static ImageApiContract GetImageApiContract(string modelName)
-        => IsWan26Model(modelName)
-            ? ImageApiContract.Wan26
-            : string.Equals(modelName, "z-image-turbo", StringComparison.OrdinalIgnoreCase)
-                ? ImageApiContract.ZImage
-                : ImageApiContract.Qwen;
-
-    private static void ValidateProviderMetadata(JsonElement metadata, ImageApiContract apiContract)
-    {
-        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
-            return;
-
-        if (metadata.ValueKind != JsonValueKind.Object)
-            throw new JsonException("Alibaba provider options must be a JSON object.");
-
-        foreach (var property in metadata.EnumerateObject())
-            ValidateMappedImageOption(property.Name, property.Value, apiContract);
-    }
-
-    private static bool TryGetProperty(JsonElement element, string propertyName, out JsonElement value)
-    {
-        value = default;
-
-        if (element.ValueKind != JsonValueKind.Object)
-            return false;
-
-        var found = false;
-        foreach (var property in element.EnumerateObject())
-        {
-            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+            // Clients supply flat, native DashScope parameters. Do not normalize names
+            // or deserialize values: unknown options and nested JSON pass through intact.
+            foreach (var property in metadata.EnumerateObject())
             {
-                value = property.Value;
-                found = true;
+                if (property.Value.ValueKind != JsonValueKind.Null)
+                    parameters[property.Name] = property.Value;
             }
         }
 
-        return found;
-    }
-
-    private static bool? TryGetOption(JsonElement options, string propertyName)
-    {
-        if (!TryGetProperty(options, propertyName, out var value)
-            || value.ValueKind == JsonValueKind.Null)
-            return null;
-
-        return value.Deserialize<bool>();
-    }
-
-    private static void AddImageOption(
-        Dictionary<string, object?> parameters,
-        JsonProperty property,
-        ImageApiContract apiContract,
-        bool includeMaxImages)
-    {
-        ValidateMappedImageOption(property.Name, property.Value, apiContract);
-
-        var mappedName = property.Name switch
-        {
-            var name when apiContract is ImageApiContract.Qwen or ImageApiContract.Wan26
-                && string.Equals(name, "negativePrompt", StringComparison.OrdinalIgnoreCase) => "negative_prompt",
-            var name when string.Equals(name, "promptExtend", StringComparison.OrdinalIgnoreCase) => "prompt_extend",
-            var name when apiContract is ImageApiContract.Qwen or ImageApiContract.Wan26
-                && string.Equals(name, "watermark", StringComparison.OrdinalIgnoreCase) => "watermark",
-            var name when apiContract == ImageApiContract.Qwen
-                && string.Equals(name, "promptExtendMode", StringComparison.OrdinalIgnoreCase) => "prompt_extend_mode",
-            var name when apiContract == ImageApiContract.Qwen
-                && string.Equals(name, "enableThinking", StringComparison.OrdinalIgnoreCase) => "enable_thinking",
-            var name when apiContract == ImageApiContract.Wan26
-                && includeMaxImages && string.Equals(name, "maxImages", StringComparison.OrdinalIgnoreCase) => "max_images",
-            var name when apiContract == ImageApiContract.Wan26
-                && string.Equals(name, "enableInterleave", StringComparison.OrdinalIgnoreCase) => null,
-            var name when apiContract == ImageApiContract.Wan26
-                && string.Equals(name, "maxImages", StringComparison.OrdinalIgnoreCase) => null,
-            _ => property.Name
-        };
-
-        if (mappedName is null)
-            return;
-
-        if (property.Value.ValueKind == JsonValueKind.Null
-            && !string.Equals(mappedName, property.Name, StringComparison.Ordinal))
-            return;
-
-        parameters[mappedName] = property.Value;
-    }
-
-    private static void ValidateMappedImageOption(
-        string propertyName,
-        JsonElement value,
-        ImageApiContract apiContract)
-    {
-        if (value.ValueKind == JsonValueKind.Null)
-            return;
-
-        if ((apiContract is ImageApiContract.Qwen or ImageApiContract.Wan26)
-            && string.Equals(propertyName, "negativePrompt", StringComparison.OrdinalIgnoreCase)
-            || apiContract == ImageApiContract.Qwen
-            && string.Equals(propertyName, "promptExtendMode", StringComparison.OrdinalIgnoreCase))
-        {
-            _ = value.Deserialize<string>();
-        }
-        else if (string.Equals(propertyName, "promptExtend", StringComparison.OrdinalIgnoreCase)
-            || (apiContract is ImageApiContract.Qwen or ImageApiContract.Wan26) && string.Equals(propertyName, "watermark", StringComparison.OrdinalIgnoreCase)
-            || apiContract == ImageApiContract.Qwen && string.Equals(propertyName, "enableThinking", StringComparison.OrdinalIgnoreCase)
-            || apiContract == ImageApiContract.Wan26 && string.Equals(propertyName, "enableInterleave", StringComparison.OrdinalIgnoreCase))
-        {
-            _ = value.Deserialize<bool>();
-        }
-        else if (apiContract == ImageApiContract.Wan26 && string.Equals(propertyName, "maxImages", StringComparison.OrdinalIgnoreCase))
-        {
-            _ = value.Deserialize<int>();
-        }
+        if (size is not null)
+            parameters["size"] = size;
+        if (seed is not null)
+            parameters["seed"] = seed;
+        if (count is not null)
+            parameters["n"] = count;
+        return parameters;
     }
 }
