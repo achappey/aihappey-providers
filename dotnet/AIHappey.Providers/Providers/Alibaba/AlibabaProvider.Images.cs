@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
-using AIHappey.Common.Model.Providers.Alibaba;
 using AIHappey.Core.AI;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Models;
@@ -32,10 +31,10 @@ public partial class AlibabaProvider
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
 
-        var providerMetadata = imageRequest.GetProviderMetadata<AlibabaImageProviderMetadata>(GetIdentifier());
+        var providerMetadata = imageRequest.GetProviderMetadata<JsonElement>(GetIdentifier());
 
         if (IsWan26Model(imageRequest.Model))
-            return await Wan26ImageRequest(imageRequest, providerMetadata?.Wan, imageRequest.Model, warnings, now, cancellationToken);
+            return await Wan26ImageRequest(imageRequest, providerMetadata, imageRequest.Model, warnings, now, cancellationToken);
 
         var inputImages = imageRequest.Files?.ToList() ?? [];
         var isQwenImage3 = imageRequest.Model.StartsWith("qwen-image-3.0", StringComparison.OrdinalIgnoreCase);
@@ -57,8 +56,6 @@ public partial class AlibabaProvider
         var dashScopeSize = MapGenericSizeToDashScope(imageRequest.Size);
 
         // Route providerOptions based on model family.
-        var (promptExtend, negativePrompt, watermark) = ResolveDashScopeParams(imageRequest.Model, providerMetadata);
-
         var content = new List<object>();
         foreach (var image in inputImages)
             content.Add(new { image = ToDashScopeImageDataUrl(image) });
@@ -78,20 +75,7 @@ public partial class AlibabaProvider
                     }
                 }
             },
-            parameters = new
-            {
-                // qwen-only (ignored by tongyi z-image)
-                negative_prompt = negativePrompt,
-                watermark,
-
-                // shared
-                prompt_extend = promptExtend,
-                prompt_extend_mode = providerMetadata?.Qwen?.PromptExtendMode,
-                enable_thinking = providerMetadata?.Qwen?.EnableThinking,
-                size = dashScopeSize,
-                seed = imageRequest.Seed,
-                n = imageRequest.N
-            }
+            parameters = BuildImageParameters(providerMetadata, isQwenImage3 ? "qwen" : "tongyi", dashScopeSize, imageRequest.Seed, imageRequest.N)
         };
 
         // Singapore-only: always use intl base.
@@ -140,25 +124,156 @@ public partial class AlibabaProvider
         return genericSize.Trim().ToLowerInvariant().Replace('x', '*');
     }
 
-    private static (bool? PromptExtend, string? NegativePrompt, bool? Watermark) ResolveDashScopeParams(
-        string modelName,
-        AlibabaImageProviderMetadata? metadata)
+    private static Dictionary<string, object?> BuildImageParameters(
+        JsonElement metadata,
+        string optionNamespace,
+        string? size,
+        int? seed,
+        int? count)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(modelName);
+        ValidateProviderMetadata(metadata);
 
-        // Tongyi Z-Image models (text-to-image)
-        if (string.Equals(modelName, "z-image-turbo", StringComparison.OrdinalIgnoreCase))
+        var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
         {
-            return (
-                metadata?.Tongyi?.PromptExtend,
-                null,
-                null);
+            parameters["size"] = size;
+            parameters["seed"] = seed;
+            parameters["n"] = count;
+            return parameters;
         }
 
-        // Default to Qwen Image behavior.
-        return (
-            metadata?.Qwen?.PromptExtend,
-            metadata?.Qwen?.NegativePrompt,
-            metadata?.Qwen?.Watermark);
+        var options = GetObjectProperty(metadata, optionNamespace);
+
+        foreach (var property in metadata.EnumerateObject())
+        {
+            if (string.Equals(property.Name, optionNamespace, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            parameters[property.Name] = property.Value;
+        }
+
+        AddImageOptionProperties(parameters, options, optionNamespace, includeMaxImages: false);
+
+        parameters["size"] = size;
+        parameters["seed"] = seed;
+        parameters["n"] = count;
+        return parameters;
+    }
+
+    private static void ValidateProviderMetadata(JsonElement metadata)
+    {
+        if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return;
+
+        if (metadata.ValueKind != JsonValueKind.Object)
+            throw new JsonException("Alibaba provider options must be a JSON object.");
+    }
+
+    private static JsonElement GetObjectProperty(JsonElement metadata, string propertyName)
+    {
+        if (!TryGetProperty(metadata, propertyName, out var value)
+            || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return default;
+
+        if (value.ValueKind != JsonValueKind.Object)
+            throw new JsonException($"Alibaba provider options '{propertyName}' must be a JSON object.");
+
+        return value;
+    }
+
+    private static bool TryGetProperty(JsonElement element, string propertyName, out JsonElement value)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            value = default;
+            return false;
+        }
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+            {
+                value = property.Value;
+                return true;
+            }
+        }
+
+        value = default;
+        return false;
+    }
+
+    private static bool? TryGetOption(JsonElement options, string propertyName)
+    {
+        if (!TryGetProperty(options, propertyName, out var value)
+            || value.ValueKind == JsonValueKind.Null)
+            return null;
+
+        return value.Deserialize<bool>();
+    }
+
+    private static void AddImageOptionProperties(
+        Dictionary<string, object?> parameters,
+        JsonElement options,
+        string optionNamespace,
+        bool includeMaxImages)
+    {
+        if (options.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return;
+
+        foreach (var property in options.EnumerateObject())
+        {
+            ValidateMappedImageOption(property.Name, property.Value, optionNamespace, includeMaxImages);
+
+            var mappedName = property.Name switch
+            {
+                var name when optionNamespace is "qwen" or "wan"
+                    && string.Equals(name, "negativePrompt", StringComparison.OrdinalIgnoreCase) => "negative_prompt",
+                var name when string.Equals(name, "promptExtend", StringComparison.OrdinalIgnoreCase) => "prompt_extend",
+                var name when optionNamespace is "qwen" or "wan"
+                    && string.Equals(name, "watermark", StringComparison.OrdinalIgnoreCase) => "watermark",
+                var name when optionNamespace == "qwen" && string.Equals(name, "promptExtendMode", StringComparison.OrdinalIgnoreCase) => "prompt_extend_mode",
+                var name when optionNamespace == "qwen" && string.Equals(name, "enableThinking", StringComparison.OrdinalIgnoreCase) => "enable_thinking",
+                var name when optionNamespace == "wan" && includeMaxImages && string.Equals(name, "maxImages", StringComparison.OrdinalIgnoreCase) => "max_images",
+                var name when optionNamespace == "wan" && string.Equals(name, "enableInterleave", StringComparison.OrdinalIgnoreCase) => null,
+                var name when optionNamespace == "wan" && string.Equals(name, "maxImages", StringComparison.OrdinalIgnoreCase) => null,
+                _ => property.Name
+            };
+
+            if (mappedName is null)
+                continue;
+
+            if (property.Value.ValueKind == JsonValueKind.Null
+                && !string.Equals(mappedName, property.Name, StringComparison.Ordinal))
+                continue;
+
+            parameters[mappedName] = property.Value;
+        }
+    }
+
+    private static void ValidateMappedImageOption(
+        string propertyName,
+        JsonElement value,
+        string optionNamespace,
+        bool includeMaxImages)
+    {
+        if (value.ValueKind == JsonValueKind.Null)
+            return;
+
+        if (string.Equals(propertyName, "negativePrompt", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(propertyName, "promptExtendMode", StringComparison.OrdinalIgnoreCase))
+        {
+            _ = value.Deserialize<string>();
+        }
+        else if (string.Equals(propertyName, "promptExtend", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(propertyName, "watermark", StringComparison.OrdinalIgnoreCase)
+            || optionNamespace == "qwen" && string.Equals(propertyName, "enableThinking", StringComparison.OrdinalIgnoreCase)
+            || optionNamespace == "wan" && string.Equals(propertyName, "enableInterleave", StringComparison.OrdinalIgnoreCase))
+        {
+            _ = value.Deserialize<bool>();
+        }
+        else if (includeMaxImages && string.Equals(propertyName, "maxImages", StringComparison.OrdinalIgnoreCase))
+        {
+            _ = value.Deserialize<int>();
+        }
     }
 }
