@@ -44,7 +44,7 @@ public partial class AlibabaProvider
     {
         ValidateProviderMetadata(metadata);
         var wan = GetObjectProperty(metadata, "wan");
-        var requestedEnableInterleave = TryGetOption<bool>(wan, "enableInterleave");
+        var requestedEnableInterleave = TryGetOption(wan, "enableInterleave");
 
         // Singapore/intl only for now.
         var baseUrl = DefaultDashScopeBaseUrl;
@@ -149,8 +149,6 @@ public partial class AlibabaProvider
         if (IsWan26Image(modelName))
         {
             parameters["enable_interleave"] = enableInterleave;
-            if (enableInterleave)
-                parameters["max_images"] = wan?.MaxImages;
         }
 
         var payload = new
