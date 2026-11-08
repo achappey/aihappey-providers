@@ -19,9 +19,8 @@ public partial class AIBramhaProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 using var req = new HttpRequestMessage(HttpMethod.Get, "v1/models");
+                req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
                 using var resp = await _client.SendAsync(req, cancellationToken);
 
                 if (!resp.IsSuccessStatusCode)
