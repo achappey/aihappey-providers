@@ -51,7 +51,7 @@ public sealed class AIMagicxProviderTests
         await foreach (var update in provider.CompleteChatStreamingAsync(options))
             updates.Add(update);
 
-        Assert.Equal("hello", response.Choices[0].Message.Content);
+        Assert.Equal("hello", response.Choices.First().Message.Content);
         Assert.NotEmpty(updates);
         Assert.Equal(2, calls);
         Assert.Null(client.DefaultRequestHeaders.Authorization);
