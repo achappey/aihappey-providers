@@ -29,7 +29,7 @@ public partial class VerdaProvider
         var warnings = new List<object>();
 
         var providerMetadata = imageRequest.GetProviderMetadata<VerdaImageProviderMetadata>(GetIdentifier());
-        var flux1 = providerMetadata?.Flux1;
+        var flux1 = GetFlux1Metadata(providerMetadata);
 
         if (!string.IsNullOrWhiteSpace(imageRequest.Size) || !string.IsNullOrWhiteSpace(imageRequest.AspectRatio))
         {
@@ -71,7 +71,7 @@ public partial class VerdaProvider
             });
         }
 
-        var outputFormat = flux1?.OutputFormat ?? "jpeg";
+        var outputFormat = GetFlux1StringOption(flux1, "output_format") ?? "jpeg";
         var endpoint = imageRequest.Model switch
         {
             "flux-kontext-pro" => "https://relay.datacrunch.io/bfl/flux-kontext-pro",
@@ -82,13 +82,19 @@ public partial class VerdaProvider
         var payload = new Flux1KontextRequest
         {
             Prompt = imageRequest.Prompt,
-            Steps = flux1?.NumInferenceSteps,
-            Guidance = flux1?.GuidanceScale,
+            Steps = GetFlux1Option<int>(flux1, "num_inference_steps"),
+            Guidance = GetFlux1Option<float>(flux1, "guidance_scale"),
             PromptUpsampling = true,
             InputImage = inputImage is null ? null : ToDataUrl(inputImage)
         };
 
-        var json = JsonSerializer.Serialize(payload, Flux1Json);
+        var json = SerializeFlux1Payload(
+            payload,
+            providerMetadata,
+            null,
+            "num_inference_steps",
+            "guidance_scale",
+            "output_format");
 
         using var resp = await _client.PostAsync(
             endpoint,
@@ -136,4 +142,3 @@ public partial class VerdaProvider
         public string? InputImage { get; set; }
     }
 }
-

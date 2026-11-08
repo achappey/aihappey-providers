@@ -24,7 +24,7 @@ public partial class VerdaProvider
         var warnings = new List<object>();
 
         var providerMetadata = imageRequest.GetProviderMetadata<VerdaImageProviderMetadata>(GetIdentifier());
-        var flux1 = providerMetadata?.Flux1;
+        var flux1 = GetFlux1Metadata(providerMetadata);
 
         var inputImage = imageRequest.Files?.FirstOrDefault();
         if (imageRequest.Files?.Skip(1).Any() == true)
@@ -47,7 +47,7 @@ public partial class VerdaProvider
         }
 
         var normalizedSize = NormalizeFluxSize(imageRequest.Size, imageRequest.AspectRatio);
-        var outputFormat = flux1?.OutputFormat ?? "jpeg";
+        var outputFormat = GetFlux1StringOption(flux1, "output_format") ?? "jpeg";
 
         var input = new Flux1Input
         {
@@ -55,17 +55,25 @@ public partial class VerdaProvider
             Size = normalizedSize,
             Seed = imageRequest.Seed,
             NumImages = imageRequest.N,
-            NumInferenceSteps = flux1?.NumInferenceSteps,
-            GuidanceScale = flux1?.GuidanceScale,
-            EnableSafetyChecker = flux1?.EnableSafetyChecker,
-            OutputFormat = flux1?.OutputFormat,
-            OutputQuality = flux1?.OutputQuality,
+            NumInferenceSteps = GetFlux1Option<int>(flux1, "num_inference_steps"),
+            GuidanceScale = GetFlux1Option<float>(flux1, "guidance_scale"),
+            EnableSafetyChecker = GetFlux1Option<bool>(flux1, "enable_safety_checker"),
+            OutputFormat = GetFlux1StringOption(flux1, "output_format"),
+            OutputQuality = GetFlux1Option<int>(flux1, "output_quality"),
             EnableBase64Output = true,
             Image = inputImage is null ? null : ToDataUrl(inputImage)
         };
 
         var payload = new Flux1Request { Input = input };
-        var json = JsonSerializer.Serialize(payload, Flux1Json);
+        var json = SerializeFlux1Payload(
+            payload,
+            providerMetadata,
+            "input",
+            "num_inference_steps",
+            "guidance_scale",
+            "enable_safety_checker",
+            "output_format",
+            "output_quality");
 
         using var resp = await _client.PostAsync(
             Flux1KontextDevEndpoint,
@@ -93,4 +101,3 @@ public partial class VerdaProvider
         };
     }
 }
-
