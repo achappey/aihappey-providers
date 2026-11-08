@@ -19,10 +19,11 @@ public sealed class AIBramhaModelCatalogTests
             Assert.Equal("/api/v1/models", request.RequestUri!.AbsolutePath);
             Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
             Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
-            Assert.Empty(client.DefaultRequestHeaders);
             return Task.FromResult(JsonResponse(
                 """{"success":true,"models":[{"id":"gpt-4o","name":"GPT-4o","category":"text","provider":"OpenAI","context_length":128000},{"id":"dall-e-3","name":"DALL-E 3","category":"image","provider":"OpenAI","context_length":4000}]}"""));
         });
+        Assert.Empty(client.DefaultRequestHeaders);
+
         var provider = new AIBramhaProvider(
             new TestKeyResolver(),
             new AsyncCacheHelper(),
@@ -51,11 +52,13 @@ public sealed class AIBramhaModelCatalogTests
             Assert.Equal("/api/v1/chat/completions", request.RequestUri.AbsolutePath);
             Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
             Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
-            Assert.Empty(client.DefaultRequestHeaders);
+
             payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync()).RootElement.Clone();
             return JsonResponse(
                 """{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"gpt-4o","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}""");
         });
+
+        Assert.Empty(client.DefaultRequestHeaders);
         var provider = new AIBramhaProvider(
             new TestKeyResolver(),
             new AsyncCacheHelper(),
@@ -84,12 +87,13 @@ public sealed class AIBramhaModelCatalogTests
             Assert.Equal("www.aibramha.in", request.RequestUri!.Host);
             Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
             Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
-            Assert.Empty(client.DefaultRequestHeaders);
+
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StringContent("data: [DONE]\n\n", Encoding.UTF8, "text/event-stream")
             });
         });
+        Assert.Empty(client.DefaultRequestHeaders);
         var provider = new AIBramhaProvider(
             new TestKeyResolver(),
             new AsyncCacheHelper(),
