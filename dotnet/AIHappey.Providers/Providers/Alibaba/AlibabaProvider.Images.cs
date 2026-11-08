@@ -141,9 +141,12 @@ public partial class AlibabaProvider
         var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
         if (metadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
         {
-            parameters["size"] = size;
-            parameters["seed"] = seed;
-            parameters["n"] = count;
+            if (size is not null)
+                parameters["size"] = size;
+            if (seed is not null)
+                parameters["seed"] = seed;
+            if (count is not null)
+                parameters["n"] = count;
             return parameters;
         }
 
@@ -151,7 +154,7 @@ public partial class AlibabaProvider
 
         foreach (var property in metadata.EnumerateObject())
         {
-            if (string.Equals(property.Name, optionNamespace, StringComparison.OrdinalIgnoreCase))
+            if (IsImageOptionNamespace(property.Name))
                 continue;
 
             parameters[property.Name] = property.Value;
@@ -164,6 +167,11 @@ public partial class AlibabaProvider
         parameters["n"] = count;
         return parameters;
     }
+
+    private static bool IsImageOptionNamespace(string propertyName)
+        => string.Equals(propertyName, "qwen", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(propertyName, "tongyi", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(propertyName, "wan", StringComparison.OrdinalIgnoreCase);
 
     private static void ValidateProviderMetadata(JsonElement metadata)
     {
@@ -207,17 +215,20 @@ public partial class AlibabaProvider
             return false;
         }
 
+        var found = false;
         foreach (var property in element.EnumerateObject())
         {
             if (string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase))
             {
                 value = property.Value;
-                return true;
+                found = true;
             }
         }
 
-        value = default;
-        return false;
+        if (!found)
+            value = default;
+
+        return found;
     }
 
     private static bool? TryGetOption(JsonElement options, string propertyName)

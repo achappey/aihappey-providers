@@ -41,7 +41,10 @@ public sealed class AlibabaImageMetadataPassthroughTests
                 "future_boolean": false,
                 "future_null": null
               },
-              "future_root_option": {"root": [1, null]}
+              "future_root_option": {"root": [1, null]},
+              "size": "metadata-size",
+              "seed": 99,
+              "n": 7
             }
             """);
         var request = CreateRequest("qwen-image-3.0", metadata);
@@ -60,6 +63,9 @@ public sealed class AlibabaImageMetadataPassthroughTests
         Assert.False(payload.TryGetProperty("another-provider", out _));
 
         var parameters = payload.GetProperty("parameters");
+        Assert.Equal("1024*1024", parameters.GetProperty("size").GetString());
+        Assert.Equal(42, parameters.GetProperty("seed").GetInt32());
+        Assert.Equal(2, parameters.GetProperty("n").GetInt32());
         Assert.Equal("no blur", parameters.GetProperty("negative_prompt").GetString());
         Assert.False(parameters.GetProperty("prompt_extend").GetBoolean());
         Assert.False(parameters.GetProperty("watermark").GetBoolean());
@@ -138,6 +144,31 @@ public sealed class AlibabaImageMetadataPassthroughTests
 
         Assert.Equal(3, payload.EnumerateObject().Count());
         Assert.Empty(payload.GetProperty("parameters").EnumerateObject());
+    }
+
+    [Fact]
+    public async Task Image_omits_null_mapped_options_but_preserves_unknown_nulls()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            if (request.Method == HttpMethod.Get)
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) };
+
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"output":{"choices":[{"message":{"content":[{"type":"image","image":"https://images.test/result.png"}]}}]}}""");
+        });
+
+        await CreateProvider(client).ImageRequest(CreateRequest(
+            "qwen-image-3.0",
+            ParseElement("""{"qwen":{"negativePrompt":null,"promptExtend":null,"watermark":null,"future_null":null}}"""),
+            includeStandardOptions: false));
+
+        var parameters = payload.GetProperty("parameters");
+        Assert.False(parameters.TryGetProperty("negative_prompt", out _));
+        Assert.False(parameters.TryGetProperty("prompt_extend", out _));
+        Assert.False(parameters.TryGetProperty("watermark", out _));
+        Assert.Equal(JsonValueKind.Null, parameters.GetProperty("future_null").ValueKind);
     }
 
     [Theory]

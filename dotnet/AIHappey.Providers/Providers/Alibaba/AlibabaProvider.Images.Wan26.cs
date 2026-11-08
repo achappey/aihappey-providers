@@ -136,14 +136,16 @@ public partial class AlibabaProvider
         {
             foreach (var property in metadata.EnumerateObject())
             {
-                if (!string.Equals(property.Name, "wan", StringComparison.OrdinalIgnoreCase))
+                if (!IsImageOptionNamespace(property.Name))
                     parameters[property.Name] = property.Value;
             }
         }
 
         AddImageOptionProperties(parameters, wan, "wan", includeMaxImages: enableInterleave);
-        parameters["size"] = dashScopeSize;
-        parameters["seed"] = imageRequest.Seed;
+        if (dashScopeSize is not null)
+            parameters["size"] = dashScopeSize;
+        if (imageRequest.Seed is not null)
+            parameters["seed"] = imageRequest.Seed;
         parameters["n"] = n;
 
         if (IsWan26Image(modelName))
