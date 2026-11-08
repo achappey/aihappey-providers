@@ -42,9 +42,8 @@ public partial class AlibabaProvider
         DateTime now,
         CancellationToken cancellationToken)
     {
-        ValidateProviderMetadata(metadata);
-        var wan = GetObjectProperty(metadata, "wan");
-        var requestedEnableInterleave = TryGetOption(wan, "enableInterleave");
+        ValidateProviderMetadata(metadata, ImageApiContract.Wan26);
+        var requestedEnableInterleave = TryGetOption(metadata, "enableInterleave");
 
         // Singapore/intl only for now.
         var baseUrl = DefaultDashScopeBaseUrl;
@@ -135,13 +134,9 @@ public partial class AlibabaProvider
         if (metadata.ValueKind == JsonValueKind.Object)
         {
             foreach (var property in metadata.EnumerateObject())
-            {
-                if (!IsImageOptionNamespace(property.Name))
-                    parameters[property.Name] = property.Value;
-            }
+                AddImageOption(parameters, property, ImageApiContract.Wan26, includeMaxImages: enableInterleave);
         }
 
-        AddImageOptionProperties(parameters, wan, "wan", includeMaxImages: enableInterleave);
         if (dashScopeSize is not null)
             parameters["size"] = dashScopeSize;
         if (imageRequest.Seed is not null)
