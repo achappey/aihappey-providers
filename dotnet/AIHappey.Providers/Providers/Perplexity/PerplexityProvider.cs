@@ -24,6 +24,7 @@ public partial class PerplexityProvider : IModelProvider, ISkillProvider
     private readonly IApiKeyResolver _keyResolver;
 
     private readonly HttpClient _client;
+    private readonly HttpClient _skillDownloadClient;
 
     private readonly AsyncCacheHelper _memoryCache;
 
@@ -33,6 +34,7 @@ public partial class PerplexityProvider : IModelProvider, ISkillProvider
         _keyResolver = keyResolver;
         _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
+        _skillDownloadClient = httpClientFactory.CreateClient();
         _client.BaseAddress = new Uri(BASE_URL);
     }
 
