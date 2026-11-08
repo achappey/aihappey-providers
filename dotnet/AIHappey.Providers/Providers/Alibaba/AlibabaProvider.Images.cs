@@ -186,11 +186,10 @@ public partial class AlibabaProvider
 
     private static bool TryGetProperty(JsonElement element, string propertyName, out JsonElement value)
     {
+        value = default;
+
         if (element.ValueKind != JsonValueKind.Object)
-        {
-            value = default;
             return false;
-        }
 
         var found = false;
         foreach (var property in element.EnumerateObject())
@@ -201,9 +200,6 @@ public partial class AlibabaProvider
                 found = true;
             }
         }
-
-        if (!found)
-            value = default;
 
         return found;
     }

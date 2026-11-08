@@ -12,6 +12,8 @@ using AIHappey.Core.Providers.Pollinations;
 using AIHappey.Core.Providers.VoyageAI;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
+using AIHappey.ChatCompletions.Models;
+using AIHappey.Core.Models;
 
 namespace AIHappey.Tests;
 
