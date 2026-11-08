@@ -19,9 +19,10 @@ public partial class AbliterationProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 using var req = new HttpRequestMessage(HttpMethod.Get, "v1/models");
+                foreach (var (name, value) in CreateAuthenticatedHeaders())
+                    req.Headers.TryAddWithoutValidation(name, value);
+
                 using var resp = await _client.SendAsync(req, cancellationToken);
 
                 if (!resp.IsSuccessStatusCode)

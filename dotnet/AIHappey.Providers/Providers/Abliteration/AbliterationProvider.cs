@@ -1,5 +1,4 @@
 using AIHappey.Core.AI;
-using System.Net.Http.Headers;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Vercel.Models;
@@ -10,6 +9,7 @@ using AIHappey.Responses;
 using System.Runtime.CompilerServices;
 using AIHappey.Core.Models;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
+using AIHappey.Responses.Extensions;
 
 namespace AIHappey.Core.Providers.Abliteration;
 
@@ -30,30 +30,61 @@ public partial class AbliterationProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.abliteration.ai/");
     }
 
-    private void ApplyAuthHeader()
+    private Dictionary<string, string> CreateAuthenticatedHeaders(
+        IEnumerable<KeyValuePair<string, string>>? requestHeaders = null,
+        bool includeAnthropicVersion = false)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Abliteration)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (requestHeaders is not null)
+        {
+            foreach (var (name, value) in requestHeaders)
+            {
+                if (string.IsNullOrWhiteSpace(name)
+                    || string.IsNullOrWhiteSpace(value)
+                    || name.Equals("Proxy-Authorization", StringComparison.OrdinalIgnoreCase)
+                    || Responses.ProviderCredentialHeaders.IsProviderKey(name))
+                {
+                    continue;
+                }
+
+                headers[name] = value;
+            }
+        }
+
+        if (includeAnthropicVersion)
+            headers.TryAdd("anthropic-version", "2023-06-01");
+
+        headers["Authorization"] = "Bearer " + key;
+        return headers;
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        options.StreamOptions ??= new StreamOptions();
+        options.StreamOptions.IncludeUsage = true;
 
-        return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
+        return await _client.GetChatCompletion(
+            options,
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(options.Headers),
+            ct: cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
+        options.StreamOptions ??= new StreamOptions();
+        options.StreamOptions.IncludeUsage = true;
 
-        return this.GetChatCompletions(_client,
-                    options, cancellationToken: cancellationToken);
+        return _client.GetChatCompletionUpdates(
+            options,
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(options.Headers),
+            ct: cancellationToken);
     }
 
     public string GetIdentifier() => nameof(Abliteration).ToLowerInvariant();
@@ -73,23 +104,22 @@ public partial class AbliterationProvider : IModelProvider
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        var response = await this.GetResponse(_client,
-                   options, cancellationToken: cancellationToken);
-
-        return response;
+        return await _client.GetResponses(
+            options,
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(options.Headers),
+            ct: cancellationToken);
     }
 
     public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(
         ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        await foreach (var update in this.GetResponses(_client,
-           options,
-           cancellationToken: cancellationToken))
+        await foreach (var update in _client.GetResponsesUpdates(
+            options,
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(options.Headers),
+            ct: cancellationToken))
         {
             yield return update;
         }
@@ -109,12 +139,11 @@ public partial class AbliterationProvider : IModelProvider
         Dictionary<string, string> headers,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        return await this.GetMessage(_client,
+        return await _client.PostMessages(
             request,
-            headers: headers,
-            cancellationToken: cancellationToken);
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(headers, includeAnthropicVersion: true),
+            ct: cancellationToken);
     }
 
     public IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(
@@ -122,12 +151,11 @@ public partial class AbliterationProvider : IModelProvider
         Dictionary<string, string> headers,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        return this.GetMessages(_client,
+        return _client.PostMessagesStreaming(
             request,
-            headers: headers,
-            cancellationToken: cancellationToken);
+            GetIdentifier(),
+            headers: CreateAuthenticatedHeaders(headers, includeAnthropicVersion: true),
+            ct: cancellationToken);
     }
 
     public Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)

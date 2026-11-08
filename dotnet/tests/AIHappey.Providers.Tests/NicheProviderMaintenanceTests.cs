@@ -4,6 +4,7 @@ using System.Text.Json;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Astica;
+using AIHappey.Core.Providers.Abliteration;
 using AIHappey.Core.Providers.Audixa;
 using AIHappey.Core.Providers.Brave;
 using AIHappey.Core.Providers.FishAudio;
@@ -98,6 +99,69 @@ public sealed class NicheProviderMaintenanceTests
         });
 
         Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Abliteration_uses_documented_endpoints_request_scoped_auth_and_messages_version()
+    {
+        var paths = new List<string>();
+        HttpClient client = null!;
+        client = CreateClient(async request =>
+        {
+            paths.Add(request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            Assert.Null(client.DefaultRequestHeaders.Authorization);
+
+            if (request.RequestUri.AbsolutePath == "/v1/chat/completions")
+            {
+                Assert.Equal("session-1", Assert.Single(request.Headers.GetValues("x-abliteration-session-id")));
+                using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+                Assert.Equal("preserved", payload.RootElement.GetProperty("future_option").GetString());
+                return JsonResponse("""{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"test-model","choices":[]}""");
+            }
+
+            if (request.RequestUri.AbsolutePath == "/v1/responses")
+                return JsonResponse("""{"id":"resp-test","model":"test-model","status":"completed","output":[]}""");
+
+            Assert.Equal("/v1/messages", request.RequestUri.AbsolutePath);
+            Assert.Equal("2023-06-01", Assert.Single(request.Headers.GetValues("anthropic-version")));
+            Assert.Equal("session-2", Assert.Single(request.Headers.GetValues("x-abliteration-session-id")));
+            return JsonResponse("""{"id":"msg-test","type":"message","role":"assistant","model":"test-model","content":[],"usage":{"input_tokens":1,"output_tokens":1}}""");
+        });
+        var provider = new AbliterationProvider(
+            new TestKeyResolver(),
+            new AIHappey.Core.AI.AsyncCacheHelper(),
+            new TestHttpClientFactory(client));
+
+        await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "test-model",
+            Headers = new Dictionary<string, string>
+            {
+                ["Authorization"] = "caller-key",
+                ["x-abliteration-session-id"] = "session-1"
+            },
+            AdditionalProperties = new()
+            {
+                ["future_option"] = JsonSerializer.SerializeToElement("preserved")
+            }
+        });
+        await provider.ResponsesAsync(new ResponseRequest
+        {
+            Model = "test-model",
+            Input = "Hello",
+            Headers = new Dictionary<string, string> { ["Authorization"] = "caller-key" }
+        });
+        await provider.MessagesAsync(
+            new MessagesRequest { Model = "test-model", MaxTokens = 16, Messages = [] },
+            new Dictionary<string, string>
+            {
+                ["Authorization"] = "caller-key",
+                ["x-abliteration-session-id"] = "session-2"
+            });
+
+        Assert.Equal(["/v1/chat/completions", "/v1/responses", "/v1/messages"], paths);
+        Assert.Empty(client.DefaultRequestHeaders);
     }
 
     [Fact]
