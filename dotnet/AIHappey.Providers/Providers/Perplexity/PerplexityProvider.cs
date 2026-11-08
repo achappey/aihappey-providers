@@ -13,7 +13,7 @@ using AIHappey.Common.Model.Providers.OpenAI.Live;
 
 namespace AIHappey.Core.Providers.Perplexity;
 
-public partial class PerplexityProvider : IModelProvider
+public partial class PerplexityProvider : IModelProvider, ISkillProvider
 {
     private readonly string BASE_URL = "https://api.perplexity.ai/";
     private const string AgentModelPrefix = "agent/";
@@ -24,6 +24,7 @@ public partial class PerplexityProvider : IModelProvider
     private readonly IApiKeyResolver _keyResolver;
 
     private readonly HttpClient _client;
+    private readonly HttpClient _skillDownloadClient;
 
     private readonly AsyncCacheHelper _memoryCache;
 
@@ -33,6 +34,7 @@ public partial class PerplexityProvider : IModelProvider
         _keyResolver = keyResolver;
         _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
+        _skillDownloadClient = httpClientFactory.CreateClient();
         _client.BaseAddress = new Uri(BASE_URL);
     }
 
