@@ -50,7 +50,7 @@ public sealed class VerbatikSpeechProviderMetadata
     [JsonPropertyName("voiceModifyTimbre")]
     public int? VoiceModifyTimbre { get; set; }
 
-    // ---- Verbatik Text-to-Music (POST /api/v1/text-to-music) ----
+    // ---- Legacy Verbatik Text-to-Music options ----
 
     [JsonPropertyName("tags")]
     public string[]? Tags { get; set; }
@@ -94,4 +94,3 @@ public sealed class VerbatikSpeechProviderMetadata
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 }
-

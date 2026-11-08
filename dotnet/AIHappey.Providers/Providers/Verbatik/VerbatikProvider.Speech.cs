@@ -1,5 +1,5 @@
-using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using AIHappey.Common.Model.Providers.Verbatik;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
@@ -26,8 +26,6 @@ public partial class VerbatikProvider
     public async Task<SpeechResponse> SpeechRequest(SpeechRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
@@ -41,110 +39,78 @@ public partial class VerbatikProvider
         var warnings = new List<object>();
 
         var metadata = request.GetProviderMetadata<VerbatikSpeechProviderMetadata>(GetIdentifier());
+        var rawOptions = GetRawProviderOptions(request);
         var model = NormalizeLocalModelId(request.Model);
-        var voiceId = ResolveVoiceId(model, request.Voice, metadata?.Voice);
+        var nativeModel = ResolveNativeSpeechModel(model);
+        var modelVoice = TryParseVoiceIdFromModel(model);
+        var voiceId = modelVoice;
+        if (string.IsNullOrWhiteSpace(voiceId))
+            voiceId = FirstNonEmpty(request.Voice, metadata?.Voice, ReadString(rawOptions, "voice"));
 
         if (!string.IsNullOrWhiteSpace(request.Instructions))
             warnings.Add(new { type = "unsupported", feature = "instructions" });
 
         if (!string.IsNullOrWhiteSpace(request.Language))
-            warnings.Add(new { type = "ignored", feature = "language", reason = "language is derived from selected voice model" });
+            warnings.Add(new { type = "unsupported", feature = "language" });
 
-        if (!string.IsNullOrWhiteSpace(request.Voice) && !string.Equals(request.Voice.Trim(), voiceId, StringComparison.OrdinalIgnoreCase))
+        if (modelVoice is not null
+            && !string.IsNullOrWhiteSpace(request.Voice)
+            && !string.Equals(request.Voice.Trim(), modelVoice, StringComparison.OrdinalIgnoreCase))
             warnings.Add(new { type = "ignored", feature = "voice", reason = "voice is derived from model id" });
 
-        if (request.Speed is { } speed && (speed < 0.5f || speed > 2f))
+        if (!string.IsNullOrWhiteSpace(request.OutputFormat) || !string.IsNullOrWhiteSpace(metadata?.Format))
+            warnings.Add(new { type = "unsupported", feature = "output_format" });
+
+        var speed = request.Speed ?? metadata?.Speed;
+        if (speed is < 0.5f or > 2f)
             throw new ArgumentOutOfRangeException(nameof(request.Speed), "Verbatik speed must be between 0.5 and 2.0.");
+        if (metadata?.Volume is { } volumeOption && (volumeOption < 0.1f || volumeOption > 10f))
+            throw new ArgumentOutOfRangeException(nameof(metadata.Volume), "Verbatik volume must be between 0.1 and 10.0.");
 
-        var format = !string.IsNullOrWhiteSpace(request.OutputFormat)
-            ? NormalizeFormat(request.OutputFormat)
-            : NormalizeFormat(metadata?.Format);
-
-        var contentType = ResolveRequestContentType(metadata?.ContentType, request.Text);
-
-        using var synthRequest = new HttpRequestMessage(HttpMethod.Post, "api/v1/tts")
-        {
-            Content = new StringContent(request.Text, Encoding.UTF8, contentType)
-        };
-
-        synthRequest.Headers.Add("X-Voice-ID", voiceId);
-        synthRequest.Headers.Add("X-Store-Audio", "false");
-
+        var settings = ReadRawSettings(rawOptions);
         if (request.Speed is { } requestSpeed)
-            synthRequest.Headers.Add("X-Speed", requestSpeed.ToString(CultureInfo.InvariantCulture));
-        else if (metadata?.Speed is { } metadataSpeed)
-            synthRequest.Headers.Add("X-Speed", metadataSpeed.ToString(CultureInfo.InvariantCulture));
+            settings["speed"] = requestSpeed;
+        else if (!settings.ContainsKey("speed") && metadata?.Speed is { } metadataSpeed)
+            settings["speed"] = metadataSpeed;
+        if (!settings.ContainsKey("volume") && metadata?.Volume is { } volume)
+            settings["volume"] = volume;
 
-        if (metadata?.Volume is { } volume)
-            synthRequest.Headers.Add("X-Volume", volume.ToString(CultureInfo.InvariantCulture));
+        var payload = CopyUnknownSpeechOptions(rawOptions);
+        payload["model"] = nativeModel;
+        payload["blocks"] = voiceId is { Length: > 0 }
+            ? new[] { new { text = request.Text, voice = voiceId } }
+            : new[] { new { text = request.Text } };
+        if (settings.Count > 0)
+            payload["settings"] = settings;
+        payload["delivery"] = "signed_url";
 
-        if (metadata?.Pitch is { } pitch)
-            synthRequest.Headers.Add("X-Pitch", pitch.ToString(CultureInfo.InvariantCulture));
-
-        if (!string.IsNullOrWhiteSpace(metadata?.Emotion))
-            synthRequest.Headers.Add("X-Emotion", metadata.Emotion.Trim());
-
-        if (metadata?.EnglishNormalization is { } englishNormalization)
-            synthRequest.Headers.Add("X-English-Normalization", englishNormalization ? "true" : "false");
-
-        if (metadata?.SampleRate is { } sampleRate)
-            synthRequest.Headers.Add("X-Sample-Rate", sampleRate.ToString(CultureInfo.InvariantCulture));
-
-        if (metadata?.Bitrate is { } bitrate)
-            synthRequest.Headers.Add("X-Bitrate", bitrate.ToString(CultureInfo.InvariantCulture));
-
-        if (!string.IsNullOrWhiteSpace(format))
-            synthRequest.Headers.Add("X-Format", format);
-
-        if (!string.IsNullOrWhiteSpace(metadata?.LanguageBoost))
-            synthRequest.Headers.Add("X-Language-Boost", metadata.LanguageBoost.Trim());
-
-        if (metadata?.VoiceModifyPitch is { } voiceModifyPitch)
-            synthRequest.Headers.Add("X-Voice-Modify-Pitch", voiceModifyPitch.ToString(CultureInfo.InvariantCulture));
-
-        if (metadata?.VoiceModifyIntensity is { } voiceModifyIntensity)
-            synthRequest.Headers.Add("X-Voice-Modify-Intensity", voiceModifyIntensity.ToString(CultureInfo.InvariantCulture));
-
-        if (metadata?.VoiceModifyTimbre is { } voiceModifyTimbre)
-            synthRequest.Headers.Add("X-Voice-Modify-Timbre", voiceModifyTimbre.ToString(CultureInfo.InvariantCulture));
+        using var synthRequest = CreateApiRequest(HttpMethod.Post, "speech");
+        synthRequest.Content = new StringContent(
+            System.Text.Json.JsonSerializer.Serialize(payload, System.Text.Json.JsonSerializerOptions.Web),
+            Encoding.UTF8,
+            "application/json");
 
         using var synthResp = await _client.SendAsync(synthRequest, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-        var synthBytes = await synthResp.Content.ReadAsByteArrayAsync(cancellationToken);
-
+        var synthBody = await synthResp.Content.ReadAsStringAsync(cancellationToken);
         if (!synthResp.IsSuccessStatusCode)
-            throw new InvalidOperationException($"{ProviderName} TTS failed ({(int)synthResp.StatusCode}): {Encoding.UTF8.GetString(synthBytes)}");
+            throw new InvalidOperationException($"{ProviderName} speech failed ({(int)synthResp.StatusCode}): {synthBody}");
 
-        byte[] audioBytes;
-        string mimeType;
-        string resolvedFormat;
+        using var synthDoc = JsonDocument.Parse(synthBody);
+        var created = synthDoc.RootElement.Clone();
+        var completed = await WaitForCompletionAsync("speech", created, cancellationToken);
+        var output = GetFirstOutput(completed);
 
-        var responseContentType = synthResp.Content.Headers.ContentType?.MediaType;
+        using var audioRequest = new HttpRequestMessage(HttpMethod.Get, output.Url);
+        using var audioResponse = await _client.SendAsync(audioRequest, cancellationToken);
+        var audioBytes = await audioResponse.Content.ReadAsByteArrayAsync(cancellationToken);
+        if (!audioResponse.IsSuccessStatusCode)
+            throw new InvalidOperationException($"{ProviderName} audio download failed ({(int)audioResponse.StatusCode}): {Encoding.UTF8.GetString(audioBytes)}");
 
-        audioBytes = synthBytes;
-        mimeType = ResolveMimeType(responseContentType, null, format);
-        resolvedFormat = ResolveFormat(mimeType, null, format);
-
-        decimal? cost = null;
-
-        if (synthResp.Headers.TryGetValues("X-Cost-Cents", out var costValues)
-            && decimal.TryParse(
-                costValues.FirstOrDefault(),
-                NumberStyles.Number,
-                CultureInfo.InvariantCulture,
-                out var costCents))
-        {
-            cost = costCents / 100m;
-        }
-        else
-        {
-            var charCount = request.Text.Length;
-            var modelItem = await this.GetModel(request.Model, cancellationToken);
-
-            cost = modelItem.Pricing?.Input is { } inputPrice && charCount > 0
-                ? inputPrice * charCount
-                : null;
-        }
+        var mimeType = ResolveMimeType(
+            audioResponse.Content.Headers.ContentType?.MediaType ?? output.MediaType,
+            output.Url,
+            null);
+        var resolvedFormat = ResolveFormat(mimeType, output.Url, null);
 
         return new SpeechResponse
         {
@@ -155,31 +121,151 @@ public partial class VerbatikProvider
                 Format = resolvedFormat
             },
             Warnings = warnings,
-            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(
-                costs: cost
-            ),
+            Request = new()
+            {
+                Body = payload
+            },
             Response = new()
             {
                 Timestamp = now,
                 Headers = synthResp.GetHeaders(),
-                ModelId = request.Model.ToModelId(GetIdentifier())
-            }
+                ModelId = request.Model.ToModelId(GetIdentifier()),
+                Body = completed
+            },
+            ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(
+                new
+                {
+                    estimated_credits = GetJsonValue(created, "estimated_credits")
+                })
         };
     }
 
-    private static string ResolveRequestContentType(string? contentTypeMetadata, string text)
+    private static JsonElement? GetJsonValue(JsonElement obj, string name)
+        => obj.ValueKind == JsonValueKind.Object
+            && obj.TryGetProperty(name, out var value)
+                ? value.Clone()
+                : null;
+
+    private static JsonElement GetRawProviderOptions(SpeechRequest request)
     {
-        if (!string.IsNullOrWhiteSpace(contentTypeMetadata))
+        if (request.ProviderOptions is not null
+            && request.ProviderOptions.TryGetValue(ProviderId, out var options)
+            && options.ValueKind == JsonValueKind.Object)
+            return options;
+
+        return default;
+    }
+
+    private static Dictionary<string, object?> ReadRawSettings(JsonElement rawOptions)
+    {
+        var settings = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (rawOptions.ValueKind == JsonValueKind.Object
+            && rawOptions.TryGetProperty("settings", out var rawSettings)
+            && rawSettings.ValueKind == JsonValueKind.Object)
         {
-            var ct = contentTypeMetadata.Trim();
-            if (string.Equals(ct, "text/plain", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(ct, "application/ssml+xml", StringComparison.OrdinalIgnoreCase))
-                return ct;
+            foreach (var property in rawSettings.EnumerateObject())
+                settings[property.Name] = property.Value.Clone();
         }
 
-        return text.TrimStart().StartsWith("<speak", StringComparison.OrdinalIgnoreCase)
-            ? "application/ssml+xml"
-            : "text/plain";
+        return settings;
+    }
+
+    private static Dictionary<string, object?> CopyUnknownSpeechOptions(JsonElement rawOptions)
+    {
+        var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
+        if (rawOptions.ValueKind != JsonValueKind.Object)
+            return payload;
+
+        var mappedOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "voice", "speed", "volume", "settings", "contentType", "pitch", "emotion",
+            "englishNormalization", "english_normalization", "sampleRate", "sample_rate",
+            "bitrate", "format", "languageBoost", "language_boost", "voiceModifyPitch",
+            "voice_modify_pitch", "voiceModifyIntensity", "voice_modify_intensity",
+            "voiceModifyTimbre", "voice_modify_timbre"
+        };
+        foreach (var property in rawOptions.EnumerateObject())
+        {
+            if (!mappedOptions.Contains(property.Name))
+                payload[property.Name] = property.Value.Clone();
+        }
+
+        return payload;
+    }
+
+    private async Task<JsonElement> WaitForCompletionAsync(
+        string operation,
+        JsonElement initial,
+        CancellationToken cancellationToken)
+    {
+        if (IsFailed(initial))
+            throw new InvalidOperationException($"{ProviderName} {operation} failed: {initial.GetRawText()}");
+        if (IsCompleted(initial))
+            return initial;
+
+        var id = ReadString(initial, "id")
+            ?? throw new InvalidOperationException($"{ProviderName} {operation} response did not include an id.");
+        var deadline = DateTime.UtcNow + TimeSpan.FromMinutes(2);
+        var path = $"{operation}/{Uri.EscapeDataString(id)}";
+
+        while (DateTime.UtcNow < deadline)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+
+            using var request = CreateApiRequest(HttpMethod.Get, path);
+            using var response = await _client.SendAsync(request, cancellationToken);
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                throw new InvalidOperationException($"{ProviderName} {operation} status failed ({(int)response.StatusCode}): {body}");
+
+            using var document = JsonDocument.Parse(body);
+            var status = document.RootElement.Clone();
+            if (IsFailed(status))
+                throw new InvalidOperationException($"{ProviderName} {operation} failed: {status.GetRawText()}");
+            if (IsCompleted(status))
+                return status;
+            if (!IsPending(status))
+                throw new InvalidOperationException($"{ProviderName} returned an unexpected {operation} status: {status.GetRawText()}");
+        }
+
+        throw new TimeoutException($"{ProviderName} {operation} timed out waiting for completion.");
+    }
+
+    private static bool IsCompleted(JsonElement response)
+        => string.Equals(ReadString(response, "status"), "completed", StringComparison.OrdinalIgnoreCase)
+            || (response.TryGetProperty("outputs", out var outputs)
+                && outputs.ValueKind == JsonValueKind.Array
+                && outputs.GetArrayLength() > 0);
+
+    private static bool IsFailed(JsonElement response)
+        => string.Equals(ReadString(response, "status"), "failed", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsPending(JsonElement response)
+    {
+        var status = ReadString(response, "status");
+        return status is null
+            || status.Equals("queued", StringComparison.OrdinalIgnoreCase)
+            || status.Equals("pending", StringComparison.OrdinalIgnoreCase)
+            || status.Equals("processing", StringComparison.OrdinalIgnoreCase)
+            || status.Equals("in_progress", StringComparison.OrdinalIgnoreCase)
+            || status.Equals("running", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static (string Url, string? MediaType) GetFirstOutput(JsonElement response)
+    {
+        if (response.TryGetProperty("outputs", out var outputs)
+            && outputs.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var output in outputs.EnumerateArray())
+            {
+                var url = ReadString(output, "url");
+                if (!string.IsNullOrWhiteSpace(url))
+                    return (url, ReadString(output, "media_type") ?? ReadString(output, "mediaType"));
+            }
+        }
+
+        throw new InvalidOperationException($"{ProviderName} completed without an audio output URL.");
     }
 
     private static string ResolveMimeType(string? contentType, string? audioUrl, string? requestedOutputFormat)
@@ -258,44 +344,33 @@ public partial class VerbatikProvider
         var value = model.Trim();
 
         var slashIndex = value.IndexOf('/');
-        if (slashIndex > 0)
-        {
-            // Allows both:
-            // tts
-            // tts/voice-id
-            // verbatik/tts
-            // verbatik/tts/voice-id
-            var firstPart = value[..slashIndex];
-
-            if (!string.Equals(firstPart, "tts", StringComparison.OrdinalIgnoreCase))
-                value = value[(slashIndex + 1)..];
-        }
+        if (slashIndex > 0
+            && string.Equals(value[..slashIndex], ProviderId, StringComparison.OrdinalIgnoreCase))
+            value = value[(slashIndex + 1)..];
 
         return value.Trim();
     }
 
     private static bool IsTextToMusicModel(string model)
-        => string.Equals(NormalizeLocalModelId(model), "text-to-music", StringComparison.OrdinalIgnoreCase);
-
-    private static string ResolveVoiceId(
-        string model,
-        string? requestVoice,
-        string? metadataVoice)
     {
-        var modelVoice = TryParseVoiceIdFromModel(model);
-
-        if (!string.IsNullOrWhiteSpace(modelVoice))
-            return modelVoice;
-
-        if (!string.IsNullOrWhiteSpace(requestVoice))
-            return requestVoice.Trim();
-
-        if (!string.IsNullOrWhiteSpace(metadataVoice))
-            return metadataVoice.Trim();
-
-        throw new ArgumentException(
-            "Voice is required. Use model 'tts/{voiceId}', request.Voice, or provider metadata voice.");
+        var localModel = NormalizeLocalModelId(model);
+        return string.Equals(localModel, "text-to-music", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(localModel, "fal-ai/minimax-music/v2", StringComparison.OrdinalIgnoreCase);
     }
+
+    private static string ResolveNativeSpeechModel(string model)
+        => model.Equals("tts", StringComparison.OrdinalIgnoreCase)
+            || model.Equals("speech-lite", StringComparison.OrdinalIgnoreCase)
+            || model.StartsWith("tts/", StringComparison.OrdinalIgnoreCase)
+            || model.StartsWith("speech-lite/", StringComparison.OrdinalIgnoreCase)
+                ? "verbatik/speech-lite"
+                : model.Equals("fal-ai/minimax/speech-2.8-turbo", StringComparison.OrdinalIgnoreCase)
+                    ? "fal-ai/minimax/speech-2.8-turbo"
+                    : throw new NotSupportedException(
+                        $"{ProviderName} model '{model}' is not supported. Expected 'tts', 'speech-lite', or a documented native speech model.");
+
+    private static string? FirstNonEmpty(params string?[] values)
+        => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim();
 
     private static string? TryParseVoiceIdFromModel(string model)
     {
@@ -304,17 +379,23 @@ public partial class VerbatikProvider
 
         var value = model.Trim();
 
-        if (string.Equals(value, "tts", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(value, "tts", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(value, "speech-lite", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(value, "fal-ai/minimax/speech-2.8-turbo", StringComparison.OrdinalIgnoreCase))
             return null;
 
-        if (!value.StartsWith("tts/", StringComparison.OrdinalIgnoreCase))
-            throw new NotSupportedException(
-                $"{ProviderName} model '{model}' is not supported. Expected 'tts' or 'tts/[voiceId]'.");
+        var prefix = value.StartsWith("tts/", StringComparison.OrdinalIgnoreCase)
+            ? "tts/"
+            : value.StartsWith("speech-lite/", StringComparison.OrdinalIgnoreCase)
+                ? "speech-lite/"
+                : null;
+        if (prefix is null)
+            return null;
 
-        var voiceId = value["tts/".Length..].Trim();
+        var voiceId = value[prefix.Length..].Trim();
 
         if (string.IsNullOrWhiteSpace(voiceId))
-            throw new ArgumentException("Model must contain a voice id after 'tts/'.", nameof(model));
+            throw new ArgumentException("Model must contain a voice id after the speech model name.", nameof(model));
 
         if (voiceId.Contains('/'))
             throw new ArgumentException("Voice id cannot contain '/'.", nameof(model));
@@ -322,4 +403,3 @@ public partial class VerbatikProvider
         return voiceId;
     }
 }
-

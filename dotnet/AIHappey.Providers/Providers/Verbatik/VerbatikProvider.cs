@@ -23,6 +23,7 @@ public partial class VerbatikProvider : IModelProvider
 {
     private const string ProviderId = "verbatik";
     private const string ProviderName = "Verbatik";
+    private static readonly Uri ApiBaseAddress = new("https://app.verbatik.com/api/v1/");
 
     private readonly IApiKeyResolver _keyResolver;
     private readonly HttpClient _client;
@@ -40,13 +41,15 @@ public partial class VerbatikProvider : IModelProvider
 
     public string GetIdentifier() => ProviderId;
 
-    private void ApplyAuthHeader()
+    private HttpRequestMessage CreateApiRequest(HttpMethod method, string path)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {ProviderName} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        var request = new HttpRequestMessage(method, new Uri(ApiBaseAddress, path));
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        return request;
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
