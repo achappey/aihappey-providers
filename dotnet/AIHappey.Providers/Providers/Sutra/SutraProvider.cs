@@ -39,7 +39,7 @@ public sealed class SutraProvider(
 
         return new Dictionary<string, string>
         {
-            ["Authorization"] = $"******"
+            ["Authorization"] = string.Concat("Bearer ", key)
         };
     }
 
