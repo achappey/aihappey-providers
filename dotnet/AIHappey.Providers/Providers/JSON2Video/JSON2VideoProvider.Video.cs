@@ -29,7 +29,6 @@ public partial class JSON2VideoProvider
         var warnings = BuildJSON2VideoWarnings(request);
         var payload = BuildMoviePayload(request);
 
-        ApplyAuthHeader();
         using var createRequest = new HttpRequestMessage(HttpMethod.Post, "v2/movies")
         {
             Content = new StringContent(
@@ -37,6 +36,7 @@ public partial class JSON2VideoProvider
                 Encoding.UTF8,
                 MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(createRequest);
         using var createResponse = await _client.SendAsync(createRequest, cancellationToken);
         var createRaw = await createResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!createResponse.IsSuccessStatusCode)
@@ -70,12 +70,11 @@ public partial class JSON2VideoProvider
             throw new ArgumentException("A video operation is required.", nameof(operation));
 
         var (projectId, model) = DecodeJSON2VideoOperation(operation);
-        ApplyAuthHeader();
-
         var escapedProjectId = Uri.EscapeDataString(projectId);
         using var statusRequest = new HttpRequestMessage(
             HttpMethod.Get,
             $"v2/movies?project={escapedProjectId}&format=simple");
+        ApplyAuthHeader(statusRequest);
         using var statusResponse = await _client.SendAsync(statusRequest, cancellationToken);
         var statusRaw = await statusResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!statusResponse.IsSuccessStatusCode)
@@ -121,7 +120,8 @@ public partial class JSON2VideoProvider
                 Response = response
             };
 
-        using var videoResponse = await _client.GetAsync(videoUrl, cancellationToken);
+        using var downloadRequest = new HttpRequestMessage(HttpMethod.Get, videoUrl);
+        using var videoResponse = await _client.SendAsync(downloadRequest, cancellationToken);
         var videoBytes = await videoResponse.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!videoResponse.IsSuccessStatusCode || videoBytes.Length == 0)
             throw new InvalidOperationException(
@@ -160,6 +160,7 @@ public partial class JSON2VideoProvider
             using var deleteRequest = new HttpRequestMessage(
                 HttpMethod.Delete,
                 $"v2/movies?project={Uri.EscapeDataString(projectId)}");
+            ApplyAuthHeader(deleteRequest);
             using var deleteResponse = await _client.SendAsync(deleteRequest, cancellationToken);
             var raw = await deleteResponse.Content.ReadAsStringAsync(cancellationToken);
             JsonElement? body = null;
