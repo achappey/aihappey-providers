@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Google;
+using AIHappey.Interactions;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Logging.Abstractions;
 
