@@ -191,7 +191,6 @@ public sealed class AlibabaImageMetadataPassthroughTests
     }
 
     [Theory]
-    [InlineData("[]")]
     [InlineData("qwen-image-3.0", "[]")]
     [InlineData("qwen-image-3.0", """{"negativePrompt":[]}""")]
     [InlineData("qwen-image-3.0", """{"watermark":"false"}""")]
