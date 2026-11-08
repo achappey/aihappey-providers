@@ -12,7 +12,7 @@ namespace AIHappey.Tests;
 public sealed class AlibabaImageMetadataPassthroughTests
 {
     [Fact]
-    public async Task Image_preserves_provider_options_and_forwards_unknown_json_with_mapped_options()
+    public async Task Qwen_image_maps_flat_options_and_forwards_unknown_json()
     {
         JsonElement payload = default;
         using var client = CreateClient(request =>
@@ -28,19 +28,17 @@ public sealed class AlibabaImageMetadataPassthroughTests
         var metadata = ParseElement(
             """
             {
-              "qwen": {
-                "negativePrompt": "no blur",
-                "promptExtend": false,
-                "watermark": false,
-                "promptExtendMode": "direct",
-                "enableThinking": true,
-                "future_object": {"nested": [{"value": 1}, [true, null, "text"]]},
-                "future_array": [1, {"more": [false, 2.5]}, []],
-                "future_string": "unchanged",
-                "future_number": 12345678901234567890.123456789,
-                "future_boolean": false,
-                "future_null": null
-              },
+              "negativePrompt": "no blur",
+              "promptExtend": false,
+              "watermark": false,
+              "promptExtendMode": "direct",
+              "enableThinking": true,
+              "future_object": {"nested": [{"value": 1}, [true, null, "text"]]},
+              "future_array": [1, {"more": [false, 2.5]}, []],
+              "future_string": "unchanged",
+              "future_number": 12345678901234567890.123456789,
+              "future_boolean": false,
+              "future_null": null,
               "future_root_option": {"root": [1, null]},
               "size": "metadata-size",
               "seed": 99,
@@ -71,15 +69,38 @@ public sealed class AlibabaImageMetadataPassthroughTests
         Assert.False(parameters.GetProperty("watermark").GetBoolean());
         Assert.Equal("direct", parameters.GetProperty("prompt_extend_mode").GetString());
         Assert.True(parameters.GetProperty("enable_thinking").GetBoolean());
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_object"), metadata.GetProperty("qwen").GetProperty("future_object")));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_array"), metadata.GetProperty("qwen").GetProperty("future_array")));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_string"), metadata.GetProperty("qwen").GetProperty("future_string")));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_number"), metadata.GetProperty("qwen").GetProperty("future_number")));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_boolean"), metadata.GetProperty("qwen").GetProperty("future_boolean")));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_null"), metadata.GetProperty("qwen").GetProperty("future_null")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_object"), metadata.GetProperty("future_object")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_array"), metadata.GetProperty("future_array")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_string"), metadata.GetProperty("future_string")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_number"), metadata.GetProperty("future_number")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_boolean"), metadata.GetProperty("future_boolean")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_null"), metadata.GetProperty("future_null")));
         Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future_root_option"), metadata.GetProperty("future_root_option")));
         Assert.Equal(JsonValueKind.Null, parameters.GetProperty("future_null").ValueKind);
-        Assert.False(parameters.TryGetProperty("qwen", out _));
+    }
+
+    [Fact]
+    public async Task Z_image_uses_its_api_contract_for_flat_option_mapping()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            if (request.Method == HttpMethod.Get)
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) };
+
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"output":{"choices":[{"message":{"content":[{"type":"image","image":"https://images.test/result.png"}]}}]}}""");
+        });
+
+        await CreateProvider(client).ImageRequest(CreateRequest(
+            "z-image-turbo",
+            ParseElement("""{"promptExtend":true,"negativePrompt":"untouched","future":null}"""),
+            includeStandardOptions: false));
+
+        var parameters = payload.GetProperty("parameters");
+        Assert.True(parameters.GetProperty("prompt_extend").GetBoolean());
+        Assert.Equal("untouched", parameters.GetProperty("negativePrompt").GetString());
+        Assert.Equal(JsonValueKind.Null, parameters.GetProperty("future").ValueKind);
     }
 
     [Fact]
@@ -97,13 +118,11 @@ public sealed class AlibabaImageMetadataPassthroughTests
         var metadata = ParseElement(
             """
             {
-              "wan": {
-                "enableInterleave": true,
-                "promptExtend": true,
-                "negativePrompt": "no blur",
-                "maxImages": 4,
-                "future": {"nested": [true, null, 2]}
-              }
+              "enableInterleave": true,
+              "promptExtend": true,
+              "negativePrompt": "no blur",
+              "maxImages": 4,
+              "future": {"nested": [true, null, 2]}
             }
             """);
 
@@ -114,7 +133,7 @@ public sealed class AlibabaImageMetadataPassthroughTests
         Assert.True(parameters.GetProperty("prompt_extend").GetBoolean());
         Assert.Equal("no blur", parameters.GetProperty("negative_prompt").GetString());
         Assert.False(parameters.TryGetProperty("max_images", out _));
-        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future"), metadata.GetProperty("wan").GetProperty("future")));
+        Assert.True(JsonElement.DeepEquals(parameters.GetProperty("future"), metadata.GetProperty("future")));
         Assert.Equal(1, parameters.GetProperty("n").GetInt32());
         Assert.False(payload.TryGetProperty("providerOptions", out _));
     }
@@ -123,8 +142,8 @@ public sealed class AlibabaImageMetadataPassthroughTests
     [InlineData(null)]
     [InlineData("null")]
     [InlineData("{}")]
-    [InlineData("""{"qwen":null}""")]
-    [InlineData("""{"qwen":{}}""")]
+    [InlineData("""{"negativePrompt":null}""")]
+    [InlineData("""{"promptExtend":null}""")]
     public async Task Image_omits_empty_metadata_options(string? metadataJson)
     {
         JsonElement payload = default;
@@ -161,7 +180,7 @@ public sealed class AlibabaImageMetadataPassthroughTests
 
         await CreateProvider(client).ImageRequest(CreateRequest(
             "qwen-image-3.0",
-            ParseElement("""{"qwen":{"negativePrompt":null,"promptExtend":null,"watermark":null,"future_null":null}}"""),
+            ParseElement("""{"negativePrompt":null,"promptExtend":null,"watermark":null,"future_null":null}"""),
             includeStandardOptions: false));
 
         var parameters = payload.GetProperty("parameters");
@@ -173,15 +192,16 @@ public sealed class AlibabaImageMetadataPassthroughTests
 
     [Theory]
     [InlineData("[]")]
-    [InlineData("""{"qwen":[]}""")]
-    [InlineData("""{"qwen":{"watermark":"false"}}""")]
-    [InlineData("""{"wan":{"enableInterleave":"true"}}""")]
-    public async Task Image_rejects_invalid_metadata_shapes_and_known_values(string metadataJson)
+    [InlineData("qwen-image-3.0", "[]")]
+    [InlineData("qwen-image-3.0", """{"negativePrompt":[]}""")]
+    [InlineData("qwen-image-3.0", """{"watermark":"false"}""")]
+    [InlineData("wan2.6-t2i", """{"enableInterleave":"true"}""")]
+    public async Task Image_rejects_invalid_metadata_shapes_and_known_values(string model, string metadataJson)
     {
         using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
 
         await Assert.ThrowsAsync<JsonException>(() => CreateProvider(client).ImageRequest(
-            CreateRequest("qwen-image-3.0", ParseElement(metadataJson))));
+            CreateRequest(model, ParseElement(metadataJson))));
     }
 
     [Fact]
