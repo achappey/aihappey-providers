@@ -57,8 +57,21 @@ public partial class AIBramhaProvider
                     if (el.TryGetProperty("description", out var descriptionEl))
                         model.Description = descriptionEl.GetString() ?? string.Empty;
 
-                    model.Type = model.Name?.Contains("[IMAGE_GEN]") == true ? "image" : model.Id.GuessModelType();
-                    
+                    if (el.TryGetProperty("category", out var categoryEl)
+                        && categoryEl.ValueKind == JsonValueKind.String
+                        && !string.IsNullOrWhiteSpace(categoryEl.GetString()))
+                        model.Type = categoryEl.GetString();
+                    else
+                        model.Type = model.Name?.Contains("[IMAGE_GEN]") == true ? "image" : model.Id.GuessModelType();
+
+                    if (el.TryGetProperty("provider", out var providerEl))
+                        model.OwnedBy = providerEl.GetString() ?? string.Empty;
+
+                    model.ContextWindow = el.TryGetProperty("context_length", out var contextLengthEl)
+                        && contextLengthEl.ValueKind == JsonValueKind.Number
+                            ? contextLengthEl.GetInt32()
+                            : null;
+
                     if (!string.IsNullOrEmpty(model.Id))
                         models.Add(model);
                 }
