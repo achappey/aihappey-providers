@@ -13,6 +13,7 @@ using AIHappey.Core.Providers.AIHorde;
 using AIHappey.Core.Providers.JigsawStack;
 using AIHappey.Core.Providers.Isaacus;
 using AIHappey.Core.Providers.MurfAI;
+using AIHappey.Core.Providers.OCRSkill;
 using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.Valyu;
 using AIHappey.Core.Providers.ZeroEntropy;
@@ -132,6 +133,53 @@ public sealed class NicheProviderMaintenanceTests
         });
 
         Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task OCRSkill_remote_documents_use_the_documented_JSON_endpoint_and_request_scoped_authentication()
+    {
+        HttpClient client = null!;
+        client = CreateClient(async request =>
+        {
+            Assert.Equal("/ocr", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", request.Headers.Authorization?.Parameter);
+            Assert.Null(client.DefaultRequestHeaders.Authorization);
+            Assert.Equal("application/json", request.Content!.Headers.ContentType!.MediaType);
+            using var payload = JsonDocument.Parse(await request.Content.ReadAsStringAsync());
+            Assert.Equal("https://cdn.example.com/invoice.pdf", payload.RootElement.GetProperty("document_url").GetString());
+
+            return JsonResponse("""{"pages":[{"index":0,"markdown":"# Invoice\n\nTotal: 120.00","images":[]}],"model":"LightOnOCR-2-1B"}""");
+        });
+        var provider = new OCRSkillProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+
+        var response = await provider.ExecuteUnifiedAsync(new AIRequest
+        {
+            ProviderId = "ocrskill",
+            Model = "ocrskill/ocr",
+            Input = new AIInput
+            {
+                Items =
+                [
+                    new AIInputItem
+                    {
+                        Role = "user",
+                        Content =
+                        [
+                            new AIFileContentPart
+                            {
+                                Type = "file",
+                                Filename = "invoice.pdf",
+                                Data = "https://cdn.example.com/invoice.pdf"
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        Assert.Equal("# Invoice\n\nTotal: 120.00",
+            Assert.IsType<AITextContentPart>(Assert.Single(Assert.Single(response.Output!.Items!).Content!)).Text);
+        Assert.Empty(client.DefaultRequestHeaders);
     }
 
     [Fact]

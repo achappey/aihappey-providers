@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using AIHappey.Core.AI;
@@ -36,7 +37,6 @@ public sealed partial class OCRSkillProvider
         var outputMode = ResolveOutputMode(request);
         var output = new List<AIOutputItem>(files.Count);
 
-        ApplyAuthHeader();
         for (var index = 0; index < files.Count; index++)
         {
             var file = NormalizeFile(files[index], index);
@@ -46,10 +46,16 @@ public sealed partial class OCRSkillProvider
 
             using var httpRequest = new HttpRequestMessage(HttpMethod.Post, endpoint)
             {
-                Content = new ByteArrayContent(file.Bytes)
+                Content = file.DocumentUrl is not null
+                    ? JsonContent.Create(new { document_url = file.DocumentUrl })
+                    : new ByteArrayContent(file.Bytes!)
             };
-            httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(file.MediaType);
-            httpRequest.Content.Headers.ContentLength = file.Bytes.Length;
+            ApplyAuthHeader(httpRequest);
+            if (file.DocumentUrl is null)
+            {
+                httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue(file.MediaType!);
+                httpRequest.Content.Headers.ContentLength = file.Bytes!.Length;
+            }
 
             using var response = await _client.SendAsync(httpRequest, cancellationToken);
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -79,6 +85,10 @@ public sealed partial class OCRSkillProvider
                         $"OCRSkill returned invalid structured JSON for '{file.Filename}'.",
                         exception);
                 }
+            }
+            else if (file.DocumentUrl is not null)
+            {
+                text = ExtractRemoteMarkdown(body, file.Filename);
             }
 
             var metadata = new Dictionary<string, object?>
@@ -209,7 +219,13 @@ public sealed partial class OCRSkillProvider
             throw new ArgumentException($"OCRSkill OCR file {index + 1} is empty.", nameof(file));
         if (value.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
             || value.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException($"OCRSkill OCR file {index + 1} cannot be a remote URL.", nameof(file));
+        {
+            if (!Uri.TryCreate(value, UriKind.Absolute, out var documentUri)
+                || documentUri.Scheme is not ("http" or "https"))
+                throw new ArgumentException($"OCRSkill OCR file {index + 1} must be an absolute HTTP or HTTPS URL.", nameof(file));
+            var urlFilename = string.IsNullOrWhiteSpace(file.Filename) ? $"document-{index + 1}" : file.Filename!;
+            return new NormalizedOcrFile(urlFilename, file.MediaType, null, value);
+        }
 
         var mediaType = file.MediaType?.Trim();
         var base64 = value;
@@ -241,7 +257,37 @@ public sealed partial class OCRSkillProvider
             throw new ArgumentException($"OCRSkill OCR file {index + 1} exceeds the 20 MB maximum file size.", nameof(file));
 
         var filename = string.IsNullOrWhiteSpace(file.Filename) ? $"document-{index + 1}" : file.Filename!;
-        return new NormalizedOcrFile(filename, mediaType, bytes);
+        return new NormalizedOcrFile(filename, mediaType, bytes, null);
+    }
+
+    private static string ExtractRemoteMarkdown(string body, string filename)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(body);
+            if (document.RootElement.ValueKind != JsonValueKind.Object
+                || !document.RootElement.TryGetProperty("pages", out var pages)
+                || pages.ValueKind != JsonValueKind.Array)
+                throw new JsonException("Expected a pages array.");
+
+            var markdown = new List<string>();
+            foreach (var page in pages.EnumerateArray())
+            {
+                if (page.ValueKind != JsonValueKind.Object
+                    || !page.TryGetProperty("markdown", out var pageMarkdown)
+                    || pageMarkdown.ValueKind != JsonValueKind.String)
+                    throw new JsonException("Expected Markdown for every page.");
+
+                markdown.Add(pageMarkdown.GetString()!);
+            }
+            return string.Join("\n\n", markdown);
+        }
+        catch (JsonException exception)
+        {
+            throw new InvalidOperationException(
+                $"OCRSkill returned invalid Markdown JSON for '{filename}'.",
+                exception);
+        }
     }
 
     private static OcrOutputMode ResolveOutputMode(AIRequest request)
@@ -410,5 +456,5 @@ public sealed partial class OCRSkillProvider
 
     private sealed record OcrOutputMode(bool Structured, string? Fields);
 
-    private sealed record NormalizedOcrFile(string Filename, string MediaType, byte[] Bytes);
+    private sealed record NormalizedOcrFile(string Filename, string? MediaType, byte[]? Bytes, string? DocumentUrl);
 }
