@@ -1,5 +1,4 @@
 using AIHappey.Core.AI;
-using System.Net.Http.Headers;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Vercel.Models;
@@ -28,36 +27,31 @@ public partial class AIMagicxProvider : IModelProvider
         _keyResolver = keyResolver;
         _memoryCache = asyncCacheHelper;
         _client = httpClientFactory.CreateClient();
-        _client.BaseAddress = new Uri("https://awww.aimagicx.com/api/");
-    }
-
-    private void ApplyAuthHeader()
-    {
-        var key = _keyResolver.Resolve(GetIdentifier());
-
-        if (string.IsNullOrWhiteSpace(key))
-            throw new InvalidOperationException($"No {nameof(AIMagicx)} API key.");
-
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        _client.BaseAddress = new Uri("https://www.aimagicx.com/api/");
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        return await this.GetChatCompletion(_client,
-             options, cancellationToken: cancellationToken);
+        return await this.GetChatCompletion(_client, options, GetRequestHeaders(),
+            cancellationToken: cancellationToken);
     }
 
     public IAsyncEnumerable<ChatCompletionUpdate> CompleteChatStreamingAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
-        return this.GetChatCompletions(_client,
-                    options, cancellationToken: cancellationToken);
+        return this.GetChatCompletions(_client, options, GetRequestHeaders(),
+            cancellationToken: cancellationToken);
     }
 
     public string GetIdentifier() => nameof(AIMagicx).ToLowerInvariant();
+
+    private IReadOnlyDictionary<string, string> GetRequestHeaders()
+    {
+        var key = _keyResolver.Resolve(GetIdentifier());
+        if (string.IsNullOrWhiteSpace(key))
+            throw new InvalidOperationException($"No {nameof(AIMagicx)} API key.");
+
+        return new Dictionary<string, string> { ["Authorization"] = string.Concat("Bearer ", key) };
+    }
 
     
 
