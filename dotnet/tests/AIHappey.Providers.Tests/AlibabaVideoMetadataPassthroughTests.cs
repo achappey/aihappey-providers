@@ -82,8 +82,13 @@ public sealed class AlibabaVideoMetadataPassthroughTests
         Assert.False(parameters.TryGetProperty("negative_prompt", out _));
     }
 
-    [Fact]
-    public async Task Video_preserves_omissions_and_rejects_invalid_provider_option_shapes()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("null")]
+    [InlineData("{}")]
+    [InlineData("""{"wan":null}""")]
+    [InlineData("""{"wan":{}}""")]
+    public async Task Video_preserves_omitted_parameters(string? metadataJson)
     {
         JsonElement payload = default;
         using var client = CreateClient(request =>
@@ -92,14 +97,57 @@ public sealed class AlibabaVideoMetadataPassthroughTests
             return JsonResponse("""{"output":{"task_id":"task-123"}}""");
         });
         var provider = CreateProvider(client);
-        var request = CreateRequest(ParseElement("""{"wan":null}"""));
+        var request = CreateRequest(metadataJson is null ? default : ParseElement(metadataJson), includeStandardOptions: false);
 
         await provider.StartVideoOperation(request);
 
         Assert.Equal(3, payload.EnumerateObject().Count());
         Assert.Equal(1, payload.GetProperty("input").EnumerateObject().Count());
         Assert.Empty(payload.GetProperty("parameters").EnumerateObject());
+    }
 
+    [Fact]
+    public async Task Video_preserves_standard_parameters_when_wan_options_are_null()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"output":{"task_id":"task-123"}}""");
+        });
+
+        await CreateProvider(client).StartVideoOperation(CreateRequest(ParseElement("""{"wan":null}""")));
+
+        var parameters = payload.GetProperty("parameters");
+        Assert.Equal(3, parameters.EnumerateObject().Count());
+        Assert.Equal("720P", parameters.GetProperty("resolution").GetString());
+        Assert.Equal(5, parameters.GetProperty("duration").GetInt32());
+        Assert.Equal(42, parameters.GetProperty("seed").GetInt32());
+    }
+
+    [Fact]
+    public async Task Video_preserves_explicit_null_mapped_options()
+    {
+        JsonElement payload = default;
+        using var client = CreateClient(request =>
+        {
+            payload = ParseElement(request.Content!.ReadAsStringAsync().GetAwaiter().GetResult());
+            return JsonResponse("""{"output":{"task_id":"task-123"}}""");
+        });
+        var metadata = ParseElement("""{"wan":{"prompt_extend":null,"watermark":null,"shot_type":null}}""");
+
+        await CreateProvider(client).StartVideoOperation(CreateRequest(metadata, includeStandardOptions: false));
+
+        var parameters = payload.GetProperty("parameters");
+        Assert.Equal(3, parameters.EnumerateObject().Count());
+        Assert.Equal(JsonValueKind.Null, parameters.GetProperty("prompt_extend").ValueKind);
+        Assert.Equal(JsonValueKind.Null, parameters.GetProperty("watermark").ValueKind);
+        Assert.Equal(JsonValueKind.Null, parameters.GetProperty("shot_type").ValueKind);
+    }
+
+    [Fact]
+    public async Task Video_rejects_invalid_provider_option_shapes_and_preserves_upstream_errors()
+    {
         using var unusedClient = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
         await Assert.ThrowsAsync<JsonException>(() => CreateProvider(unusedClient)
             .StartVideoOperation(CreateRequest(ParseElement("""{"wan":[]}"""))));
@@ -115,14 +163,14 @@ public sealed class AlibabaVideoMetadataPassthroughTests
         Assert.Equal("Wan video create failed (400): upstream failure", error.Message);
     }
 
-    private static VideoRequest CreateRequest(JsonElement metadata)
+    private static VideoRequest CreateRequest(JsonElement metadata, bool includeStandardOptions = true)
         => new()
         {
             Model = "wan2.6-t2v",
             Prompt = "Make a video",
-            Resolution = "720P",
-            Duration = 5,
-            Seed = 42,
+            Resolution = includeStandardOptions ? "720P" : null,
+            Duration = includeStandardOptions ? 5 : null,
+            Seed = includeStandardOptions ? 42 : null,
             ProviderOptions = metadata.ValueKind == JsonValueKind.Undefined
                 ? null
                 : new Dictionary<string, JsonElement>

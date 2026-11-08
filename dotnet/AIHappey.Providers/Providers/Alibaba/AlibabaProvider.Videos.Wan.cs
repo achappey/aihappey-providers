@@ -156,17 +156,20 @@ public partial class AlibabaProvider
             input["img_url"] = imageData;
         }
 
-        var negativePrompt = ReadWanVideoOption<string>(wanOptions, "negative_prompt");
-        if (!string.IsNullOrWhiteSpace(negativePrompt))
+        if (TryReadWanVideoOption<string>(wanOptions, "negative_prompt", out var negativePrompt)
+            && !string.IsNullOrWhiteSpace(negativePrompt))
             input["negative_prompt"] = negativePrompt;
 
         var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
         CopyUnknownWanVideoOptions(providerMetadata, parameters, skipWanNamespace: true);
         CopyUnknownWanVideoOptions(wanOptions, parameters, skipWanNamespace: false);
 
-        parameters["prompt_extend"] = ReadWanVideoOption<bool?>(wanOptions, "prompt_extend");
-        parameters["watermark"] = ReadWanVideoOption<bool?>(wanOptions, "watermark");
-        parameters["shot_type"] = ReadWanVideoOption<string>(wanOptions, "shot_type");
+        if (TryReadWanVideoOption<bool?>(wanOptions, "prompt_extend", out var promptExtend))
+            parameters["prompt_extend"] = promptExtend;
+        if (TryReadWanVideoOption<bool?>(wanOptions, "watermark", out var watermark))
+            parameters["watermark"] = watermark;
+        if (TryReadWanVideoOption<string>(wanOptions, "shot_type", out var shotType))
+            parameters["shot_type"] = shotType;
 
         if (!string.IsNullOrWhiteSpace(request.Resolution))
             parameters["resolution"] = request.Resolution;
@@ -206,16 +209,22 @@ public partial class AlibabaProvider
         return null;
     }
 
-    private static T? ReadWanVideoOption<T>(JsonElement? wanOptions, string name)
+    private static bool TryReadWanVideoOption<T>(JsonElement? wanOptions, string name, out T? value)
     {
+        value = default;
         if (wanOptions is not { ValueKind: JsonValueKind.Object } options)
-            return default;
+            return false;
 
         foreach (var property in options.EnumerateObject())
+        {
             if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                return property.Value.Deserialize<T>(JsonSerializerOptions.Web);
+            {
+                value = property.Value.Deserialize<T>(JsonSerializerOptions.Web);
+                return true;
+            }
+        }
 
-        return default;
+        return false;
     }
 
     private static void CopyUnknownWanVideoOptions(
