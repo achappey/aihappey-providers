@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using AIHappey.Common.Extensions;
 using AIHappey.Common.Model.Providers.Verda;
@@ -31,7 +32,7 @@ public partial class VerdaProvider
         var warnings = new List<object>();
 
         var providerMetadata = imageRequest.GetProviderMetadata<VerdaImageProviderMetadata>(GetIdentifier());
-        var flux1 = providerMetadata?.Flux1;
+        var flux1 = GetFlux1Metadata(providerMetadata);
 
         var inputImage = imageRequest.Files?.FirstOrDefault();
         if (imageRequest.Files?.Skip(1).Any() == true)
@@ -54,7 +55,7 @@ public partial class VerdaProvider
         }
 
         var normalizedSize = NormalizeFluxSize(imageRequest.Size, imageRequest.AspectRatio);
-        var outputFormat = flux1?.OutputFormat ?? "jpeg";
+        var outputFormat = GetFlux1StringOption(flux1, "output_format") ?? "jpeg";
 
         var input = new Flux1Input
         {
@@ -62,17 +63,25 @@ public partial class VerdaProvider
             Size = normalizedSize,
             Seed = imageRequest.Seed,
             NumImages = imageRequest.N,
-            NumInferenceSteps = flux1?.NumInferenceSteps,
-            GuidanceScale = flux1?.GuidanceScale,
-            EnableSafetyChecker = flux1?.EnableSafetyChecker,
-            OutputFormat = flux1?.OutputFormat,
-            OutputQuality = flux1?.OutputQuality,
+            NumInferenceSteps = GetFlux1Option<int>(flux1, "num_inference_steps"),
+            GuidanceScale = GetFlux1Option<float>(flux1, "guidance_scale"),
+            EnableSafetyChecker = GetFlux1Option<bool>(flux1, "enable_safety_checker"),
+            OutputFormat = GetFlux1StringOption(flux1, "output_format"),
+            OutputQuality = GetFlux1Option<int>(flux1, "output_quality"),
             EnableBase64Output = true,
             Image = inputImage is null ? null : ToDataUrl(inputImage)
         };
 
         var payload = new Flux1Request { Input = input };
-        var json = JsonSerializer.Serialize(payload, Flux1Json);
+        var json = SerializeFlux1Payload(
+            payload,
+            providerMetadata,
+            "input",
+            "num_inference_steps",
+            "guidance_scale",
+            "enable_safety_checker",
+            "output_format",
+            "output_quality");
 
         using var resp = await _client.PostAsync(
             Flux1Endpoint,
@@ -118,6 +127,80 @@ public partial class VerdaProvider
         }
 
         return null;
+    }
+
+    private static JsonElement? GetFlux1Metadata(VerdaImageProviderMetadata? metadata)
+    {
+        var flux1 = metadata?.Flux1;
+        if (!flux1.HasValue || flux1.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return null;
+
+        if (flux1.Value.ValueKind != JsonValueKind.Object)
+            throw new JsonException("Verda flux_1 metadata must be a JSON object.");
+
+        _ = GetFlux1Option<int>(flux1, "num_inference_steps");
+        _ = GetFlux1Option<float>(flux1, "guidance_scale");
+        _ = GetFlux1Option<bool>(flux1, "enable_safety_checker");
+        _ = GetFlux1StringOption(flux1, "output_format");
+        _ = GetFlux1Option<int>(flux1, "output_quality");
+
+        return flux1;
+    }
+
+    private static T? GetFlux1Option<T>(JsonElement? metadata, string propertyName)
+        where T : struct
+    {
+        if (!metadata.HasValue
+            || !metadata.Value.TryGetProperty(propertyName, out var value)
+            || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return null;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static string? GetFlux1StringOption(JsonElement? metadata, string propertyName)
+    {
+        if (!metadata.HasValue
+            || !metadata.Value.TryGetProperty(propertyName, out var value)
+            || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return null;
+
+        return value.Deserialize<string>(JsonSerializerOptions.Web);
+    }
+
+    private static string SerializeFlux1Payload(
+        object payload,
+        VerdaImageProviderMetadata? providerMetadata,
+        string? targetProperty,
+        params string[] mappedMetadataProperties)
+    {
+        var payloadNode = JsonSerializer.SerializeToNode(payload, Flux1Json)?.AsObject()
+            ?? throw new JsonException("Verda payload must be a JSON object.");
+        var target = targetProperty is null
+            ? payloadNode
+            : payloadNode[targetProperty]?.AsObject()
+                ?? throw new JsonException($"Verda payload is missing '{targetProperty}'.");
+
+        foreach (var (name, value) in providerMetadata?.AdditionalProperties ?? [])
+        {
+            if (!target.ContainsKey(name))
+                target[name] = JsonNode.Parse(value.GetRawText());
+        }
+
+        var flux1 = GetFlux1Metadata(providerMetadata);
+        if (flux1.HasValue)
+        {
+            foreach (var property in flux1.Value.EnumerateObject())
+            {
+                if (mappedMetadataProperties.Contains(property.Name, StringComparer.Ordinal)
+                    || target.ContainsKey(property.Name))
+                    continue;
+
+                target[property.Name] = JsonNode.Parse(property.Value.GetRawText());
+            }
+        }
+
+        return payloadNode.ToJsonString(Flux1Json);
     }
 
     private static string ToDataUrl(ImageFile file)
