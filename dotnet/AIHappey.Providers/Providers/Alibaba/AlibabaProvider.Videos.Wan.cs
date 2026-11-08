@@ -2,7 +2,6 @@ using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AIHappey.Common.Model.Providers.Alibaba;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Models;
@@ -27,13 +26,19 @@ public partial class AlibabaProvider
 
         var now = DateTime.UtcNow;
         List<object> warnings = [];
-        AlibabaVideoProviderMetadata? providerMetadata = null;
+        var providerMetadata = default(JsonElement);
         if (request.ProviderOptions is not null
             && request.ProviderOptions.TryGetValue(GetIdentifier(), out var providerElement)
             && providerElement.ValueKind is not JsonValueKind.Null and not JsonValueKind.Undefined)
-            providerMetadata = providerElement.Deserialize<AlibabaVideoProviderMetadata>(JsonSerializerOptions.Web);
+        {
+            if (providerElement.ValueKind != JsonValueKind.Object)
+                throw new JsonException("Alibaba provider options must be a JSON object.");
+
+            providerMetadata = providerElement;
+        }
 
         var modelName = request.Model;
+        var wanOptions = GetWanVideoOptions(providerMetadata);
         // Singapore/intl only for now.
         var baseUrl = DefaultDashScopeBaseUrl;
 
@@ -46,9 +51,7 @@ public partial class AlibabaProvider
         if (request.N is not null && request.N > 1)
             warnings.Add(new { type = "unsupported", feature = "n" });
 
-        var wan = providerMetadata?.Wan;
-
-        var payload = BuildWanVideoPayload(request, wan, modelName, warnings);
+        var payload = BuildWanVideoPayload(request, providerMetadata, wanOptions, modelName, warnings);
         var json = JsonSerializer.Serialize(payload, WanVideoJsonOptions);
 
         using var createReq = new HttpRequestMessage(HttpMethod.Post, new Uri($"{baseUrl}{DashScopeVideoPath}"))
@@ -129,7 +132,8 @@ public partial class AlibabaProvider
 
     private static Dictionary<string, object?> BuildWanVideoPayload(
         VideoRequest request,
-        AlibabaWanVideoOptions? wan,
+        JsonElement providerMetadata,
+        JsonElement? wanOptions,
         string modelName,
         List<object> warnings)
     {
@@ -152,15 +156,17 @@ public partial class AlibabaProvider
             input["img_url"] = imageData;
         }
 
-        if (!string.IsNullOrWhiteSpace(wan?.NegativePrompt))
-            input["negative_prompt"] = wan.NegativePrompt;
+        var negativePrompt = ReadWanVideoOption<string>(wanOptions, "negative_prompt");
+        if (!string.IsNullOrWhiteSpace(negativePrompt))
+            input["negative_prompt"] = negativePrompt;
 
-        var parameters = new Dictionary<string, object?>
-        {
-            ["prompt_extend"] = wan?.PromptExtend,
-            ["watermark"] = wan?.Watermark,
-            ["shot_type"] = wan?.ShotType
-        };
+        var parameters = new Dictionary<string, object?>(StringComparer.Ordinal);
+        CopyUnknownWanVideoOptions(providerMetadata, parameters, skipWanNamespace: true);
+        CopyUnknownWanVideoOptions(wanOptions, parameters, skipWanNamespace: false);
+
+        parameters["prompt_extend"] = ReadWanVideoOption<bool?>(wanOptions, "prompt_extend");
+        parameters["watermark"] = ReadWanVideoOption<bool?>(wanOptions, "watermark");
+        parameters["shot_type"] = ReadWanVideoOption<string>(wanOptions, "shot_type");
 
         if (!string.IsNullOrWhiteSpace(request.Resolution))
             parameters["resolution"] = request.Resolution;
@@ -178,6 +184,65 @@ public partial class AlibabaProvider
             ["parameters"] = parameters
         };
     }
+
+    private static JsonElement? GetWanVideoOptions(JsonElement providerMetadata)
+    {
+        if (providerMetadata.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
+            return null;
+
+        foreach (var property in providerMetadata.EnumerateObject())
+        {
+            if (!property.Name.Equals("wan", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (property.Value.ValueKind == JsonValueKind.Null)
+                return null;
+            if (property.Value.ValueKind != JsonValueKind.Object)
+                throw new JsonException("Alibaba providerOptions.wan must be a JSON object.");
+
+            return property.Value;
+        }
+
+        return null;
+    }
+
+    private static T? ReadWanVideoOption<T>(JsonElement? wanOptions, string name)
+    {
+        if (wanOptions is not { ValueKind: JsonValueKind.Object } options)
+            return default;
+
+        foreach (var property in options.EnumerateObject())
+            if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                return property.Value.Deserialize<T>(JsonSerializerOptions.Web);
+
+        return default;
+    }
+
+    private static void CopyUnknownWanVideoOptions(
+        JsonElement? options,
+        Dictionary<string, object?> parameters,
+        bool skipWanNamespace)
+    {
+        if (options is not { ValueKind: JsonValueKind.Object } jsonObject)
+            return;
+
+        foreach (var property in jsonObject.EnumerateObject())
+        {
+            if (skipWanNamespace && property.Name.Equals("wan", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (!skipWanNamespace && IsMappedWanVideoOption(property.Name))
+                continue;
+
+            parameters[property.Name] = property.Value.Clone();
+        }
+    }
+
+    private static bool IsMappedWanVideoOption(string name)
+        => name.Equals("negative_prompt", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("prompt_extend", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("watermark", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("shot_type", StringComparison.OrdinalIgnoreCase);
 
     private static string? TryGetTaskId(JsonElement root)
     {
