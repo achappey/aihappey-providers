@@ -7,7 +7,7 @@ namespace AIHappey.Common.Model.Providers.Verda;
 public sealed class VerdaImageProviderMetadata
 {
     [JsonPropertyName("flux_1")]
-    public VerdaFlux1ImageProviderMetadata? Flux1 { get; set; }
+    public JsonElement? Flux1 { get; set; }
 
     [JsonPropertyName("flux_2")]
     public JsonElement? Flux2 { get; set; }
