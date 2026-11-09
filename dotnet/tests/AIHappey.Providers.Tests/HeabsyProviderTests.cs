@@ -96,6 +96,7 @@ public sealed class HeabsyProviderTests
         });
         await Provider(client).ExecuteUnifiedAsync(new AIRequest
         {
+            ProviderId = "heabsy",
             Model = "qwen", Input = new AIInput { Text = "Hello" },
             Metadata = new() { ["heabsy"] = native }
         });
