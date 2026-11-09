@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Common.Model.Providers.OpenAI.Live;
@@ -7,8 +8,8 @@ using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Models;
 using AIHappey.Messages;
-using AIHappey.Messages.Mapping;
-using AIHappey.Responses.Mapping;
+using AIHappey.Responses;
+using AIHappey.Responses.Extensions;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 
@@ -31,17 +32,33 @@ public partial class PrismProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.prisminference.com/v1/");
     }
 
-    private IReadOnlyDictionary<string, string> GetAuthHeaders()
+    private Dictionary<string, string> GetAuthHeaders(
+        IEnumerable<KeyValuePair<string, string>>? requestHeaders = null,
+        bool includeAnthropicVersion = false)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(Prism)} API key.");
 
-        return new Dictionary<string, string>
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (name, value) in requestHeaders ?? [])
         {
-            [nameof(HttpRequestHeaders.Authorization)] = new AuthenticationHeaderValue("Bearer", key).ToString()
-        };
+            if (ProviderCredentialHeaders.IsProviderKey(name)
+                || name.Equals("Proxy-Authorization", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("x-api-key", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("x-goog-api-key", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("api-key", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            headers[name] = value;
+        }
+
+        if (includeAnthropicVersion)
+            headers.TryAdd("anthropic-version", "2023-06-01");
+
+        headers[nameof(HttpRequestHeaders.Authorization)] = new AuthenticationHeaderValue("Bearer", key).ToString();
+        return headers;
     }
 
     public Task<ChatCompletion> CompleteChatAsync(
@@ -78,19 +95,27 @@ public partial class PrismProvider : IModelProvider
     public Task<RerankingResponse> RerankingRequest(RerankingRequest request, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
 
-    public async Task<Responses.ResponseResult> ResponsesAsync(
+    public Task<Responses.ResponseResult> ResponsesAsync(
         Responses.ResponseRequest request,
         CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            .ToResponseResult();
+        => _client.GetResponses(PrepareResponses(request, stream: false), GetIdentifier(),
+            relativeUrl: "responses", headers: GetAuthHeaders(request.Headers), ct: cancellationToken);
 
-    public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(
+    public IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(
         Responses.ResponseRequest request,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
+        => _client.GetResponsesUpdates(PrepareResponses(request, stream: true), GetIdentifier(),
+            relativeUrl: "responses", headers: GetAuthHeaders(request.Headers), ct: cancellationToken);
+
+    private static ResponseRequest PrepareResponses(ResponseRequest request, bool stream)
     {
-        await foreach (var part in StreamUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-            .ToResponseStreamParts(cancellationToken))
-            yield return part;
+        var copy = JsonSerializer.SerializeToElement(request, ResponseJson.Default)
+            .Deserialize<ResponseRequest>(ResponseJson.Default)!;
+        // The shared transport merges request.Headers again; pass authenticated headers separately.
+        copy.Headers = null;
+        copy.Stream = stream;
+        copy.Store ??= false;
+        return copy;
     }
 
     public Task<RealtimeResponse> GetRealtimeToken(RealtimeRequest request, CancellationToken cancellationToken)
@@ -99,28 +124,32 @@ public partial class PrismProvider : IModelProvider
     public Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
 
-    public async Task<MessagesResponse> MessagesAsync(
+    public Task<MessagesResponse> MessagesAsync(
         MessagesRequest request,
         Dictionary<string, string> headers,
         CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken))
-            .ToMessagesResponse();
+        => this.GetMessage(_client, PrepareMessages(request, stream: false), relativeUrl: "messages",
+            headers: GetAuthHeaders(headers, includeAnthropicVersion: true), cancellationToken: cancellationToken);
 
-    public async IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(
+    public IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(
         MessagesRequest request,
         Dictionary<string, string> headers,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)
+        => this.GetMessages(_client, PrepareMessages(request, stream: true), relativeUrl: "messages",
+            headers: GetAuthHeaders(headers, includeAnthropicVersion: true), cancellationToken: cancellationToken);
+
+    private static MessagesRequest PrepareMessages(MessagesRequest request, bool stream)
     {
-        await foreach (var part in StreamUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken)
-            .ToMessageStreamParts(request.Model, cancellationToken))
-            yield return part;
+        var copy = JsonSerializer.SerializeToElement(request).Deserialize<MessagesRequest>()!;
+        copy.Stream = stream;
+        return copy;
     }
 
     public Task<AIResponse> ExecuteUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)
-        => this.ExecuteUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken);
+        => this.ExecuteUnifiedViaResponsesAsync(request, cancellationToken: cancellationToken);
 
     public IAsyncEnumerable<AIStreamEvent> StreamUnifiedAsync(AIRequest request, CancellationToken cancellationToken = default)
-        => this.StreamUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken);
+        => this.StreamUnifiedViaResponsesAsync(request, cancellationToken: cancellationToken);
 
     public Task<(byte[] Audio, string MimeType)> OpenAISpeechRequestAsync(AudioSpeechRequest options, CancellationToken cancellationToken = default)
         => throw new NotSupportedException();
