@@ -6,6 +6,7 @@ using AIHappey.Core.Providers.Allternit;
 using AIHappey.Core.Providers.CoralBricks;
 using AIHappey.Core.Providers.JuiceFactory;
 using AIHappey.Core.Providers.Keln;
+using AIHappey.Core.Providers.CreeksideCompute;
 using AIHappey.Core.Providers.Codebase;
 using AIHappey.Core.Providers.AbacusAI;
 using AIHappey.Core.Providers.BespokeLabs;
@@ -753,6 +754,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, RespanProvider>();
         services.AddScoped<IModelProvider, HatzAIProvider>();
         services.AddScoped<IModelProvider, KelnProvider>();
+        services.AddScoped<IModelProvider, CreeksideComputeProvider>();
         services.AddScoped<IModelProvider, GoogleAIProvider>();
         services.AddScoped<IModelProvider, JinaProvider>();
         services.AddScoped<IModelProvider, GroqProvider>();
