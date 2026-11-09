@@ -1794,6 +1794,10 @@
       "sha256": "98911af771121c8c22f7277e4820149697da9f48692bd03a0567c4f0152ff029"
     },
     {
+      "file": "providers/conway.json",
+      "sha256": "44026c3784c765ebc34b4f42b4150a5689751c758e80a16a016788d7bd3884ce"
+    },
+    {
       "file": "providers/copilot.json",
       "sha256": "74ba7914c7b794c914053898a3de923a4aec5c39a2eeb00e9b6ecc6da4beef87"
     },
@@ -1812,6 +1816,10 @@
     {
       "file": "providers/crazyrouter.json",
       "sha256": "1ffbe1341fdf67992b29383e75eb74189f5bbcbcf3c4b4a4419e1c1b1ecc0f38"
+    },
+    {
+      "file": "providers/creeksidecompute.json",
+      "sha256": "48fc3e467ad2fd294e1e1d51f673ccd58cbdf6cd106961a34aed085652e05e8b"
     },
     {
       "file": "providers/creora.json",
@@ -2158,6 +2166,10 @@
       "sha256": "f89477c24eda994d9fb84816974fa612861ba70e5bb5adc554da0c1eb4208b53"
     },
     {
+      "file": "providers/guidai.json",
+      "sha256": "22711942d4b6a441dbe97534edff64d50b8a855fae8f3c6e3ad57e3cc5cae1cd"
+    },
+    {
       "file": "providers/gtranslate.json",
       "sha256": "b5d6196f7262ab50a5780f6cc7f59c4e2422988604fd6f25965b40d2d5d7c402"
     },
@@ -2295,7 +2307,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "7b4be9d2fdc8a4b03799929a15b9ce32a59db4fd851172de5182c69750a8926d"
+      "sha256": "a854619d48fa689b847fca39740f64b16e1545f7291772c298dbafac6bf7cf86"
     },
     {
       "file": "providers/infercom.json",
@@ -2380,6 +2392,10 @@
     {
       "file": "providers/jkaihub.json",
       "sha256": "36aec406b73b708c1d2f329bc46c3719240f70ab0bae687a8f9319ef500e51e5"
+    },
+    {
+      "file": "providers/joulecloud.json",
+      "sha256": "7a771783aeb0985325bd2df2d46e65d43131a7b6adca357012f142af5dc70261"
     },
     {
       "file": "providers/json2video.json",

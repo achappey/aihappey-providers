@@ -1,5 +1,9 @@
 [
   {
+    "id": "joulecloud",
+    "file": "joulecloud.json"
+     },
+  {
     "id": "raven",
     "file": "raven.json"
   },
@@ -2802,5 +2806,9 @@
   {
     "id": "wrenai",
     "file": "wrenai.json"
+  },
+  {
+    "id": "creeksidecompute",
+    "file": "creeksidecompute.json"
   }
 ]
