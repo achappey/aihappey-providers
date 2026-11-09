@@ -27,14 +27,14 @@ public partial class DataForSEOProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.dataforseo.com/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(DataForSEO)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", key);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", key);
     }
 
     public async Task<ChatCompletion> CompleteChatAsync(ChatCompletionOptions options, CancellationToken cancellationToken = default)

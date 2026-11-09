@@ -36,6 +36,7 @@ public partial class DataForSEOProvider
                     using var req = new HttpRequestMessage(
                         HttpMethod.Get,
                         $"v3/ai_optimization/{endpoint}/llm_responses/models");
+                    ApplyAuthHeader(req);
 
                     using var resp = await _client.SendAsync(req, ct);
 
