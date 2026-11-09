@@ -1,5 +1,9 @@
 [
   {
+    "id": "paperinstruments",
+    "file": "paperinstruments.json"
+  },
+   {
     "id": "coralbricks",
     "file": "coralbricks.json"  
   },

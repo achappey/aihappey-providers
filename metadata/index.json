@@ -3070,6 +3070,10 @@
       "sha256": "fb6f9a6499b611c69fc55206f93f3a306c586a89d3dd2c40a2c1c002b20f5384"
     },
     {
+      "file": "providers/paperinstruments.json",
+      "sha256": "2fdac087699467d5c57823f51dcdda32dbbcba440ce32da9cbb38fc6eeb357fd"
+    },
+    {
       "file": "providers/parallel.json",
       "sha256": "6857a1dffef0b5e34857080182263d8c321bcc09d294bf371047bd96dc758f9d"
     },
