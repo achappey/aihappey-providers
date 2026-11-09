@@ -70,7 +70,7 @@ public sealed class SmallestAITranscriptionMetadataPassthroughTests
         Assert.Equal("null", Single(query, "future_null"));
         Assert.Equal(metadata.GetProperty("timestamp_granularities").GetRawText(), Single(query, "timestamp_granularities"));
         Assert.Equal(15, query.Count);
-        Assert.Equal(1, query["model"].Count);
+        Assert.Single(query["model"]);
         Assert.DoesNotContain("providerOptions", query.Keys);
         Assert.DoesNotContain("smallestai", query.Keys);
         Assert.DoesNotContain("another-provider", query.Keys);

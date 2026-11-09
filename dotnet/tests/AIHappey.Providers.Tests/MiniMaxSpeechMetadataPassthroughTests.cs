@@ -81,6 +81,7 @@ public sealed class MiniMaxSpeechMetadataPassthroughTests
 
         Assert.Equal("AA==", response.Audio.Base64);
         Assert.Equal("audio/wav", response.Audio.MimeType);
+        Assert.NotNull(response.ProviderMetadata);
         Assert.Equal(1, response.ProviderMetadata["minimax"].GetProperty("extra_info").GetProperty("usage_characters").GetInt32());
         Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions["minimax"]));
 

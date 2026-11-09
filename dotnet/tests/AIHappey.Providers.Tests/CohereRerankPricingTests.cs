@@ -28,6 +28,7 @@ public sealed class CohereRerankPricingTests
 
         var response = await provider.RerankingRequest(CreateRequest(model));
 
+        Assert.NotNull(response.ProviderMetadata);
         Assert.Equal(
             decimal.Parse(expectedCost, System.Globalization.CultureInfo.InvariantCulture),
             response.ProviderMetadata["gateway"].GetProperty("cost").GetDecimal());
@@ -43,6 +44,7 @@ public sealed class CohereRerankPricingTests
 
         var response = await provider.RerankingRequest(CreateRequest("rerank-v5.0-fast"));
 
+        Assert.NotNull(response.ProviderMetadata);
         Assert.False(response.ProviderMetadata.ContainsKey("gateway"));
     }
 

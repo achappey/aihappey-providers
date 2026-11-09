@@ -420,7 +420,7 @@ public sealed class SonioxTests
         }
         Assert.Contains("en", models[0].Tags!);
         Assert.Contains("es", models[1].Tags!);
-        var voice = Assert.Single(models.Where(m => m.Id.EndsWith("/Adrian", StringComparison.Ordinal)));
+        var voice = Assert.Single(models, m => m.Id.EndsWith("/Adrian", StringComparison.Ordinal));
         Assert.Contains("voice", voice.Tags!);
         Assert.Contains("male", voice.Tags!);
         Assert.Null(client.DefaultRequestHeaders.Authorization);

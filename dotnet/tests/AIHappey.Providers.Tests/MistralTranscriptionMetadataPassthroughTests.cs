@@ -57,8 +57,8 @@ public sealed class MistralTranscriptionMetadataPassthroughTests
         Assert.Equal("false", Single(fields, "future_boolean"));
         Assert.Equal("null", Single(fields, "future_null"));
         Assert.Equal(10, fields.Count);
-        Assert.Equal(1, fields["model"].Count);
-        Assert.Equal(1, fields["file"].Count);
+        Assert.Single(fields["model"]);
+        Assert.Single(fields["file"]);
         Assert.DoesNotContain("providerOptions", fields.Keys);
         Assert.DoesNotContain("mistral", fields.Keys);
     }

@@ -57,7 +57,9 @@ public sealed class DataForSEOLiveTests
         });
         Assert.Null(client.DefaultRequestHeaders.Authorization);
         Assert.Equal("dataforseo/actual-model", response.Model);
-        Assert.Equal("Answer", Assert.Single(response.Output!.Items!.SelectMany(i => i.Content ?? []).OfType<AITextContentPart>()).Text);
+        Assert.NotNull(response.Output);
+        Assert.NotNull(response.Output.Items);
+        Assert.Equal("Answer", Assert.Single(response.Output.Items.SelectMany(i => i.Content ?? []).OfType<AITextContentPart>()).Text);
         Assert.Equal("Thinking", Assert.Single(response.Output.Items.SelectMany(i => i.Content ?? []).OfType<AIReasoningContentPart>()).Text);
         var textPart = Assert.Single(response.Output.Items.SelectMany(i => i.Content ?? []).OfType<AITextContentPart>());
         Assert.Equal("https://example.com", Assert.IsType<JsonElement>(textPart.Metadata!["responses.annotations"])[0].GetProperty("url").GetString());

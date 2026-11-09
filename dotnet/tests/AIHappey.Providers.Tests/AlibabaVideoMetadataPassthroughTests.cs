@@ -102,7 +102,7 @@ public sealed class AlibabaVideoMetadataPassthroughTests
         await provider.StartVideoOperation(request);
 
         Assert.Equal(3, payload.EnumerateObject().Count());
-        Assert.Equal(1, payload.GetProperty("input").EnumerateObject().Count());
+        Assert.Single(payload.GetProperty("input").EnumerateObject());
         Assert.Empty(payload.GetProperty("parameters").EnumerateObject());
     }
 

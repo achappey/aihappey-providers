@@ -74,6 +74,7 @@ public sealed class DeepgramProviderStreamingSpeechTests
         Assert.Single(parts.OfType<SpeechStreamStartPart>());
         Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
         var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.NotNull(finish.ProviderMetadata);
         Assert.Equal(3, finish.ProviderMetadata["deepgram"].GetProperty("events").GetArrayLength());
         Assert.Equal(WebSocketMessageType.Text, socket.SentTypes[0]);
         Assert.Equal(WebSocketMessageType.Text, socket.SentTypes[1]);

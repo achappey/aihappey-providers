@@ -118,7 +118,7 @@ public sealed class BuildprintProviderTests
             Assert.Equal("Bearer", http.Headers.Authorization?.Scheme);
             var body = JsonSerializer.Deserialize<JsonElement>(await http.Content!.ReadAsStringAsync(ct));
             Assert.Equal("latest", body.GetProperty("prompt").GetString());
-            Assert.Equal(1, body.EnumerateObject().Count());
+            Assert.Single(body.EnumerateObject());
             return Json("""{"agentId":"agent_1","queued":true}""");
         });
 

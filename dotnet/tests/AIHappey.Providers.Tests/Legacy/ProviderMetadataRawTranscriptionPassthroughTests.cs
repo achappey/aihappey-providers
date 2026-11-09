@@ -69,8 +69,8 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
         Assert.Equal("12345678901234567890.123456789", Single(fields, "future_number"));
         Assert.Equal("false", Single(fields, "future_boolean"));
         Assert.Equal("null", Single(fields, "future_null"));
-        Assert.Equal(1, fields["model"].Count);
-        Assert.Equal(1, fields["file"].Count);
+        Assert.Single(fields["model"]);
+        Assert.Single(fields["file"]);
         Assert.Equal(15, fields.Count);
         Assert.DoesNotContain("providerOptions", fields.Keys);
         Assert.DoesNotContain("relaxai", fields.Keys);
@@ -174,8 +174,8 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
         Assert.Equal("false", Single(fields, "future_boolean"));
         Assert.Equal("null", Single(fields, "future_null"));
         Assert.Equal("false", Single(fields, "stream"));
-        Assert.Equal(1, fields["model"].Count);
-        Assert.Equal(1, fields["file"].Count);
+        Assert.Single(fields["model"]);
+        Assert.Single(fields["file"]);
         Assert.Equal(11, fields.Count);
         Assert.DoesNotContain("providerOptions", fields.Keys);
         Assert.DoesNotContain("zai", fields.Keys);
@@ -303,7 +303,7 @@ public sealed class ProviderMetadataRawTranscriptionPassthroughTests
         await provider.TranscriptionRequest(CreateNovitaRequest(default));
         Assert.False(payload.TryGetProperty("prompt", out _));
         Assert.False(payload.TryGetProperty("hotwords", out _));
-        Assert.Equal(1, payload.EnumerateObject().Count());
+        Assert.Single(payload.EnumerateObject());
 
         var requestsSent = 0;
         using var unusedClient = CreateClient(_ =>

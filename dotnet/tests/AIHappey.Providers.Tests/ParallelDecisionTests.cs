@@ -111,6 +111,7 @@ public sealed class ParallelDecisionTests
         var score = Assert.IsType<DecisionScoreAnswer>(result.Answers["quality"]);
         Assert.Equal(1.25, score.Score);
         Assert.IsType<DecisionRefusalAnswer>(result.Answers["declined"]);
+        Assert.NotNull(result.Usage);
         Assert.Equal(123, result.Usage.InputTokens);
         Assert.Equal(45, result.Usage.OutputTokens);
         Assert.Equal("decisions_123", result.Response!.Id);

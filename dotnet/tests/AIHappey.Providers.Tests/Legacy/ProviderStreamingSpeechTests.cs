@@ -276,6 +276,7 @@ public sealed class ProviderStreamingSpeechTests
         Assert.Single(parts.OfType<SpeechStreamStartPart>());
         Assert.Single(parts.OfType<SpeechResponseMetadataPart>());
         var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.NotNull(finish.ProviderMetadata);
         Assert.Equal(6, finish.ProviderMetadata["assemblyai"].GetProperty("events").GetArrayLength());
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
@@ -510,9 +511,13 @@ public sealed class ProviderStreamingSpeechTests
         });
         Assert.Equal(2, parts.OfType<SpeechRawPart>().Count());
         var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.NotNull(finish.ProviderMetadata);
         Assert.Equal(2, finish.ProviderMetadata["neuphonic"].GetProperty("events").GetArrayLength());
-        Assert.Contains(parts.OfType<SpeechAudioPart>().Select(part => part.ProviderMetadata["neuphonic"]),
-            item => item.GetProperty("data").TryGetProperty("alignment", out _));
+        Assert.Contains(parts.OfType<SpeechAudioPart>(), part =>
+        {
+            Assert.NotNull(part.ProviderMetadata);
+            return part.ProviderMetadata["neuphonic"].GetProperty("data").TryGetProperty("alignment", out _);
+        });
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
@@ -580,6 +585,7 @@ public sealed class ProviderStreamingSpeechTests
         Assert.Equal(24000, audio.AudioFormat.Rate);
         Assert.Equal(3, parts.OfType<SpeechRawPart>().Count());
         var finish = Assert.Single(parts.OfType<SpeechFinishPart>());
+        Assert.NotNull(finish.ProviderMetadata);
         Assert.Single(finish.ProviderMetadata["cartesia"].GetProperty("events").EnumerateArray());
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }

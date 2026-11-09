@@ -46,7 +46,7 @@ public sealed class SarvamTranscriptionMetadataPassthroughTests
 
         await CreateProvider(client).TranscriptionRequest(request);
 
-        Assert.Equal(1, payload.EnumerateObject().Count());
+        Assert.Single(payload.EnumerateObject());
         Assert.False(payload.TryGetProperty("providerOptions", out _));
         Assert.False(payload.TryGetProperty("sarvam", out _));
         var parameters = payload.GetProperty("job_parameters");

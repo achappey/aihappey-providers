@@ -41,6 +41,7 @@ public sealed class OpenAIImageOutputFormatTests
         var result = await CreateProvider(client).ImageRequest(Request(route,
             JsonSerializer.SerializeToElement(new { output_format = format })));
 
+        Assert.NotNull(result.Images);
         Assert.Equal($"data:{mime};base64,AQID", Assert.Single(result.Images));
     }
 
@@ -79,6 +80,7 @@ public sealed class OpenAIImageOutputFormatTests
         var request = Request(route, metadata);
         var result = await CreateProvider(client).ImageRequest(request);
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/gif;base64,AQID", Assert.Single(result.Images));
         Assert.Empty(result.Warnings ?? []);
         Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions!["openai"]));
@@ -100,6 +102,7 @@ public sealed class OpenAIImageOutputFormatTests
 
         var result = await CreateProvider(client).ImageRequest(Request("generation", expected.RootElement.Clone()));
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/png;base64,AQID", Assert.Single(result.Images));
     }
 
@@ -129,6 +132,7 @@ public sealed class OpenAIImageOutputFormatTests
         var metadata = metadataJson is null ? (JsonElement?)null : JsonSerializer.Deserialize<JsonElement>(metadataJson);
         var result = await CreateProvider(client).ImageRequest(Request(route, metadata));
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/png;base64,AQID", Assert.Single(result.Images));
     }
 
@@ -147,6 +151,7 @@ public sealed class OpenAIImageOutputFormatTests
         var result = await CreateProvider(client).ImageRequest(Request(route,
             JsonSerializer.SerializeToElement(new { output_format = "gif" })));
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/jpeg;base64,AQID", Assert.Single(result.Images));
     }
 
@@ -185,6 +190,7 @@ public sealed class OpenAIImageOutputFormatTests
         request.Size = "1536x864";
         var result = await CreateProvider(client).ImageRequest(request);
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/svg+xml;base64,AQID", Assert.Single(result.Images));
         Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions!["openai"]));
     }
@@ -200,6 +206,7 @@ public sealed class OpenAIImageOutputFormatTests
         using var client = CreateClient(_ => ImageResponse(route, "png", image));
         var result = await CreateProvider(client).ImageRequest(Request(route));
 
+        Assert.NotNull(result.Images);
         Assert.Equal(image, Assert.Single(result.Images));
     }
 
@@ -218,6 +225,7 @@ public sealed class OpenAIImageOutputFormatTests
         request.Model = "dall-e-3";
         var result = await CreateProvider(client).ImageRequest(request);
 
+        Assert.NotNull(result.Images);
         Assert.Equal("data:image/png;base64,AQID", Assert.Single(result.Images));
     }
 
