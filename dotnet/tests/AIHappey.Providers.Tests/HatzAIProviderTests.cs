@@ -88,7 +88,9 @@ public sealed class HatzAIProviderTests
         metadata["headers"] = Headers();
         var input = new AIRequest
         {
-            ProviderId = "hatzai", Model = "hatzai/vendor/test-model", Input = new AIInput { Text = "Hello" },
+            ProviderId = "hatzai",
+            Model = "hatzai/vendor/test-model",
+            Input = new AIInput { Text = "Hello" },
             Metadata = new() { ["hatzai"] = metadata, ["other"] = new { foreign_setting = true } }
         };
         if (streaming) Assert.NotEmpty(await Drain(Provider(client).StreamUnifiedAsync(input)));
@@ -298,7 +300,7 @@ public sealed class HatzAIProviderTests
     }
 
     [Fact]
-    public void Registration_resolves_hatzai_and_unsupported_capabilities_throw()
+    public async Task Registration_resolves_hatzai_and_unsupported_capabilities_throw()
     {
         var services = new ServiceCollection();
         services.AddProviders();
@@ -308,9 +310,14 @@ public sealed class HatzAIProviderTests
         var provider = Assert.IsType<HatzAIProvider>(root.GetRequiredService<ProviderRegistry>()
             .GetModelProvider(scope.ServiceProvider, "hatzai"));
         Assert.Equal("hatzai", provider.GetIdentifier());
-        Assert.Throws<NotSupportedException>(() => provider.ImageRequest(null!));
-        Assert.Throws<NotSupportedException>(() => provider.EmbeddingRequestAsync(null!));
-        Assert.Throws<NotSupportedException>(() => provider.SpeechRequest(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(
+       () => provider.ImageRequest(null!));
+
+        await Assert.ThrowsAsync<NotSupportedException>(
+            () => provider.EmbeddingRequestAsync(null!));
+
+        await Assert.ThrowsAsync<NotSupportedException>(
+            () => provider.SpeechRequest(null!));
     }
 
     private static async Task Invoke(HatzAIProvider provider, string endpoint, bool streaming, JsonElement body,
@@ -379,10 +386,14 @@ public sealed class HatzAIProviderTests
 
     private static Dictionary<string, string> Headers() => new()
     {
-        ["aUtHoRiZaTiOn"] = "untrusted", ["X-aPi-KeY"] = "untrusted",
-        ["aPi-KeY"] = "untrusted", ["pRoXy-AuThOrIzAtIoN"] = "untrusted",
-        ["x-GoOg-ApI-kEy"] = "untrusted", ["X-HatzAI-Key"] = "untrusted",
-        ["X-Other-Key"] = "untrusted", ["x-trace-id"] = "trace-1"
+        ["aUtHoRiZaTiOn"] = "untrusted",
+        ["X-aPi-KeY"] = "untrusted",
+        ["aPi-KeY"] = "untrusted",
+        ["pRoXy-AuThOrIzAtIoN"] = "untrusted",
+        ["x-GoOg-ApI-kEy"] = "untrusted",
+        ["X-HatzAI-Key"] = "untrusted",
+        ["X-Other-Key"] = "untrusted",
+        ["x-trace-id"] = "trace-1"
     };
 
     private static void AssertAuth(HttpRequestMessage request, string key)
@@ -395,7 +406,8 @@ public sealed class HatzAIProviderTests
 
     private static string Route(string endpoint) => endpoint switch
     {
-        "chat" or "responses" => "openai/responses", _ => "anthropic/messages"
+        "chat" or "responses" => "openai/responses",
+        _ => "anthropic/messages"
     };
 
     private static HttpResponseMessage Reply(string endpoint, bool streaming)
