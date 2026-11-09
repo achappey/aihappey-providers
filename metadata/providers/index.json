@@ -2794,5 +2794,9 @@
   {
     "id": "wrenai",
     "file": "wrenai.json"
+  },
+  {
+    "id": "creeksidecompute",
+    "file": "creeksidecompute.json"
   }
 ]
