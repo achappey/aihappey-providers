@@ -27,8 +27,6 @@ public partial class DataForSEOProvider
             cacheKey,
             async ct =>
             {
-                ApplyAuthHeader();
-
                 var models = new List<Model>();
 
                 foreach (var endpoint in Endpoints)
