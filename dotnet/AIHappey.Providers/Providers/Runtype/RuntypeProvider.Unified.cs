@@ -19,7 +19,12 @@ public sealed partial class RuntypeProvider
         {
             RouteKind.List => CreateOperationResponse(route, "list_runtype_agents",
                 await ListAgentsPage(options, cancellationToken)),
+            RouteKind.Runs => CreateOperationResponse(route, "list_runtype_runs",
+                await ListRunsPage(route, options, cancellationToken)),
             RouteKind.Status or RouteKind.Detail => await ReadRunAsync(route, request, options, cancellationToken),
+            RouteKind.ConversationEvents => CreateOperationResponse(route, "list_runtype_conversation_events",
+                await ListConversationEvents(route, request, options, cancellationToken)),
+            RouteKind.Cancel => await CancelExecution(route, request, options, cancellationToken),
             RouteKind.Execute => await ExecuteAgentJson(route, request, options, cancellationToken),
             RouteKind.Events => throw new NotSupportedException("Runtype execution event replay requires the streaming gateway endpoint."),
             _ => throw new ArgumentOutOfRangeException(nameof(request))

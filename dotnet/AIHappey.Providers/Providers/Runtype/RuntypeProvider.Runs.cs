@@ -7,13 +7,76 @@ namespace AIHappey.Core.Providers.Runtype;
 
 public sealed partial class RuntypeProvider
 {
+    private static readonly string[] RunQueryParameters =
+    [
+        "agentId", "flowId", "conversationId", "surfaceId", "surfaceType", "recordId",
+        "batchExecutionId", "parentExecutionId", "rootExecutionId", "includeChildren",
+        "executionId", "source", "status", "traffic", "signal", "from", "to", "view",
+        "overlay", "limit", "cursor", "includeCount"
+    ];
+
     private async Task<JsonReply> ListAgentsPage(JsonObject options, CancellationToken ct)
     {
         var query = new List<string>();
-        foreach (var name in new[] { "limit", "cursor", "includeCount", "search", "agentType", "managedInCode", "view" })
+        foreach (var name in new[] { "limit", "cursor", "includeCount", "search", "agentType", "managedInCode", "model", "view" })
             if (options[name] is JsonValue value)
                 query.Add($"{name}={Uri.EscapeDataString(value.ToString())}");
         return await SendJson(HttpMethod.Get, "v1/agents" + (query.Count > 0 ? "?" + string.Join("&", query) : ""), null, ct);
+    }
+
+    private async Task<JsonReply> ListRunsPage(Route route, JsonObject options, CancellationToken ct)
+    {
+        var query = new List<string>();
+        foreach (var name in RunQueryParameters)
+        {
+            if (name == "agentId" && route.AgentId is not null)
+            {
+                query.Add($"agentId={Uri.EscapeDataString(route.AgentId)}");
+                continue;
+            }
+
+            if (options[name] is JsonArray values)
+            {
+                foreach (var value in values)
+                    AddRunQueryValue(query, name, value);
+            }
+            else
+            {
+                AddRunQueryValue(query, name, options[name]);
+            }
+        }
+
+        return await SendJson(HttpMethod.Get, "v1/runs" + (query.Count > 0 ? "?" + string.Join("&", query) : ""), null, ct);
+    }
+
+    private static void AddRunQueryValue(List<string> query, string name, JsonNode? value)
+    {
+        if (value is not JsonValue) return;
+        query.Add($"{Uri.EscapeDataString(name)}={Uri.EscapeDataString(value.ToString())}");
+    }
+
+    private async Task<JsonReply> ListConversationEvents(Route route, AIRequest request, JsonObject options, CancellationToken ct)
+    {
+        var conversationId = RequiredId(options, request, "conversationId");
+        var query = new List<string>();
+        foreach (var name in new[] { "limit", "after" })
+            if (options[name] is JsonValue value)
+                query.Add($"{name}={Uri.EscapeDataString(value.ToString())}");
+
+        var path = $"v1/agents/{Uri.EscapeDataString(route.AgentId!)}/conversations/{Uri.EscapeDataString(conversationId)}/events";
+        return await SendJson(HttpMethod.Get, path + (query.Count > 0 ? "?" + string.Join("&", query) : ""), null, ct);
+    }
+
+    private async Task<AIResponse> CancelExecution(Route route, AIRequest request, JsonObject options, CancellationToken ct)
+    {
+        var executionId = RequiredId(options, request, "executionId");
+        var conversationId = Text(options, "conversationId") ?? FindIdentity(request, "conversationId");
+        var path = $"v1/agents/{Uri.EscapeDataString(route.AgentId!)}/executions/{Uri.EscapeDataString(executionId)}/cancel";
+        if (conversationId is not null)
+            path += "?conversationId=" + Uri.EscapeDataString(conversationId);
+
+        return CreateOperationResponse(route, "cancel_runtype_execution",
+            await SendJson(HttpMethod.Post, path, null, ct), executionId);
     }
 
     private async Task<AIResponse> ReadRunAsync(Route route, AIRequest request, JsonObject options, CancellationToken ct)
