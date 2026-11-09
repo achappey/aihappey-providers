@@ -24,6 +24,14 @@ public sealed class HatzAIProvider(
 {
     private const string ResponsesPath = "openai/responses";
     private const string MessagesPath = "anthropic/messages";
+    private static readonly HashSet<string> ChatReservedProperties = new(StringComparer.Ordinal)
+    {
+        "messages", "max_tokens", "max_completion_tokens", "response_format", "stream_options",
+        "frequency_penalty", "presence_penalty", "logit_bias", "logprobs", "top_logprobs",
+        "n", "seed", "stop", "functions", "function_call", "headers", "stream", "reasoning_effort",
+        "model", "input", "instructions", "tools", "tool_choice", "parallel_tool_calls",
+        "max_output_tokens", "max_tool_calls", "temperature", "top_p", "text", "reasoning"
+    };
     private readonly HttpClient _client = CreateClient(httpClientFactory);
 
     private static HttpClient CreateClient(IHttpClientFactory factory)
@@ -77,16 +85,48 @@ public sealed class HatzAIProvider(
     private AIRequest ToUnifiedChatRequest(ChatCompletionOptions options)
     {
         var request = options.ToUnifiedRequest(GetIdentifier());
+        var metadata = new Dictionary<string, object?>(request.Metadata ?? []);
+        if (options.AdditionalProperties is { Count: > 0 })
+        {
+            var native = new Dictionary<string, object?>();
+            if (metadata.TryGetValue(GetIdentifier(), out var existing) && existing is not null)
+            {
+                var existingOptions = JsonSerializer.SerializeToElement(existing);
+                if (existingOptions.ValueKind == JsonValueKind.Object)
+                    foreach (var property in existingOptions.EnumerateObject())
+                        native[property.Name] = property.Value.Clone();
+            }
+            foreach (var name in ChatReservedProperties)
+                native.Remove(name);
+            foreach (var (name, value) in options.AdditionalProperties)
+                if (!ChatReservedProperties.Contains(name))
+                    native[name] = value.Clone();
+            metadata[GetIdentifier()] = native;
+        }
         return new AIRequest
         {
             ProviderId = request.ProviderId, Model = request.Model, Id = request.Id,
             Instructions = request.Instructions, Input = request.Input, Temperature = request.Temperature,
             TopP = request.TopP, MaxOutputTokens = request.MaxOutputTokens,
             MaxToolCalls = request.MaxToolCalls, Stream = request.Stream,
-            ParallelToolCalls = request.ParallelToolCalls, ToolChoice = request.ToolChoice,
-            ResponseFormat = request.ResponseFormat, Tools = request.Tools, Metadata = request.Metadata,
+            ParallelToolCalls = request.ParallelToolCalls, ToolChoice = NormalizeChatToolChoice(request.ToolChoice),
+            ResponseFormat = request.ResponseFormat, Tools = request.Tools, Metadata = metadata,
             Headers = options.Headers, Verbosity = request.Verbosity
         };
+    }
+
+    private static object? NormalizeChatToolChoice(object? choice)
+    {
+        if (choice is null)
+            return null;
+        var value = JsonSerializer.SerializeToElement(choice);
+        if (value.ValueKind == JsonValueKind.Object
+            && value.TryGetProperty("type", out var type) && type.ValueKind == JsonValueKind.String
+            && type.GetString() == "function"
+            && value.TryGetProperty("function", out var function) && function.ValueKind == JsonValueKind.Object
+            && function.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
+            return JsonSerializer.SerializeToElement(new { type = "function", name = name.GetString() });
+        return choice;
     }
 
     public Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
@@ -104,6 +144,7 @@ public sealed class HatzAIProvider(
             .Deserialize<ResponseRequest>(ResponseJson.Default)!;
         // The shared transports can merge the request's headers again.
         copy.Headers = null;
+        copy.Model = NativeModel(copy.Model);
         copy.Stream = stream;
         return copy;
     }
@@ -122,9 +163,14 @@ public sealed class HatzAIProvider(
     {
         var copy = JsonSerializer.SerializeToElement(request).Deserialize<MessagesRequest>()!;
         copy.Headers = null;
+        copy.Model = NativeModel(copy.Model);
         copy.Stream = stream;
         return copy;
     }
+
+    private static string? NativeModel(string? model)
+        => model?.StartsWith("hatzai/", StringComparison.OrdinalIgnoreCase) == true
+            ? model["hatzai/".Length..] : model;
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
     {

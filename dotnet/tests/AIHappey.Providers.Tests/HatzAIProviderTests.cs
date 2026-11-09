@@ -50,15 +50,18 @@ public sealed class HatzAIProviderTests
             }
             var payload = Parse(await request.Content!.ReadAsStringAsync());
             Assert.Equal(streaming, payload.GetProperty("stream").GetBoolean());
-            Assert.Equal("test-model", payload.GetProperty("model").GetString());
+            Assert.Equal("vendor/test-model", payload.GetProperty("model").GetString());
             if (endpoint != "chat")
                 AssertOptions(payload);
             else
+            {
+                AssertOptions(payload, includeMetadata: false);
                 Assert.True(payload.TryGetProperty("input", out _));
+            }
             Assert.False(payload.TryGetProperty("headers", out _));
             return endpoint == "chat" ? ChatCompatibilityReply(streaming) : Reply(endpoint, streaming);
         });
-        await Invoke(Provider(client), endpoint, streaming, Body());
+        await Invoke(Provider(client), endpoint, streaming, Body("hatzai/vendor/test-model"));
         Assert.Equal(1, calls);
         Assert.Empty(client.DefaultRequestHeaders);
     }
@@ -73,6 +76,7 @@ public sealed class HatzAIProviderTests
             Assert.Equal("/v1/openai/responses", request.RequestUri!.AbsolutePath);
             AssertAuth(request, "resolved-key");
             var payload = Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("vendor/test-model", payload.GetProperty("model").GetString());
             AssertOptions(payload);
             Assert.False(payload.TryGetProperty("hatzai", out _));
             Assert.False(payload.TryGetProperty("foreign_setting", out _));
@@ -84,7 +88,7 @@ public sealed class HatzAIProviderTests
         metadata["headers"] = Headers();
         var input = new AIRequest
         {
-            ProviderId = "hatzai", Model = "test-model", Input = new AIInput { Text = "Hello" },
+            ProviderId = "hatzai", Model = "hatzai/vendor/test-model", Input = new AIInput { Text = "Hello" },
             Metadata = new() { ["hatzai"] = metadata, ["other"] = new { foreign_setting = true } }
         };
         if (streaming) Assert.NotEmpty(await Drain(Provider(client).StreamUnifiedAsync(input)));
@@ -100,7 +104,9 @@ public sealed class HatzAIProviderTests
             calls++;
             Assert.Equal("/v1/openai/responses", request.RequestUri!.AbsolutePath);
             AssertAuth(request, "resolved-key");
-            AssertOptions(Parse(await request.Content!.ReadAsStringAsync()));
+            var payload = Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("test-model", payload.GetProperty("model").GetString());
+            AssertOptions(payload);
             return Reply("responses", true);
         });
         await Drain(Provider(client).StreamAsync(new ChatRequest
@@ -110,6 +116,75 @@ public sealed class HatzAIProviderTests
             ProviderMetadata = new() { ["hatzai"] = Parse(RawOptions) }
         }));
         Assert.Equal(1, calls);
+    }
+
+    [Theory]
+    [InlineData("responses", "hatzai/vendor/model", "vendor/model")]
+    [InlineData("responses", "hatzai/hatzai/model", "hatzai/model")]
+    [InlineData("responses", "vendor/hatzai/model", "vendor/hatzai/model")]
+    [InlineData("responses", "vendor/model", "vendor/model")]
+    [InlineData("messages", "hatzai/vendor/model", "vendor/model")]
+    [InlineData("messages", "hatzai/hatzai/model", "hatzai/model")]
+    [InlineData("messages", "vendor/hatzai/model", "vendor/hatzai/model")]
+    [InlineData("messages", "vendor/model", "vendor/model")]
+    public async Task Native_models_remove_only_one_leading_provider_prefix(string endpoint, string model, string expected)
+    {
+        using var client = Client(async request =>
+        {
+            var payload = Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal(expected, payload.GetProperty("model").GetString());
+            return Reply(endpoint, false);
+        });
+        await Invoke(Provider(client), endpoint, false, Body(model));
+    }
+
+    [Theory]
+    [InlineData(false, """{"type":"function","function":{"name":"lookup"}}""", """{"type":"function","name":"lookup"}""")]
+    [InlineData(true, """{"type":"function","function":{"name":"lookup"}}""", """{"type":"function","name":"lookup"}""")]
+    [InlineData(false, "\"auto\"", "\"auto\"")]
+    [InlineData(false, "\"none\"", "\"none\"")]
+    [InlineData(false, "\"required\"", "\"required\"")]
+    [InlineData(false, """{"type":"function","name":"lookup"}""", """{"type":"function","name":"lookup"}""")]
+    public async Task Chat_named_function_tool_choice_is_flattened_without_changing_other_choices(
+        bool streaming, string toolChoice, string expected)
+    {
+        using var client = Client(async request =>
+        {
+            Assert.Equal("/v1/openai/responses", request.RequestUri!.AbsolutePath);
+            var payload = Parse(await request.Content!.ReadAsStringAsync());
+            Assert.True(JsonElement.DeepEquals(Parse(expected), payload.GetProperty("tool_choice")));
+            return ChatCompatibilityReply(streaming);
+        });
+        var fields = Body().EnumerateObject().ToDictionary(property => property.Name, property => property.Value.Clone());
+        fields["tool_choice"] = Parse(toolChoice);
+        fields["tools"] = Parse("""
+            [{"type":"function","function":{"name":"lookup","description":"Look up a value","parameters":{"type":"object","properties":{}}}}]
+            """);
+        await Invoke(Provider(client), "chat", streaming, JsonSerializer.SerializeToElement(fields));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Chat_extensions_cannot_replace_mapped_responses_fields_or_forward_chat_only_fields(bool streaming)
+    {
+        using var client = Client(async request =>
+        {
+            var payload = Parse(await request.Content!.ReadAsStringAsync());
+            AssertOptions(payload, includeMetadata: false);
+            Assert.DoesNotContain("extension-must-not-replace-input", payload.GetProperty("input").GetRawText());
+            Assert.Contains("Hello", payload.GetProperty("input").GetRawText());
+            foreach (var name in new[] { "messages", "max_tokens", "functions", "function_call", "stream_options" })
+                Assert.False(payload.TryGetProperty(name, out _), name);
+            return ChatCompatibilityReply(streaming);
+        });
+        var chat = Body().Deserialize<ChatCompletionOptions>()!;
+        Assert.NotNull(chat.AdditionalProperties);
+        chat.AdditionalProperties["input"] = Parse("\"extension-must-not-replace-input\"");
+        chat.AdditionalProperties["functions"] = Parse("""[{"name":"old_chat_function"}]""");
+        chat.AdditionalProperties["function_call"] = Parse("\"auto\"");
+        if (streaming) await Drain(Provider(client).CompleteChatStreamingAsync(chat));
+        else await Provider(client).CompleteChatAsync(chat);
     }
 
     [Theory]
@@ -260,6 +335,7 @@ public sealed class HatzAIProviderTests
                         .GetProperty("message").GetProperty("content").GetString());
                 }
                 Assert.Equal("untrusted", chat.Headers["aUtHoRiZaTiOn"]);
+                Assert.Equal(body.GetProperty("model").GetString(), chat.Model);
                 break;
             case "responses":
                 var responses = body.Deserialize<ResponseRequest>(ResponseJson.Default)!;
@@ -267,6 +343,7 @@ public sealed class HatzAIProviderTests
                 if (streaming) Assert.Single(await Drain(provider.ResponsesStreamingAsync(responses, ct)));
                 else Assert.NotNull(await provider.ResponsesAsync(responses, ct));
                 Assert.Equal("untrusted", responses.Headers["aUtHoRiZaTiOn"]);
+                Assert.Equal(body.GetProperty("model").GetString(), responses.Model);
                 break;
             default:
                 var messages = body.Deserialize<MessagesRequest>()!;
@@ -274,24 +351,26 @@ public sealed class HatzAIProviderTests
                 if (streaming) Assert.Single(await Drain(provider.MessagesStreamingAsync(messages, Headers(), ct)));
                 else Assert.NotNull(await provider.MessagesAsync(messages, Headers(), ct));
                 Assert.Equal("body-key", messages.Headers["X-API-Key"]);
+                Assert.Equal(body.GetProperty("model").GetString(), messages.Model);
                 break;
         }
     }
 
-    private static void AssertOptions(JsonElement payload)
+    private static void AssertOptions(JsonElement payload, bool includeMetadata = true)
     {
-        foreach (var property in Parse(RawOptions).EnumerateObject())
+        foreach (var property in Parse(RawOptions).EnumerateObject()
+                     .Where(property => includeMetadata || property.Name != "metadata"))
         {
             Assert.True(JsonElement.DeepEquals(property.Value, payload.GetProperty(property.Name)), property.Name);
             Assert.Single(payload.EnumerateObject(), candidate => candidate.Name == property.Name);
         }
     }
 
-    private static JsonElement Body()
+    private static JsonElement Body(string model = "test-model")
     {
         var fields = Parse(RawOptions).EnumerateObject()
             .ToDictionary(property => property.Name, property => property.Value.Clone());
-        fields["model"] = JsonSerializer.SerializeToElement("test-model");
+        fields["model"] = JsonSerializer.SerializeToElement(model);
         fields["input"] = JsonSerializer.SerializeToElement("Hello");
         fields["messages"] = Parse("""[{"role":"user","content":"Hello"}]""");
         fields["max_tokens"] = JsonSerializer.SerializeToElement(32);
