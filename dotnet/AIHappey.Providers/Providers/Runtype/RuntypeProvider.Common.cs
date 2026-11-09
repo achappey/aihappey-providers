@@ -290,7 +290,7 @@ public sealed partial class RuntypeProvider
             Output = new CallToolResult { StructuredContent = JsonSerializer.SerializeToElement(new
             {
                 agentId, executionId, conversationId = String(raw, "conversationId"),
-                status = String(raw, "status"), raw
+                status = String(raw, "status"), statusUrl = String(raw, "statusUrl"), raw
             }, Json) }, Metadata = Metadata(raw)
         };
     }

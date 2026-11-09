@@ -113,6 +113,44 @@ public sealed class RuntypeProviderTests
     }
 
     [Fact]
+    public async Task PollsTheNativeAsyncStatusUrl()
+    {
+        using var client = new HttpClient(new Handler(request =>
+        {
+            Assert.Equal(HttpMethod.Get, request.Method);
+            Assert.Equal("/v1/agents/agent-1/executions/exec-1/status", request.RequestUri!.AbsolutePath);
+            Assert.Contains("detail=true", request.RequestUri.Query);
+            return JsonResponse("""{"executionId":"exec-1","status":"running"}""");
+        }));
+
+        await Provider(client).ExecuteUnifiedAsync(new AIRequest
+        {
+            ProviderId = "runtype",
+            Model = "runtype/executions/status",
+            Metadata = new Dictionary<string, object?>
+            {
+                ["runtype"] = new { executionId = "exec-1", statusUrl = "/v1/agents/agent-1/executions/exec-1/status?detail=true" }
+            }
+        });
+    }
+
+    [Fact]
+    public async Task RejectsStatusUrlsOutsideTheRuntypeApiOrigin()
+    {
+        using var client = new HttpClient(new Handler(_ => throw new InvalidOperationException("No request expected.")));
+
+        await Assert.ThrowsAsync<ArgumentException>(() => Provider(client).ExecuteUnifiedAsync(new AIRequest
+        {
+            ProviderId = "runtype",
+            Model = "runtype/executions/status",
+            Metadata = new Dictionary<string, object?>
+            {
+                ["runtype"] = new { executionId = "exec-1", statusUrl = "https://example.com/status" }
+            }
+        }));
+    }
+
+    [Fact]
     public async Task CancelsDetachedExecutionWithConversationContext()
     {
         using var client = new HttpClient(new Handler(request =>

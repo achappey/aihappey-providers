@@ -83,10 +83,28 @@ public sealed partial class RuntypeProvider
     {
         var id = RequiredId(options, request, "executionId");
         var path = route.Kind == RouteKind.Status
-            ? $"v1/executions/{Uri.EscapeDataString(id)}/status"
+            ? StatusPath(options, request, id)
             : $"v1/agents/{Uri.EscapeDataString(route.AgentId!)}/executions/{Uri.EscapeDataString(id)}";
         return CreateOperationResponse(route, route.Kind == RouteKind.Status ? "get_runtype_execution_status" : "get_runtype_execution",
             await SendJson(HttpMethod.Get, path, null, ct), id);
+    }
+
+    private static string StatusPath(JsonObject options, AIRequest request, string executionId)
+    {
+        var statusUrl = Text(options, "statusUrl") ?? FindIdentity(request, "statusUrl");
+        if (string.IsNullOrWhiteSpace(statusUrl))
+            return $"v1/executions/{Uri.EscapeDataString(executionId)}/status";
+
+        var apiRoot = new Uri("https://api.runtype.com/");
+        if (!Uri.TryCreate(apiRoot, statusUrl, out var uri)
+            || uri.Scheme != Uri.UriSchemeHttps
+            || !uri.Host.Equals(apiRoot.Host, StringComparison.OrdinalIgnoreCase)
+            || uri.Port != apiRoot.Port
+            || !string.IsNullOrEmpty(uri.UserInfo)
+            || !string.IsNullOrEmpty(uri.Fragment))
+            throw new ArgumentException("Runtype statusUrl must resolve to an HTTPS URL on api.runtype.com.", nameof(options));
+
+        return uri.PathAndQuery.TrimStart('/');
     }
 
     private AIResponse CreateOperationResponse(Route route, string toolName, JsonReply reply, string? executionId = null)
