@@ -586,6 +586,10 @@
       "sha256": "ef9dc0bb09c899c1e37f3b18fb743e17ca07d01e5b7f54bf2c95d068ddc8d3ff"
     },
     {
+      "file": "models/providers/prism.json",
+      "sha256": "e487ce4e32291740228774e90158e39650c3c378acb7156a3477df62bfdd891f"
+    },
+    {
       "file": "models/providers/prunaai/image.json",
       "sha256": "7184fa20066a867f308d15c60dbfe96035c617fa41f1b38cdc20ce989015a035"
     },
