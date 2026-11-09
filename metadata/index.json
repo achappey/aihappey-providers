@@ -1794,6 +1794,10 @@
       "sha256": "98911af771121c8c22f7277e4820149697da9f48692bd03a0567c4f0152ff029"
     },
     {
+      "file": "providers/conway.json",
+      "sha256": "44026c3784c765ebc34b4f42b4150a5689751c758e80a16a016788d7bd3884ce"
+    },
+    {
       "file": "providers/copilot.json",
       "sha256": "74ba7914c7b794c914053898a3de923a4aec5c39a2eeb00e9b6ecc6da4beef87"
     },
