@@ -2178,6 +2178,10 @@
       "sha256": "f84199733b8f3853e18a748e8bd63435562e072645341b14a87053e09fadef69"
     },
     {
+      "file": "providers/hatzai.json",
+      "sha256": "97e6dfa5de9cd3f26c40b2408697361b8b90f34cbe75b84237994fcb4c3b4e1c"
+    },
+    {
       "file": "providers/hcompany.json",
       "sha256": "ec01c2c32ed4a1931ca65a9bafca1831d9dd3c87d3087ee0438258bad811db66"
     },
