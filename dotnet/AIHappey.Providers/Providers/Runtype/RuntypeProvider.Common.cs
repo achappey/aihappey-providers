@@ -13,7 +13,7 @@ public sealed partial class RuntypeProvider
     private static readonly JsonSerializerOptions Json = JsonSerializerOptions.Web;
     private const string IdentityTool = "runtype_execution";
 
-    private enum RouteKind { List, Execute, Detail, Events, Status }
+    private enum RouteKind { List, Runs, Execute, Detail, Events, ConversationEvents, Cancel, Status }
     private sealed record Route(RouteKind Kind, string? AgentId, string Model);
     private sealed record JsonReply(JsonElement Body, int HttpStatus, Dictionary<string, object?> Headers);
 
@@ -23,16 +23,25 @@ public sealed partial class RuntypeProvider
         if (local.StartsWith("runtype/", StringComparison.OrdinalIgnoreCase)) local = local[8..];
         var parts = local.Split('/', StringSplitOptions.RemoveEmptyEntries);
         if (parts.Length == 1 && parts[0] == "agents") return new(RouteKind.List, null, "runtype/agents");
+        if (parts.Length == 1 && parts[0] == "runs") return new(RouteKind.Runs, null, "runtype/runs");
         if (parts.Length == 2 && parts[0] == "executions" && parts[1] == "status")
             return new(RouteKind.Status, null, "runtype/executions/status");
         if (parts.Length >= 2 && parts[0] == "agents" && !string.IsNullOrWhiteSpace(parts[1])
             && parts[1] is not ("execution" or "events"))
         {
             if (parts.Length == 2) return new(RouteKind.Execute, parts[1], $"runtype/agents/{parts[1]}");
+            if (parts.Length == 3 && parts[2] == "runs")
+                return new(RouteKind.Runs, parts[1], $"runtype/agents/{parts[1]}/runs");
             if (parts.Length == 3 && parts[2] == "execution")
                 return new(RouteKind.Detail, parts[1], $"runtype/agents/{parts[1]}/execution");
             if (parts.Length == 3 && parts[2] == "events")
                 return new(RouteKind.Events, parts[1], $"runtype/agents/{parts[1]}/events");
+            if (parts.Length == 4 && parts[2] == "execution" && parts[3] == "events")
+                return new(RouteKind.Events, parts[1], $"runtype/agents/{parts[1]}/execution/events");
+            if (parts.Length == 4 && parts[2] == "execution" && parts[3] == "cancel")
+                return new(RouteKind.Cancel, parts[1], $"runtype/agents/{parts[1]}/execution/cancel");
+            if (parts.Length == 4 && parts[2] == "conversations" && parts[3] == "events")
+                return new(RouteKind.ConversationEvents, parts[1], $"runtype/agents/{parts[1]}/conversations/events");
         }
         throw new ArgumentException($"Unknown Runtype model '{model}'.", nameof(model));
     }
@@ -281,7 +290,7 @@ public sealed partial class RuntypeProvider
             Output = new CallToolResult { StructuredContent = JsonSerializer.SerializeToElement(new
             {
                 agentId, executionId, conversationId = String(raw, "conversationId"),
-                status = String(raw, "status"), raw
+                status = String(raw, "status"), statusUrl = String(raw, "statusUrl"), raw
             }, Json) }, Metadata = Metadata(raw)
         };
     }

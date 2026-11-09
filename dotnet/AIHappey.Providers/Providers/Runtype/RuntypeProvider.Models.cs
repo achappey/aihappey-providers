@@ -15,6 +15,7 @@ public sealed partial class RuntypeProvider
             var models = new List<Model>
             {
                 OperationModel("agents", "List Runtype agents (raw paginated response)"),
+                OperationModel("runs", "List Runtype runs (raw paginated response)"),
                 OperationModel("executions/status", "Read Runtype asynchronous execution status")
             };
             var cursor = (string?)null;
@@ -34,8 +35,12 @@ public sealed partial class RuntypeProvider
                     models.Add(new Model { Id = $"agents/{id}".ToModelId(GetIdentifier()), Name = name,
                         Description = description, Created = created, Type = "language", OwnedBy = "Runtype",
                         Tags = ["agent"] });
+                    models.Add(OperationModel($"agents/{id}/runs", $"List runs for {name}"));
                     models.Add(OperationModel($"agents/{id}/execution", $"Read execution detail for {name}"));
+                    models.Add(OperationModel($"agents/{id}/execution/cancel", $"Cancel a detached execution for {name}"));
                     models.Add(OperationModel($"agents/{id}/events", $"Replay and tail execution events for {name}"));
+                    models.Add(OperationModel($"agents/{id}/execution/events", $"Replay and tail execution events for {name}"));
+                    models.Add(OperationModel($"agents/{id}/conversations/events", $"List internal conversation events for {name}"));
                 }
                 var pagination = Property(page, "pagination");
                 cursor = pagination is { } p && Property(p, "hasMore") is { ValueKind: JsonValueKind.True }
