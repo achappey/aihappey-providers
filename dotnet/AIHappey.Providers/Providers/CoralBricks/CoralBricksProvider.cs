@@ -65,8 +65,22 @@ public sealed partial class CoralBricksProvider : IModelProvider
     {
         var unified = request.ToUnifiedRequest(GetIdentifier());
         unified.Metadata!.Remove(GetIdentifier());
-        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out var native) == true)
-            unified.Metadata[GetIdentifier()] = native.Clone();
+        var properties = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        if (request.ToolChoice is { } choice)
+            properties["tool_choice"] = choice.Type switch
+            {
+                "auto" or "none" => JsonSerializer.SerializeToElement(choice.Type),
+                "any" => JsonSerializer.SerializeToElement("required"),
+                "tool" => JsonSerializer.SerializeToElement(new { type = "function", function = new { name = choice.Name } }),
+                _ => JsonSerializer.SerializeToElement(choice)
+            };
+        // Adapter defaults must not replace explicit native provider options.
+        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out var native) == true
+            && native.ValueKind == JsonValueKind.Object)
+            foreach (var property in native.EnumerateObject())
+                properties[property.Name] = property.Value.Clone();
+        if (properties.Count > 0)
+            unified.Metadata[GetIdentifier()] = JsonSerializer.SerializeToElement(properties);
         return unified;
     }
 

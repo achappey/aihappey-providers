@@ -10,7 +10,7 @@
   "category": "inference_compute",
   "apiBaseUrl": "https://inference.coralbricks.ai/v1",
   "chatEndpoints": [
-    "/v1/chat/completions",
-    "/v1/responses"
+    "/chat/completions",
+    "/responses"
   ]
 }

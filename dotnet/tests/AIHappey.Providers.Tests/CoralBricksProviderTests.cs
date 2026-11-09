@@ -271,6 +271,85 @@ public sealed class CoralBricksProviderTests
         Assert.Null(client.DefaultRequestHeaders.Authorization);
     }
 
+    public static IEnumerable<object?[]> MessagesToolChoices()
+    {
+        foreach (var choice in new[] { "auto", "any", "none", "tool" })
+            foreach (var disableParallel in new bool?[] { null, false, true })
+                foreach (var streaming in new[] { false, true })
+                    yield return [choice, disableParallel, streaming];
+    }
+
+    [Theory]
+    [MemberData(nameof(MessagesToolChoices))]
+    public async Task Messages_maps_tool_choices_and_parallel_semantics(string choice, bool? disableParallel, bool streaming)
+    {
+        using var client = Client(async (http, ct) =>
+        {
+            var body = Element(await http.Content!.ReadAsStringAsync(ct));
+            Assert.Equal("/v1/chat/completions", http.RequestUri!.AbsolutePath);
+            Assert.Equal(streaming, body.GetProperty("stream").GetBoolean());
+            var expected = choice == "tool"
+                ? Element("""{"type":"function","function":{"name":"lookup"}}""")
+                : JsonSerializer.SerializeToElement(choice == "any" ? "required" : choice);
+            Assert.True(JsonElement.DeepEquals(expected, body.GetProperty("tool_choice")));
+            if (disableParallel is null)
+                Assert.False(body.TryGetProperty("parallel_tool_calls", out _));
+            else
+                Assert.Equal(!disableParallel.Value, body.GetProperty("parallel_tool_calls").GetBoolean());
+            Assert.False(body.TryGetProperty("disable_parallel_tool_use", out _));
+            Assert.Equal("lookup", body.GetProperty("tools")[0].GetProperty("function").GetProperty("name").GetString());
+            return streaming ? Events(ChatEvents) : Json(ChatReply);
+        });
+        var request = ToolMessagesRequest();
+        request.ToolChoice = new()
+        {
+            Type = choice, Name = choice == "tool" ? "lookup" : null, DisableParallelToolUse = disableParallel
+        };
+        var before = JsonSerializer.Serialize(request);
+        var provider = Provider(client);
+        if (streaming)
+            Assert.NotEmpty(await Collect(provider.MessagesStreamingAsync(request, [])));
+        else
+            Assert.NotEmpty((await provider.MessagesAsync(request, [])).Content);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Messages_preserves_native_tool_choice_and_parallel_overrides(bool streaming, bool nativeParallel)
+    {
+        var native = JsonSerializer.SerializeToElement(new
+        {
+            tool_choice = new { type = "future_choice", config = new { large = 9007199254740993L, empty = new { } } },
+            parallel_tool_calls = nativeParallel
+        });
+        using var client = Client(async (http, ct) =>
+        {
+            var body = Element(await http.Content!.ReadAsStringAsync(ct));
+            foreach (var property in native.EnumerateObject())
+                Assert.True(JsonElement.DeepEquals(property.Value, body.GetProperty(property.Name)), property.Name);
+            return streaming ? Events(ChatEvents) : Json(ChatReply);
+        });
+        var request = ToolMessagesRequest();
+        request.ToolChoice = new() { Type = "tool", Name = "lookup", DisableParallelToolUse = nativeParallel };
+        request.AdditionalProperties = new() { ["coralbricks"] = native };
+        var before = JsonSerializer.Serialize(request);
+        var provider = Provider(client);
+        if (streaming)
+            await Collect(provider.MessagesStreamingAsync(request, []));
+        else
+            await provider.MessagesAsync(request, []);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    private static MessagesRequest ToolMessagesRequest() => JsonSerializer.Deserialize<MessagesRequest>("""
+        {"model":"coralbricks/org/model","max_tokens":20,"messages":[{"role":"user","content":"Hi"}],
+         "tools":[{"name":"lookup","description":"Look up a value","input_schema":{"type":"object","properties":{}}}]}
+        """)!;
+
     [Fact]
     public async Task Discovery_maps_available_metadata_and_is_cached_per_credential()
     {
