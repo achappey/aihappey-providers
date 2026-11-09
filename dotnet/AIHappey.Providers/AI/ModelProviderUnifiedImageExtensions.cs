@@ -122,7 +122,7 @@ public static class ModelProviderUnifiedImageExtensions
                 CreateOpenAIEditRequest(imageRequest, request.Metadata, stream: true),
                 cancellationToken)
             : modelProvider.OpenAIImageGenerationStreamingAsync(
-                CreateOpenAIGenerationRequest(imageRequest, request.Metadata, stream: true),
+                CreateOpenAIGenerationRequest(imageRequest, request.Metadata, providerId, stream: true),
                 cancellationToken);
 
         await using var enumerator = stream.GetAsyncEnumerator(cancellationToken);
@@ -305,8 +305,10 @@ public static class ModelProviderUnifiedImageExtensions
     private static OpenAIImageGenerationRequest CreateOpenAIGenerationRequest(
         ImageRequest request,
         Dictionary<string, object?>? metadata,
+        string providerId,
         bool stream)
-        => new()
+    {
+        var options = new OpenAIImageGenerationRequest
         {
             Model = request.Model,
             Prompt = request.Prompt,
@@ -325,6 +327,24 @@ public static class ModelProviderUnifiedImageExtensions
             Style = ReadMetadataString(metadata, "style"),
             User = ReadMetadataString(metadata, "user")
         };
+
+        var standardFields = JsonSerializer.SerializeToElement(options);
+        var additional = new Dictionary<string, JsonElement>();
+        if (request.ProviderOptions?.TryGetValue(providerId, out var nativeOptions) == true
+            && nativeOptions.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in nativeOptions.EnumerateObject())
+                if (!standardFields.TryGetProperty(property.Name, out _))
+                    additional[property.Name] = property.Value.Clone();
+        }
+
+        if (request.Seed is not null)
+            additional.TryAdd("seed", JsonSerializer.SerializeToElement(request.Seed.Value));
+        if (request.AspectRatio is not null)
+            additional.TryAdd("aspect_ratio", JsonSerializer.SerializeToElement(request.AspectRatio));
+        options.AdditionalProperties = additional.Count > 0 ? additional : null;
+        return options;
+    }
 
     private static OpenAIImageEditRequest CreateOpenAIEditRequest(
         ImageRequest request,
