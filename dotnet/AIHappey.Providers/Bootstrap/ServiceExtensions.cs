@@ -703,6 +703,7 @@ using AIHappey.Core.Providers.Parel;
 using AIHappey.Core.Providers.Ampersand;
 using AIHappey.Core.Providers.SippulseAI;
 using AIHappey.Core.Providers.Conway;
+using AIHappey.Core.Providers.Guidai;
 
 namespace AIHappey.Core.AI;
 
@@ -727,6 +728,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AbacusAIProvider>();
         services.AddScoped<IModelProvider, AmpersandProvider>();
         services.AddScoped<IModelProvider, ConwayProvider>();
+        services.AddScoped<IModelProvider, GuidaiProvider>();
         services.AddScoped<IModelProvider, MachineFiProvider>();
         services.AddScoped<IModelProvider, BespokeLabsProvider>();
         services.AddScoped<ISkillProvider, GrooveDevProvider>();
