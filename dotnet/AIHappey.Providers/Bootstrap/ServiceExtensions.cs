@@ -442,7 +442,6 @@ using AIHappey.Core.Providers.OmniaKey;
 using AIHappey.Core.Providers.Nouswise;
 using AIHappey.Core.Providers.Shengsuanyun;
 using AIHappey.Core.Providers.Occludra;
-using AIHappey.Core.Providers.Citadelis;
 using AIHappey.Core.Providers.Finora;
 using AIHappey.Core.Providers.GeekAI;
 using AIHappey.Core.Providers.AIMagicx;
@@ -1163,7 +1162,6 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, NouswiseProvider>();
         services.AddScoped<IModelProvider, ShengsuanyunProvider>();
         services.AddScoped<IModelProvider, OccludraProvider>();
-        services.AddScoped<IModelProvider, CitadelisProvider>();
         services.AddScoped<IModelProvider, FinoraProvider>();
         services.AddScoped<IModelProvider, GeekAIProvider>();
         services.AddScoped<IModelProvider, AIMagicxProvider>();
