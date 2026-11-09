@@ -221,7 +221,9 @@ public sealed class CreeksideComputeProviderTests
         else
             await provider.ExecuteUnifiedAsync(new AIRequest
             {
-                Model = "creeksidecompute/model", Input = new AIInput { Text = "Hello" },
+                ProviderId = "creeksidecompute",
+                Model = "model",
+                Input = new AIInput { Text = "Hello" },
                 Metadata = new() { ["creeksidecompute"] = native }
             });
     }
@@ -264,16 +266,17 @@ public sealed class CreeksideComputeProviderTests
     }
 
     [Fact]
-    public void UnsupportedModalitiesAreExplicit()
+    public async Task UnsupportedModalitiesAreExplicit()
     {
         using var client = Client((_, _) => throw new InvalidOperationException("Network must not be used."));
         var provider = Provider(client);
-        Assert.Throws<NotSupportedException>(() => provider.ImageRequest(null!));
-        Assert.Throws<NotSupportedException>(() => provider.EmbeddingRequestAsync(null!));
-        Assert.Throws<NotSupportedException>(() => provider.SpeechRequest(null!));
-        Assert.Throws<NotSupportedException>(() => provider.TranscriptionRequest(null!));
-        Assert.Throws<NotSupportedException>(() => provider.RerankingRequest(null!));
-        Assert.Throws<NotSupportedException>(() => provider.CreateLiveSessionAsync(null!));
+
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.ImageRequest(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.EmbeddingRequestAsync(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.SpeechRequest(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.TranscriptionRequest(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.RerankingRequest(null!));
+        await Assert.ThrowsAsync<NotSupportedException>(() => provider.CreateLiveSessionAsync(null!));
     }
 
     [Fact]
@@ -292,7 +295,9 @@ public sealed class CreeksideComputeProviderTests
 
     private static string Reply(string endpoint) => endpoint switch
     {
-        "chat" => ChatReply, "messages" => MessagesReply, _ => ResponsesReply
+        "chat" => ChatReply,
+        "messages" => MessagesReply,
+        _ => ResponsesReply
     };
 
     private static string StreamReply(string endpoint) => endpoint switch

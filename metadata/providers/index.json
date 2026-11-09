@@ -108,6 +108,14 @@
     "file": "connect0.json"
   },
   {
+    "id": "conway",
+    "file": "conway.json"
+  },
+  {
+    "id": "guidai",
+    "file": "guidai.json"
+  },
+  {
     "id": "manyfold",
     "file": "manyfold.json"
   },
