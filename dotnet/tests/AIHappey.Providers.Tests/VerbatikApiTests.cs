@@ -23,11 +23,20 @@ public sealed class VerbatikApiTests
                 Assert.Equal("/api/v1/speech", request.RequestUri.AbsolutePath);
                 using var payload = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
                 var root = payload.RootElement;
+                using var expectedOptions = JsonDocument.Parse(
+                    """{"future_option":{"enabled":true,"nested":[1,null,{"label":"keep"}]},"future_array":[false,2,"three"],"future_count":7,"future_null":null,"pitch":1.5}""");
                 Assert.Equal("verbatik/speech-lite", root.GetProperty("model").GetString());
                 Assert.Equal("Hello", root.GetProperty("blocks")[0].GetProperty("text").GetString());
                 Assert.Equal("voice-1", root.GetProperty("blocks")[0].GetProperty("voice").GetString());
                 Assert.Equal(1.25, root.GetProperty("settings").GetProperty("speed").GetDouble());
-                Assert.Equal("preserved", root.GetProperty("future_option").GetString());
+                using var expectedSettings = JsonDocument.Parse("""{"array":[2,null,{"nested":true}]}""");
+                Assert.True(JsonElement.DeepEquals(
+                    expectedSettings.RootElement,
+                    root.GetProperty("settings").GetProperty("future_setting")));
+                foreach (var property in expectedOptions.RootElement.EnumerateObject())
+                    Assert.True(JsonElement.DeepEquals(property.Value, root.GetProperty(property.Name)), property.Name);
+                Assert.False(root.TryGetProperty("providerOptions", out _));
+                Assert.False(root.TryGetProperty("speed", out _));
                 return JsonResponse("""{"id":"speech-1","status":"queued"}""", HttpStatusCode.Accepted);
             }
 
@@ -52,13 +61,34 @@ public sealed class VerbatikApiTests
             Speed = 1.25f,
             ProviderOptions = new()
             {
-                ["verbatik"] = JsonDocument.Parse("""{"future_option":"preserved"}""").RootElement.Clone()
+                ["verbatik"] = JsonDocument.Parse(
+                    """{"future_option":{"enabled":true,"nested":[1,null,{"label":"keep"}]},"future_array":[false,2,"three"],"future_count":7,"future_null":null,"pitch":1.5,"speed":1.75,"settings":{"speed":1.8,"future_setting":{"array":[2,null,{"nested":true}]}}}""").RootElement.Clone()
             }
         });
 
         Assert.Equal(Convert.ToBase64String([1, 2, 3]), response.Audio.Base64);
         Assert.Equal("audio/wav", response.Audio.MimeType);
         Assert.Empty(client.DefaultRequestHeaders);
+    }
+
+    [Fact]
+    public async Task Speech_preserves_volume_validation_before_sending_the_request()
+    {
+        using var client = CreateClient(_ => throw new InvalidOperationException("Request should not be sent."));
+        var provider = CreateProvider(client);
+        using var providerOptions = JsonDocument.Parse("""{"volume":10.1}""");
+
+        var error = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => provider.SpeechRequest(new SpeechRequest
+        {
+            Model = "verbatik/tts",
+            Text = "Hello",
+            ProviderOptions = new()
+            {
+                ["verbatik"] = providerOptions.RootElement.Clone()
+            }
+        }));
+
+        Assert.Equal("Volume", error.ParamName);
     }
 
     [Fact]
@@ -99,7 +129,17 @@ public sealed class VerbatikApiTests
                 Assert.Equal("audio", root.GetProperty("mode").GetString());
                 Assert.Equal("fal-ai/minimax-music/v2", root.GetProperty("model").GetString());
                 Assert.Equal("Warm instrumental", root.GetProperty("prompt").GetString());
-                Assert.Equal("preserved", root.GetProperty("future_option").GetString());
+                using var expectedObject = JsonDocument.Parse("""{"enabled":true,"nested":[1,null,{"label":"keep"}]}""");
+                using var expectedArray = JsonDocument.Parse("""[false,2,"three"]""");
+                Assert.True(JsonElement.DeepEquals(
+                    expectedObject.RootElement,
+                    root.GetProperty("future_option")));
+                Assert.True(JsonElement.DeepEquals(
+                    expectedArray.RootElement,
+                    root.GetProperty("future_array")));
+                Assert.Equal(7, root.GetProperty("future_count").GetInt32());
+                Assert.True(root.GetProperty("future_null").ValueKind == JsonValueKind.Null);
+                Assert.Equal(19, root.GetProperty("seed").GetInt32());
                 Assert.Equal("5", root.GetProperty("parameters").GetProperty("duration").GetString());
                 Assert.Equal("lyrics here", root.GetProperty("parameters").GetProperty("lyrics").GetString());
                 return JsonResponse("""{"id":"generation-1","status":"queued"}""", HttpStatusCode.Accepted);
@@ -127,7 +167,7 @@ public sealed class VerbatikApiTests
             ProviderOptions = new()
             {
                 ["verbatik"] = JsonDocument.Parse(
-                    """{"parameters":{"duration":"5"},"future_option":"preserved"}""").RootElement.Clone()
+                    """{"parameters":{"duration":"5"},"future_option":{"enabled":true,"nested":[1,null,{"label":"keep"}]},"future_array":[false,2,"three"],"future_count":7,"future_null":null,"seed":19}""").RootElement.Clone()
             }
         });
 

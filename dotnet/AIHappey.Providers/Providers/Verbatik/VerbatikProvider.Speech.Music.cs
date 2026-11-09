@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.Verbatik;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Vercel.Extensions;
@@ -19,9 +18,8 @@ public partial class VerbatikProvider
             throw new ArgumentException("Verbatik music generation requires a prompt.", nameof(request));
 
         var now = DateTime.UtcNow;
-        var metadata = request.GetProviderMetadata<VerbatikSpeechProviderMetadata>(GetIdentifier());
         var rawOptions = GetRawProviderOptions(request);
-        var warnings = BuildMusicWarnings(request, metadata);
+        var warnings = BuildMusicWarnings(request, rawOptions);
         var payload = BuildMusicPayload(request, rawOptions, prompt);
 
         using var createRequest = CreateApiRequest(HttpMethod.Post, "generations");
@@ -79,32 +77,32 @@ public partial class VerbatikProvider
 
     private static List<object> BuildMusicWarnings(
         SpeechRequest request,
-        VerbatikSpeechProviderMetadata? metadata)
+        JsonElement rawOptions)
     {
         var warnings = new List<object>();
         if (!string.IsNullOrWhiteSpace(request.Voice))
             warnings.Add(new { type = "unsupported", feature = "voice" });
         if (!string.IsNullOrWhiteSpace(request.Language))
             warnings.Add(new { type = "unsupported", feature = "language" });
-        if (request.Speed is not null || metadata?.Speed is not null)
+        if (request.Speed is not null || ReadOption<float?>(rawOptions, "speed") is not null)
             warnings.Add(new { type = "unsupported", feature = "speed" });
-        if (!string.IsNullOrWhiteSpace(request.OutputFormat) || !string.IsNullOrWhiteSpace(metadata?.Format))
+        if (!string.IsNullOrWhiteSpace(request.OutputFormat) || !string.IsNullOrWhiteSpace(ReadOption<string>(rawOptions, "format")))
             warnings.Add(new { type = "unsupported", feature = "output_format" });
-        if (metadata?.Tags is { Length: > 0 })
+        if (ReadOption<string[]>(rawOptions, "tags") is { Length: > 0 })
             warnings.Add(new { type = "unsupported", feature = "tags" });
-        if (metadata?.Seed is not null
-            || metadata?.PromptStrength is not null
-            || metadata?.PromptStrengthCamel is not null
-            || metadata?.BalanceStrength is not null
-            || metadata?.BalanceStrengthCamel is not null
-            || metadata?.NumSongs is not null
-            || metadata?.NumSongsCamel is not null
-            || metadata?.OutputBitRate is not null
-            || metadata?.OutputBitRateCamel is not null
-            || metadata?.Bpm is not null
-            || metadata?.StoreAudio is not null
-            || metadata?.StoreAudioCamel is not null
-            || !string.IsNullOrWhiteSpace(metadata?.Name))
+        if (ReadOption<int?>(rawOptions, "seed") is not null
+            || ReadOption<double?>(rawOptions, "prompt_strength") is not null
+            || ReadOption<double?>(rawOptions, "promptStrength") is not null
+            || ReadOption<double?>(rawOptions, "balance_strength") is not null
+            || ReadOption<double?>(rawOptions, "balanceStrength") is not null
+            || ReadOption<int?>(rawOptions, "num_songs") is not null
+            || ReadOption<int?>(rawOptions, "numSongs") is not null
+            || ReadOption<string>(rawOptions, "output_bit_rate") is not null
+            || ReadOption<string>(rawOptions, "outputBitRate") is not null
+            || HasNonNullOption(rawOptions, "bpm")
+            || ReadOption<bool?>(rawOptions, "store_audio") is not null
+            || ReadOption<bool?>(rawOptions, "storeAudio") is not null
+            || !string.IsNullOrWhiteSpace(ReadOption<string>(rawOptions, "name")))
             warnings.Add(new { type = "unsupported", feature = "legacy_music_options" });
         return warnings;
     }
@@ -114,8 +112,15 @@ public partial class VerbatikProvider
         JsonElement rawOptions,
         string prompt)
     {
-        var payload = CopyUnknownMusicOptions(rawOptions);
+        var payload = CopyRawOptions(rawOptions);
         var parameters = CopyRawMusicParameters(rawOptions);
+        if (rawOptions.ValueKind == JsonValueKind.Object
+            && rawOptions.TryGetProperty("parameters", out var rawParameters)
+            && rawParameters.ValueKind == JsonValueKind.Object)
+            payload.Remove("parameters");
+        if (rawOptions.ValueKind == JsonValueKind.Object
+            && rawOptions.TryGetProperty("lyrics", out _))
+            payload.Remove("lyrics");
         if (!string.IsNullOrWhiteSpace(request.Instructions))
             parameters["lyrics"] = request.Instructions;
 
@@ -125,31 +130,6 @@ public partial class VerbatikProvider
         if (parameters.Count > 0)
             payload["parameters"] = parameters;
         payload["delivery"] = "signed_url";
-        return payload;
-    }
-
-    private static Dictionary<string, object?> CopyUnknownMusicOptions(JsonElement rawOptions)
-    {
-        var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
-        if (rawOptions.ValueKind != JsonValueKind.Object)
-            return payload;
-
-        var legacyOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "mode", "model", "prompt", "parameters", "delivery", "tags", "lyrics", "seed",
-            "prompt_strength", "promptStrength", "balance_strength", "balanceStrength",
-            "num_songs", "numSongs", "output_format", "outputFormat", "output_bit_rate",
-            "outputBitRate", "bpm", "store_audio", "storeAudio", "name", "voice", "speed",
-            "volume", "pitch", "emotion", "englishNormalization", "sampleRate", "bitrate",
-            "contentType", "languageBoost", "voiceModifyPitch", "voiceModifyIntensity",
-            "voiceModifyTimbre"
-        };
-        foreach (var property in rawOptions.EnumerateObject())
-        {
-            if (!legacyOptions.Contains(property.Name))
-                payload[property.Name] = property.Value.Clone();
-        }
-
         return payload;
     }
 

@@ -1,6 +1,5 @@
 using System.Text;
 using System.Text.Json;
-using AIHappey.Common.Model.Providers.Verbatik;
 using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.Models;
@@ -38,14 +37,13 @@ public partial class VerbatikProvider
         var now = DateTime.UtcNow;
         var warnings = new List<object>();
 
-        var metadata = request.GetProviderMetadata<VerbatikSpeechProviderMetadata>(GetIdentifier());
         var rawOptions = GetRawProviderOptions(request);
         var model = NormalizeLocalModelId(request.Model);
         var nativeModel = ResolveNativeSpeechModel(model);
         var modelVoice = TryParseVoiceIdFromModel(model);
         var voiceId = modelVoice;
         if (string.IsNullOrWhiteSpace(voiceId))
-            voiceId = FirstNonEmpty(request.Voice, metadata?.Voice, ReadString(rawOptions, "voice"));
+            voiceId = FirstNonEmpty(request.Voice, ReadOption<string>(rawOptions, "voice"));
 
         if (!string.IsNullOrWhiteSpace(request.Instructions))
             warnings.Add(new { type = "unsupported", feature = "instructions" });
@@ -58,24 +56,33 @@ public partial class VerbatikProvider
             && !string.Equals(request.Voice.Trim(), modelVoice, StringComparison.OrdinalIgnoreCase))
             warnings.Add(new { type = "ignored", feature = "voice", reason = "voice is derived from model id" });
 
-        if (!string.IsNullOrWhiteSpace(request.OutputFormat) || !string.IsNullOrWhiteSpace(metadata?.Format))
+        if (!string.IsNullOrWhiteSpace(request.OutputFormat) || !string.IsNullOrWhiteSpace(ReadOption<string>(rawOptions, "format")))
             warnings.Add(new { type = "unsupported", feature = "output_format" });
 
-        var speed = request.Speed ?? metadata?.Speed;
+        var metadataSpeed = ReadOption<float?>(rawOptions, "speed");
+        var metadataVolume = ReadOption<float?>(rawOptions, "volume");
+        var speed = request.Speed ?? metadataSpeed;
         if (speed is < 0.5f or > 2f)
             throw new ArgumentOutOfRangeException(nameof(request.Speed), "Verbatik speed must be between 0.5 and 2.0.");
-        if (metadata?.Volume is { } volumeOption && (volumeOption < 0.1f || volumeOption > 10f))
-            throw new ArgumentOutOfRangeException(nameof(metadata.Volume), "Verbatik volume must be between 0.1 and 10.0.");
+        if (metadataVolume is { } volumeOption && (volumeOption < 0.1f || volumeOption > 10f))
+            throw new ArgumentOutOfRangeException("Volume", "Verbatik volume must be between 0.1 and 10.0.");
 
         var settings = ReadRawSettings(rawOptions);
         if (request.Speed is { } requestSpeed)
             settings["speed"] = requestSpeed;
-        else if (!settings.ContainsKey("speed") && metadata?.Speed is { } metadataSpeed)
-            settings["speed"] = metadataSpeed;
-        if (!settings.ContainsKey("volume") && metadata?.Volume is { } volume)
+        else if (!settings.ContainsKey("speed") && metadataSpeed is { } resolvedSpeed)
+            settings["speed"] = resolvedSpeed;
+        if (!settings.ContainsKey("volume") && metadataVolume is { } volume)
             settings["volume"] = volume;
 
-        var payload = CopyUnknownSpeechOptions(rawOptions);
+        var payload = CopyRawOptions(rawOptions);
+        RemoveOption(payload, "voice");
+        RemoveOption(payload, "speed");
+        RemoveOption(payload, "volume");
+        if (rawOptions.ValueKind == JsonValueKind.Object
+            && rawOptions.TryGetProperty("settings", out var rawSettings)
+            && rawSettings.ValueKind == JsonValueKind.Object)
+            payload.Remove("settings");
         payload["model"] = nativeModel;
         payload["blocks"] = voiceId is { Length: > 0 }
             ? new[] { new { text = request.Text, voice = voiceId } }
@@ -170,27 +177,56 @@ public partial class VerbatikProvider
         return settings;
     }
 
-    private static Dictionary<string, object?> CopyUnknownSpeechOptions(JsonElement rawOptions)
+    private static Dictionary<string, object?> CopyRawOptions(JsonElement rawOptions)
     {
         var payload = new Dictionary<string, object?>(StringComparer.Ordinal);
         if (rawOptions.ValueKind != JsonValueKind.Object)
             return payload;
 
-        var mappedOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "voice", "speed", "volume", "settings", "contentType", "pitch", "emotion",
-            "englishNormalization", "english_normalization", "sampleRate", "sample_rate",
-            "bitrate", "format", "languageBoost", "language_boost", "voiceModifyPitch",
-            "voice_modify_pitch", "voiceModifyIntensity", "voice_modify_intensity",
-            "voiceModifyTimbre", "voice_modify_timbre"
-        };
         foreach (var property in rawOptions.EnumerateObject())
-        {
-            if (!mappedOptions.Contains(property.Name))
-                payload[property.Name] = property.Value.Clone();
-        }
+            payload[property.Name] = property.Value.Clone();
 
         return payload;
+    }
+
+    private static void RemoveOption(Dictionary<string, object?> options, string name)
+    {
+        var matchingKeys = options.Keys.Where(key =>
+            string.Equals(key, name, StringComparison.OrdinalIgnoreCase));
+        foreach (var key in matchingKeys.ToArray())
+            options.Remove(key);
+    }
+
+    private static T? ReadOption<T>(JsonElement rawOptions, string name)
+    {
+        if (!TryGetOption(rawOptions, name, out var value)
+            || value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            return default;
+
+        return value.Deserialize<T>(JsonSerializerOptions.Web);
+    }
+
+    private static bool HasNonNullOption(JsonElement rawOptions, string name)
+        => TryGetOption(rawOptions, name, out var value)
+            && value.ValueKind is not (JsonValueKind.Null or JsonValueKind.Undefined);
+
+    private static bool TryGetOption(JsonElement rawOptions, string name, out JsonElement value)
+    {
+        var found = false;
+        value = default;
+        if (rawOptions.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in rawOptions.EnumerateObject())
+            {
+                if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    value = property.Value;
+                    found = true;
+                }
+            }
+        }
+
+        return found;
     }
 
     private async Task<JsonElement> WaitForCompletionAsync(
