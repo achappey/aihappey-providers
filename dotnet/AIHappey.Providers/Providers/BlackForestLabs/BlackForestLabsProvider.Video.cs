@@ -73,7 +73,12 @@ public partial class BlackForestLabsProvider
             operationData.TaskId,
             new Uri(operationData.PollingUrl, UriKind.Absolute),
             cancellationToken);
-        var metadata = GetIdentifier().CreatePrimitiveProviderMetadata(pollResult.Root);
+        var metadata = GetIdentifier().CreatePrimitiveProviderMetadata(
+            pollResult.Root,
+            costs: IsBflVideoErrorStatus(pollResult.Status)
+                || string.Equals(pollResult.Status, "Ready", StringComparison.OrdinalIgnoreCase)
+                ? TryGetBflVideoCost(pollResult.Root)
+                : null);
         var response = new HeaderResponseData
         {
             Timestamp = DateTime.UtcNow,
@@ -282,6 +287,13 @@ public partial class BlackForestLabsProvider
            && result.TryGetProperty("sample", out var sample)
            && sample.ValueKind == JsonValueKind.String
             ? sample.GetString()
+            : null;
+
+    private static decimal? TryGetBflVideoCost(JsonElement root)
+        => root.TryGetProperty("cost", out var cost)
+           && cost.ValueKind == JsonValueKind.Number
+           && cost.TryGetDecimal(out var credits)
+            ? credits / 100m
             : null;
 
     private static bool IsBflVideoErrorStatus(string? status)
