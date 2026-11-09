@@ -2386,6 +2386,10 @@
       "sha256": "36aec406b73b708c1d2f329bc46c3719240f70ab0bae687a8f9319ef500e51e5"
     },
     {
+      "file": "providers/joulecloud.json",
+      "sha256": "7a771783aeb0985325bd2df2d46e65d43131a7b6adca357012f142af5dc70261"
+    },
+    {
       "file": "providers/json2video.json",
       "sha256": "81ce7ee34ed64806eb9dae387763f4dfff82c23d02f4411c043f363179870618"
     },
