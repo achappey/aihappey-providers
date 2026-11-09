@@ -2,6 +2,13 @@
     "object": "list",
     "data": [
         {
+            "id": "segmind/fast-flux-schnell",
+            "object": "model",
+            "owned_by": "Segmind",
+            "name": "Fast Flux.1 Schnell",
+            "type": "image"
+        },
+        {
             "id": "segmind/grok-2-vision",
             "object": "model",
             "owned_by": "Segmind",

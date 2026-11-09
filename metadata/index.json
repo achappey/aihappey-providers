@@ -707,7 +707,7 @@
     },
     {
       "file": "models/providers/segmind.json",
-      "sha256": "e3c3ffbbdf3f4b2b3a8a56ae22d4934a0e7241b78ba85b8a27940587927977b8"
+      "sha256": "504e2b8ec892a26113961e565d677608a789960d4fb39dd49eaaf83700f8d248"
     },
     {
       "file": "models/providers/selinaai.json",
