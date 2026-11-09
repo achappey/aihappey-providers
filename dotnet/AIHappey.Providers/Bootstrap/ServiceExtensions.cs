@@ -143,6 +143,7 @@ using AIHappey.Core.Providers.Runpod;
 using AIHappey.Core.Providers.MegaNova;
 using AIHappey.Core.Providers.LLMGateway;
 using AIHappey.Core.Providers.Abliteration;
+using AIHappey.Core.Providers.PaperInstruments;
 using AIHappey.Core.Providers.AmazonBedrock;
 using AIHappey.Core.Providers.Parasail;
 using AIHappey.Core.Providers.MancerAI;
@@ -852,6 +853,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, MegaNovaProvider>();
         services.AddScoped<IModelProvider, LLMGatewayProvider>();
         services.AddScoped<IModelProvider, AbliterationProvider>();
+        services.AddScoped<IModelProvider, PaperInstrumentsProvider>();
         services.AddScoped<IModelProvider, AmazonBedrockProvider>();
         services.AddScoped<IModelProvider, ParasailProvider>();
         services.AddScoped<IModelProvider, MancerAIProvider>();

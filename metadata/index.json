@@ -2283,7 +2283,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "c193a7a9258f77214b52212db829f214291b9dcaa40ee310dc7c7437e5ec8ad5"
+      "sha256": "f0c16bf3c3eee7e342241123d501895ebb023c8cf52ab466311a2263fa122cb4"
     },
     {
       "file": "providers/infercom.json",
@@ -3064,6 +3064,10 @@
     {
       "file": "providers/ovhcloud.json",
       "sha256": "fb6f9a6499b611c69fc55206f93f3a306c586a89d3dd2c40a2c1c002b20f5384"
+    },
+    {
+      "file": "providers/paperinstruments.json",
+      "sha256": "2fdac087699467d5c57823f51dcdda32dbbcba440ce32da9cbb38fc6eeb357fd"
     },
     {
       "file": "providers/parallel.json",
