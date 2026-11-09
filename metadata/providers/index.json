@@ -1,5 +1,9 @@
 [
   {
+    "id": "coralbricks",
+    "file": "coralbricks.json"
+  },
+  {
     "id": "upivia",
     "file": "upivia.json"
   },
