@@ -1,0 +1,19 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "prism/deepseek-v4.1-flash",
+      "object": "model",
+      "owned_by": "Prism",
+      "name": "DeepSeek V4.1 Flash",
+      "type": "language"
+    },
+    {
+      "id": "prism/gemma-4-31b",
+      "object": "model",
+      "owned_by": "Prism",
+      "name": "Gemma 4 31B",
+      "type": "language"
+    }
+  ]
+}
