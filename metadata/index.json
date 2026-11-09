@@ -1794,6 +1794,10 @@
       "sha256": "74ba7914c7b794c914053898a3de923a4aec5c39a2eeb00e9b6ecc6da4beef87"
     },
     {
+      "file": "providers/coralbricks.json",
+      "sha256": "8a58f934b393a84d9a759a5c4c5392f966cf9cf791d7b54270a3a183a1642fe9"
+    },
+    {
       "file": "providers/cortecs.json",
       "sha256": "197148781940d6c6028333eac597f1acd8602060ae2113d0f0b4792f0c20dba5"
     },
@@ -2283,7 +2287,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "f0c16bf3c3eee7e342241123d501895ebb023c8cf52ab466311a2263fa122cb4"
+      "sha256": "bcbd5d49e5cb7d58fb6d071a88b3aef2b710e53342326a14fb80e6b54435483a"    
     },
     {
       "file": "providers/infercom.json",

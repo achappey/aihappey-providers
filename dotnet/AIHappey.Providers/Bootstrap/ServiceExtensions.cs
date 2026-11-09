@@ -3,6 +3,7 @@ using AIHappey.Core.Providers.Buildprint;
 using AIHappey.Core.Providers.Spawnlabs;
 using AIHappey.Core.Providers.Nolgia;
 using AIHappey.Core.Providers.Allternit;
+using AIHappey.Core.Providers.CoralBricks;
 using AIHappey.Core.Providers.Keln;
 using AIHappey.Core.Providers.Codebase;
 using AIHappey.Core.Providers.AbacusAI;
@@ -1276,6 +1277,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, InceptronProvider>();
         services.AddScoped<IModelProvider, CommandCodeProvider>();
         services.AddScoped<IModelProvider, LilacProvider>();
+        services.AddScoped<IModelProvider, CoralBricksProvider>();
         services.AddScoped<IModelProvider, OpenAdapterProvider>();
         services.AddScoped<IModelProvider, Router9Provider>();
         services.AddScoped<IModelProvider, AurikoProvider>();
