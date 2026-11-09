@@ -8,6 +8,7 @@ using AIHappey.Core.Contracts;
 using AIHappey.Core.Models;
 using AIHappey.Core.Providers.JuiceFactory;
 using AIHappey.Messages;
+using AIHappey.Responses;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -161,6 +162,35 @@ public sealed class JuiceFactoryProviderTests
         request.AdditionalProperties = new() { ["juicefactory"] = JsonSerializer.SerializeToElement(properties) };
         var before = JsonSerializer.Serialize(request);
         await Provider(client).MessagesAsync(request, []);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Responses_maps_named_tool_choice_and_preserves_native_override(bool nativeOverride)
+    {
+        using var client = Client(async (http, ct) =>
+        {
+            Assert.Equal("/v1/chat/completions", http.RequestUri!.AbsolutePath);
+            var body = Element(await http.Content!.ReadAsStringAsync(ct));
+            AssertNative(body);
+            var choice = body.GetProperty("tool_choice");
+            if (nativeOverride)
+                Assert.Equal("future-choice", choice.GetProperty("type").GetString());
+            else
+                Assert.Equal("lookup", choice.GetProperty("function").GetProperty("name").GetString());
+            return Json(Reply);
+        });
+        var request = JsonSerializer.Deserialize<ResponseRequest>("""
+            {"model":"qwen3.8-27b","input":"Hi","tool_choice":{"type":"function","name":"lookup"},
+             "tools":[{"type":"function","name":"lookup","description":"Look up a value","parameters":{"type":"object","properties":{}}}]}
+            """)!;
+        var properties = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Native)!;
+        if (nativeOverride) properties["tool_choice"] = Element("""{"type":"future-choice"}""");
+        request.AdditionalProperties = new() { ["juicefactory"] = JsonSerializer.SerializeToElement(properties) };
+        var before = JsonSerializer.Serialize(request);
+        await Provider(client).ResponsesAsync(request);
         Assert.Equal(before, JsonSerializer.Serialize(request));
     }
 

@@ -135,13 +135,39 @@ public sealed partial class JuiceFactoryProvider(
     }
 
     public async Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToResponseResult();
+        => (await ExecuteUnifiedAsync(ResponsesRequest(options), cancellationToken)).ToResponseResult();
 
     public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+        await foreach (var part in StreamUnifiedAsync(ResponsesRequest(options), cancellationToken)
             .ToResponseStreamParts(cancellationToken)) yield return part;
+    }
+
+    private AIRequest ResponsesRequest(ResponseRequest request)
+    {
+        var unified = request.ToUnifiedRequest(GetIdentifier());
+        var properties = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        if (unified.Metadata!.TryGetValue(GetIdentifier(), out var metadata))
+        {
+            var existing = JsonSerializer.SerializeToElement(metadata, ResponseJson.Default);
+            if (existing.ValueKind == JsonValueKind.Object)
+                foreach (var property in existing.EnumerateObject())
+                    properties[property.Name] = property.Value.Clone();
+        }
+        var serialized = JsonSerializer.SerializeToElement(request, ResponseJson.Default);
+        if (serialized.TryGetProperty("tool_choice", out var choice) && choice.ValueKind == JsonValueKind.Object
+            && choice.TryGetProperty("type", out var type) && type.GetString() == "function"
+            && choice.TryGetProperty("name", out var name))
+            properties["tool_choice"] = JsonSerializer.SerializeToElement(new { type = "function", function = new { name } });
+
+        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out var native) == true
+            && native.ValueKind == JsonValueKind.Object)
+            foreach (var property in native.EnumerateObject())
+                properties[property.Name] = property.Value.Clone();
+        if (properties.Count > 0)
+            unified.Metadata[GetIdentifier()] = JsonSerializer.SerializeToElement(properties);
+        return unified;
     }
 
     public async Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers,
