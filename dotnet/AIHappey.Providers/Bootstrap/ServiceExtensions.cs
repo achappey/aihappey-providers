@@ -298,6 +298,7 @@ using AIHappey.Core.Providers.APIPod;
 using AIHappey.Core.Providers.TokenFlux;
 using AIHappey.Core.Providers.TokenLab;
 using AIHappey.Core.Providers.Assisters;
+using AIHappey.Core.Providers.Raven;
 using AIHappey.Core.Providers.LLMWise;
 using AIHappey.Core.Providers.CaseDev;
 using AIHappey.Core.Providers.ModelRouter;
@@ -1008,6 +1009,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, TokenFluxProvider>();
         services.AddScoped<IModelProvider, TokenLabProvider>();
         services.AddScoped<IModelProvider, AssistersProvider>();
+        services.AddScoped<IModelProvider, RavenProvider>();
         services.AddScoped<IModelProvider, LLMWiseProvider>();
         services.AddScoped<CaseDevProvider>();
         services.AddScoped<ISkillProvider, CaseDevProvider>();
