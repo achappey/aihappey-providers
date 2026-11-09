@@ -119,7 +119,7 @@ public static class ModelProviderUnifiedImageExtensions
 
         var stream = isEdit
             ? modelProvider.OpenAIImageEditStreamingAsync(
-                CreateOpenAIEditRequest(imageRequest, request.Metadata, stream: true),
+                CreateOpenAIEditRequest(imageRequest, request.Metadata, providerId, stream: true),
                 cancellationToken)
             : modelProvider.OpenAIImageGenerationStreamingAsync(
                 CreateOpenAIGenerationRequest(imageRequest, request.Metadata, providerId, stream: true),
@@ -349,8 +349,10 @@ public static class ModelProviderUnifiedImageExtensions
     private static OpenAIImageEditRequest CreateOpenAIEditRequest(
         ImageRequest request,
         Dictionary<string, object?>? metadata,
+        string providerId,
         bool stream)
-        => new()
+    {
+        var options = new OpenAIImageEditRequest
         {
             Model = request.Model,
             Prompt = request.Prompt,
@@ -369,6 +371,16 @@ public static class ModelProviderUnifiedImageExtensions
             Stream = stream,
             User = ReadMetadataString(metadata, "user")
         };
+        if (request.ProviderOptions?.TryGetValue(providerId, out var nativeOptions) == true
+            && nativeOptions.ValueKind == JsonValueKind.Object)
+        {
+            var standardFields = JsonSerializer.SerializeToElement(options);
+            options.AdditionalProperties = nativeOptions.EnumerateObject()
+                .Where(property => !standardFields.TryGetProperty(property.Name, out _))
+                .ToDictionary(property => property.Name, property => property.Value.Clone());
+        }
+        return options;
+    }
 
     private static bool IsImageFile(AIFileContentPart file)
         => file.MediaType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) == true

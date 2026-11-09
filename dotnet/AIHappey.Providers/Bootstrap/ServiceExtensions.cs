@@ -44,6 +44,7 @@ using AIHappey.Core.Providers.OpenAI;
 using AIHappey.Core.Providers.Perplexity;
 using AIHappey.Core.Providers.Pollinations;
 using AIHappey.Core.Providers.Nebius;
+using AIHappey.Core.Providers.FrontiereAI;
 using AIHappey.Core.Providers.Runware;
 using AIHappey.Core.Providers.Runway;
 using AIHappey.Core.Providers.SambaNova;
@@ -778,6 +779,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, ElevenLabsProvider>();
         services.AddScoped<IModelProvider, TelnyxProvider>();
         services.AddScoped<IModelProvider, NebiusProvider>();
+        services.AddScoped<IModelProvider, FrontiereAIProvider>();
         services.AddScoped<IModelProvider, ReplicateProvider>();
         services.AddScoped<IModelProvider, BasetenProvider>();
         services.AddScoped<AzureProvider>();
