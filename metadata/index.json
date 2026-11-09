@@ -2295,7 +2295,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "0edbb4812adf2ae9a7f0176ec73b32523fd543ad0d0da2d46145e5682d17bf1f"
+      "sha256": "be043b0f9c86b2cdf5ab8161443bbc4e0a90f611861f4859087ecc4494320529"
     },
     {
       "file": "providers/infercom.json",
@@ -2384,6 +2384,10 @@
     {
       "file": "providers/json2video.json",
       "sha256": "81ce7ee34ed64806eb9dae387763f4dfff82c23d02f4411c043f363179870618"
+    },
+    {
+      "file": "providers/juicefactory.json",
+      "sha256": "49362cf6486b6d37e03d8b23b5d7c03ceb723f9b6e0c9eea339eb8dda51da041"
     },
     {
       "file": "providers/kalpalabs.json",
