@@ -274,6 +274,7 @@ using AIHappey.Core.Providers.LovelyRouter;
 using AIHappey.Core.Providers.ARWriter;
 using AIHappey.Core.Providers.Qiniu;
 using AIHappey.Core.Providers.Lunos;
+using AIHappey.Core.Providers.Lutheos;
 using AIHappey.Core.Providers.MaritacaAI;
 using AIHappey.Core.Providers.CloudFerro;
 using AIHappey.Core.Providers.ArliAI;
@@ -978,6 +979,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, ARWriterProvider>();
         services.AddScoped<IModelProvider, QiniuProvider>();
         services.AddScoped<IModelProvider, LunosProvider>();
+        services.AddScoped<IModelProvider, LutheosProvider>();
         services.AddScoped<IModelProvider, MaritacaAIProvider>();
         services.AddScoped<IModelProvider, CloudFerroProvider>();
         services.AddScoped<IModelProvider, ArliAIProvider>();
