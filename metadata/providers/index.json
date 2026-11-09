@@ -32,6 +32,14 @@
     "file": "zeroentropy.json"
   },
   {
+    "id": "lutheos",
+    "file": "lutheos.json"
+  },
+  {
+    "id": "heabsy",
+    "file": "heabsy.json"
+  },
+  {
     "id": "epho",
     "file": "epho.json"
   },
