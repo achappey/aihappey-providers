@@ -2082,6 +2082,10 @@
       "sha256": "3e0ff7c9e3ef8a2546013f16d3f89f96eecc66b73b7647cf31b55eea1c3f878e"
     },
     {
+      "file": "providers/frontiereai.json",
+      "sha256": "c2d27e006a57edf4bb688c8448af2b90804b80950e6ecd411881147187570110"
+    },
+    {
       "file": "providers/fullai.json",
       "sha256": "31266a8f7b02fa52980b29dd748a54e275dd3dd62bb26aebb4870da7bbd6fd15"
     },
@@ -2299,7 +2303,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "a854619d48fa689b847fca39740f64b16e1545f7291772c298dbafac6bf7cf86"
+      "sha256": "1a465fd1076837bb64231b8176c5908ba0f36116a75575eee376ce239919fc83"
     },
     {
       "file": "providers/infercom.json",
