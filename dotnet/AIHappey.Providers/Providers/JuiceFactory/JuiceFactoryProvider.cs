@@ -146,13 +146,36 @@ public sealed partial class JuiceFactoryProvider(
 
     public async Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers,
         CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToMessagesResponse();
+        => (await ExecuteUnifiedAsync(MessagesRequest(request), cancellationToken)).ToMessagesResponse();
 
     public async IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(MessagesRequest request, Dictionary<string, string> headers,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+        await foreach (var part in StreamUnifiedAsync(MessagesRequest(request), cancellationToken)
             .ToMessageStreamParts(request.Model, cancellationToken)) yield return part;
+    }
+
+    private AIRequest MessagesRequest(MessagesRequest request)
+    {
+        var unified = request.ToUnifiedRequest(GetIdentifier());
+        unified.Metadata!.Remove(GetIdentifier());
+        var properties = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        if (request.ToolChoice is { } choice)
+            properties["tool_choice"] = choice.Type switch
+            {
+                "auto" or "none" => JsonSerializer.SerializeToElement(choice.Type),
+                "any" => JsonSerializer.SerializeToElement("required"),
+                "tool" => JsonSerializer.SerializeToElement(new { type = "function", function = new { name = choice.Name } }),
+                _ => JsonSerializer.SerializeToElement(choice)
+            };
+        // Explicit native options take precedence over adapter defaults.
+        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out var native) == true
+            && native.ValueKind == JsonValueKind.Object)
+            foreach (var property in native.EnumerateObject())
+                properties[property.Name] = property.Value.Clone();
+        if (properties.Count > 0)
+            unified.Metadata[GetIdentifier()] = JsonSerializer.SerializeToElement(properties);
+        return unified;
     }
 
     public async IAsyncEnumerable<UIMessagePart> StreamAsync(ChatRequest request,

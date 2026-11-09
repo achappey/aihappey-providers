@@ -7,8 +7,10 @@ using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Models;
 using AIHappey.Core.Providers.JuiceFactory;
+using AIHappey.Messages;
 using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AIHappey.Tests;
@@ -114,6 +116,7 @@ public sealed class JuiceFactoryProviderTests
         });
         var request = new AIRequest
         {
+            ProviderId = "juicefactory",
             Model = "qwen3.8-27b",
             Input = new() { Text = "Hello" },
             Metadata = new() { ["juicefactory"] = Element(Native) }
@@ -121,6 +124,43 @@ public sealed class JuiceFactoryProviderTests
         var before = JsonSerializer.Serialize(request);
         if (streaming) await Collect(Provider(client).StreamUnifiedAsync(request));
         else await Provider(client).ExecuteUnifiedAsync(request);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData("auto", false)]
+    [InlineData("none", false)]
+    [InlineData("any", false)]
+    [InlineData("tool", false)]
+    [InlineData("any", true)]
+    public async Task Messages_maps_tool_choices_and_preserves_native_overrides(string choice, bool nativeOverride)
+    {
+        using var client = Client(async (http, ct) =>
+        {
+            var body = Element(await http.Content!.ReadAsStringAsync(ct));
+            AssertNative(body);
+            var toolChoice = body.GetProperty("tool_choice");
+            if (nativeOverride)
+                Assert.Equal("future-choice", toolChoice.GetProperty("type").GetString());
+            else if (choice == "tool")
+            {
+                Assert.Equal("function", toolChoice.GetProperty("type").GetString());
+                Assert.Equal("lookup", toolChoice.GetProperty("function").GetProperty("name").GetString());
+            }
+            else
+                Assert.Equal(choice == "any" ? "required" : choice, toolChoice.GetString());
+            return Json(Reply);
+        });
+        var request = JsonSerializer.Deserialize<MessagesRequest>("""
+            {"model":"qwen3.8-27b","max_tokens":20,"messages":[{"role":"user","content":"Hi"}],
+             "tools":[{"name":"lookup","description":"Look up a value","input_schema":{"type":"object","properties":{}}}]}
+            """)!;
+        request.ToolChoice = new() { Type = choice, Name = choice == "tool" ? "lookup" : null };
+        var properties = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Native)!;
+        if (nativeOverride) properties["tool_choice"] = Element("""{"type":"future-choice"}""");
+        request.AdditionalProperties = new() { ["juicefactory"] = JsonSerializer.SerializeToElement(properties) };
+        var before = JsonSerializer.Serialize(request);
+        await Provider(client).MessagesAsync(request, []);
         Assert.Equal(before, JsonSerializer.Serialize(request));
     }
 
@@ -176,6 +216,7 @@ public sealed class JuiceFactoryProviderTests
     [Fact]
     public async Task Models_use_authenticated_endpoint_and_cache_results()
     {
+        using var memory = new MemoryCache(new MemoryCacheOptions());
         var calls = 0;
         using var client = Client((http, _) =>
         {
@@ -184,7 +225,7 @@ public sealed class JuiceFactoryProviderTests
             calls++;
             return Task.FromResult(Json("""{"data":[{"id":"qwen3.8-27b","owned_by":"qwen"},{"id":"embed","type":"embedding"}]}"""));
         });
-        var provider = Provider(client);
+        var provider = new JuiceFactoryProvider(new Keys(() => "test-key"), new AsyncCacheHelper(memory), new Factory(client));
         var models = (await provider.ListModels()).ToArray();
         Assert.Equal(["juicefactory/qwen3.8-27b", "juicefactory/embed"], models.Select(model => model.Id));
         Assert.Equal("embedding", models[1].Type);
