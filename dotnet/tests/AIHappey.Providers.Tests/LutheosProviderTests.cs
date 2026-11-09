@@ -109,8 +109,7 @@ public sealed class LutheosProviderTests
                 Assert.True(JsonElement.DeepEquals(field.Value, body.GetProperty(field.Name)), field.Name);
             return Reply(streaming
                 ? messages
-                    ? "event: message_start\ndata: {\"type\":\"message_start\",\"message\":" + MessageReply.Replace("\n", "")
-                        + "}\n\nevent: message_stop\ndata: {\"type\":\"message_stop\"}\n\n"
+                    ? MessageEvents(MessageReply)
                     : ChatEvents
                 : messages ? MessageReply : ChatReply, streaming);
         });
@@ -156,6 +155,31 @@ public sealed class LutheosProviderTests
         }
         Assert.Equal("Basic", client.DefaultRequestHeaders.Authorization.Scheme);
         Assert.Equal("unchanged", client.DefaultRequestHeaders.Authorization.Parameter);
+    }
+
+    [Theory]
+    [InlineData("\n")]
+    [InlineData("\r\n")]
+    [InlineData("\r")]
+    public async Task Messages_streaming_fixture_is_independent_of_JSON_line_endings(string lineEnding)
+    {
+        using var client = Client((_, _) => Task.FromResult(
+            Reply(MessageEvents(MessageReply.ReplaceLineEndings(lineEnding)), streaming: true)));
+        var provider = Provider(client);
+        var request = new MessagesRequest { Model = "vendor/model", MaxTokens = 100, Messages = [] };
+
+        var parts = await Collect(provider.MessagesStreamingAsync(request, []));
+
+        Assert.Collection(parts,
+            part =>
+            {
+                Assert.Equal("message_start", part.Type);
+                Assert.Equal("lutheos/vendor/model", part.Message!.Model);
+                Assert.True(JsonElement.DeepEquals(
+                    Element(MessageReply).GetProperty("future_reply"),
+                    Element(JsonSerializer.Serialize(part.Message)).GetProperty("future_reply")));
+            },
+            part => Assert.Equal("message_stop", part.Type));
     }
 
     [Theory]
@@ -238,6 +262,9 @@ public sealed class LutheosProviderTests
     private static LutheosProvider Provider(HttpClient client, Keys? keys = null, IMemoryCache? cache = null)
         => new(keys ?? new Keys(), new AsyncCacheHelper(cache), new Clients(client));
     private static JsonElement Element(string value) => JsonSerializer.Deserialize<JsonElement>(value);
+    private static string MessageEvents(string messageReply)
+        => "event: message_start\ndata: {\"type\":\"message_start\",\"message\":" + JsonSerializer.Serialize(Element(messageReply))
+            + "}\n\nevent: message_stop\ndata: {\"type\":\"message_stop\"}\n\n";
     private static HttpResponseMessage Reply(string value, bool streaming = false) => new(HttpStatusCode.OK)
         { Content = new StringContent(value, Encoding.UTF8, streaming ? "text/event-stream" : "application/json") };
     private static HttpClient Client(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> send)
