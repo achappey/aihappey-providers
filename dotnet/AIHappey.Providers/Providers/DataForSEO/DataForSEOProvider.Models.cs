@@ -39,27 +39,23 @@ public partial class DataForSEOProvider
                     using var resp = await _client.SendAsync(req, ct);
 
                     if (!resp.IsSuccessStatusCode)
-                        continue;
+                        throw new HttpRequestException($"DataForSEO {endpoint} model discovery failed ({(int)resp.StatusCode}): {await resp.Content.ReadAsStringAsync(ct)}", null, resp.StatusCode);
 
                     await using var stream = await resp.Content.ReadAsStreamAsync(ct);
                     using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
                     var root = doc.RootElement;
+                    if (root.TryGetProperty("status_code", out _))
+                        EnsureSuccess(root, "model discovery");
 
                     if (!root.TryGetProperty("tasks", out var tasksEl) ||
                         tasksEl.ValueKind != JsonValueKind.Array)
-                        continue;
+                        throw new InvalidOperationException($"DataForSEO {endpoint} model discovery is missing its tasks array.");
 
                     foreach (var task in tasksEl.EnumerateArray())
                     {
-                        string provider = endpoint;
-
-                        if (task.TryGetProperty("data", out var dataEl) &&
-                            dataEl.TryGetProperty("se", out var seEl))
-                        {
-                            provider = seEl.GetString() ?? endpoint;
-                        }
-
+                        if (task.TryGetProperty("status_code", out _))
+                            EnsureSuccess(task, "model discovery task");
                         if (!task.TryGetProperty("result", out var resultEl) ||
                             resultEl.ValueKind != JsonValueKind.Array)
                             continue;
@@ -78,7 +74,7 @@ public partial class DataForSEOProvider
                             {
                                 Id = name.ToModelId(GetIdentifier()),
                                 Name = name,
-                                OwnedBy = provider
+                                OwnedBy = endpoint
                             });
                         }
                     }
