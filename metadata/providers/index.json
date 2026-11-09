@@ -96,6 +96,10 @@
     "file": "harnessrouter.json"
   },
   {
+    "id": "hatzai",
+    "file": "hatzai.json"
+  },
+  {
     "id": "lelapaai",
     "file": "lelapaai.json"
   },
