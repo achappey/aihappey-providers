@@ -2166,6 +2166,10 @@
       "sha256": "f89477c24eda994d9fb84816974fa612861ba70e5bb5adc554da0c1eb4208b53"
     },
     {
+      "file": "providers/guidai.json",
+      "sha256": "22711942d4b6a441dbe97534edff64d50b8a855fae8f3c6e3ad57e3cc5cae1cd"
+    },
+    {
       "file": "providers/gtranslate.json",
       "sha256": "b5d6196f7262ab50a5780f6cc7f59c4e2422988604fd6f25965b40d2d5d7c402"
     },
