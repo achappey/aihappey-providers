@@ -84,6 +84,25 @@ public sealed class OpenAIImageOutputFormatTests
         Assert.True(JsonElement.DeepEquals(metadata, request.ProviderOptions!["openai"]));
     }
 
+    [Fact]
+    public async Task Unknown_provider_options_merge_into_the_OpenAI_request_root_without_filtering()
+    {
+        using var expected = JsonDocument.Parse(
+            """{"future_object":{"enabled":true,"nested":[1,null,{"label":"keep"}]},"future_array":[false,2,"three"],"future_count":7,"future_null":null}""");
+        using var client = CreateClient(http =>
+        {
+            var payload = ReadPayload(http, "generation");
+            foreach (var property in expected.RootElement.EnumerateObject())
+                Assert.True(JsonElement.DeepEquals(property.Value, payload.GetProperty(property.Name)), property.Name);
+            Assert.False(payload.TryGetProperty("providerOptions", out _));
+            return ImageResponse("generation", null);
+        });
+
+        var result = await CreateProvider(client).ImageRequest(Request("generation", expected.RootElement.Clone()));
+
+        Assert.Equal("data:image/png;base64,AQID", Assert.Single(result.Images));
+    }
+
     public static IEnumerable<object?[]> Defaults()
     {
         foreach (var route in Routes)
