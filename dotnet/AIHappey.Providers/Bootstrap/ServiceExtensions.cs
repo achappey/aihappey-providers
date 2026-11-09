@@ -148,6 +148,7 @@ using AIHappey.Core.Providers.Parasail;
 using AIHappey.Core.Providers.MancerAI;
 using AIHappey.Core.Providers.Kilo;
 using AIHappey.Core.Providers.Helicone;
+using AIHappey.Core.Providers.Heabsy;
 using AIHappey.Core.Providers.NousResearch;
 using AIHappey.Core.Providers.ParalonCloud;
 using AIHappey.Core.Providers.ASIOne;
@@ -854,6 +855,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, MancerAIProvider>();
         services.AddScoped<IModelProvider, KiloProvider>();
         services.AddScoped<IModelProvider, HeliconeProvider>();
+        services.AddScoped<IModelProvider, HeabsyProvider>();
         services.AddScoped<IModelProvider, NousResearchProvider>();
         services.AddScoped<IModelProvider, ParalonCloudProvider>();
         services.AddScoped<IModelProvider, ASIOneProvider>();
