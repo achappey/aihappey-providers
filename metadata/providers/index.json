@@ -1,5 +1,9 @@
 [
   {
+    "id": "raven",
+    "file": "raven.json"
+  },
+  {
     "id": "juicefactory",
     "file": "juicefactory.json"
   },

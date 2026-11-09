@@ -2291,7 +2291,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "be043b0f9c86b2cdf5ab8161443bbc4e0a90f611861f4859087ecc4494320529"
+      "sha256": "7b4be9d2fdc8a4b03799929a15b9ce32a59db4fd851172de5182c69750a8926d"
     },
     {
       "file": "providers/infercom.json",
@@ -3224,6 +3224,10 @@
     {
       "file": "providers/ramprouter.json",
       "sha256": "9997766be304ab1c09d65b6e9e6dee7e749860a10670ece0c4151da78fb1a4f7"
+    },
+    {
+      "file": "providers/raven.json",
+      "sha256": "3df74ee122c08364a6cbbecb70a0e621832baf151dc81e98de4de3cef21441b4"
     },
     {
       "file": "providers/raxai.json",
