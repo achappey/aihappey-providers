@@ -1,7 +1,11 @@
 [
   {
     "id": "coralbricks",
-    "file": "coralbricks.json"
+    "file": "coralbricks.json"  
+  },
+  {
+    "id": "particle",
+    "file": "particle.json"
   },
   {
     "id": "upivia",

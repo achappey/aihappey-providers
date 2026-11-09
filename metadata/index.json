@@ -2287,7 +2287,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "bcbd5d49e5cb7d58fb6d071a88b3aef2b710e53342326a14fb80e6b54435483a"
+      "sha256": "bcbd5d49e5cb7d58fb6d071a88b3aef2b710e53342326a14fb80e6b54435483a"    
     },
     {
       "file": "providers/infercom.json",
@@ -3084,6 +3084,10 @@
     {
       "file": "providers/parel.json",
       "sha256": "c6485e601fa4030916ea5a5f6c4fa250d27358065a0f66d7fabc472e1fd58402"
+    },
+    {
+      "file": "providers/particle.json",
+      "sha256": "241d51aceefc25cdc9fa312d4acaa0fd471eea681789084f976f46c1c0ae0fcb"
     },
     {
       "file": "providers/paul.json",

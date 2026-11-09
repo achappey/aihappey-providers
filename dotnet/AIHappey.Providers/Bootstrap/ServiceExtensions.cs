@@ -506,6 +506,7 @@ using AIHappey.Core.Providers.Creora;
 using AIHappey.Core.Providers.Xpectrum;
 using AIHappey.Core.Providers.Herma;
 using AIHappey.Core.Providers.ByteSpace;
+using AIHappey.Core.Providers.Particle;
 using AIHappey.Core.Providers.Runcrate;
 using AIHappey.Core.Providers.MuleRouter;
 using AIHappey.Core.Providers.Mixlayer;
@@ -1226,6 +1227,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, XpectrumProvider>();
         services.AddScoped<IModelProvider, HermaProvider>();
         services.AddScoped<IModelProvider, ByteSpaceProvider>();
+        services.AddScoped<IModelProvider, ParticleProvider>();
         services.AddScoped<IModelProvider, RuncrateProvider>();
         services.AddScoped<IModelProvider, MuleRouterProvider>();
         services.AddScoped<IModelProvider, MixlayerProvider>();
