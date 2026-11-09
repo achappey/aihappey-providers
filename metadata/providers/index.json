@@ -1,5 +1,13 @@
 [
   {
+    "id": "raven",
+    "file": "raven.json"
+  },
+  {
+    "id": "juicefactory",
+    "file": "juicefactory.json"
+  },
+  {
     "id": "paperinstruments",
     "file": "paperinstruments.json"
   },
@@ -102,6 +110,10 @@
   {
     "id": "harnessrouter",
     "file": "harnessrouter.json"
+  },
+  {
+    "id": "hatzai",
+    "file": "hatzai.json"
   },
   {
     "id": "lelapaai",
