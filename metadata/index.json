@@ -2295,7 +2295,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "be043b0f9c86b2cdf5ab8161443bbc4e0a90f611861f4859087ecc4494320529"
+      "sha256": "7b004372f246c472f602bc91c6860b2fea318038493236a8febc14700254c3be"
     },
     {
       "file": "providers/infercom.json",
@@ -2380,6 +2380,10 @@
     {
       "file": "providers/jkaihub.json",
       "sha256": "36aec406b73b708c1d2f329bc46c3719240f70ab0bae687a8f9319ef500e51e5"
+    },
+    {
+      "file": "providers/joulecloud.json",
+      "sha256": "7a771783aeb0985325bd2df2d46e65d43131a7b6adca357012f142af5dc70261"
     },
     {
       "file": "providers/json2video.json",
