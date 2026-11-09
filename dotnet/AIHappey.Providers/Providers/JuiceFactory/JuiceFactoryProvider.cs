@@ -153,7 +153,9 @@ public sealed partial class JuiceFactoryProvider(
             var existing = JsonSerializer.SerializeToElement(metadata, ResponseJson.Default);
             if (existing.ValueKind == JsonValueKind.Object)
                 foreach (var property in existing.EnumerateObject())
-                    properties[property.Name] = property.Value.Clone();
+                    // The source capture still contains the envelope; its contents are merged below.
+                    if (property.Name != GetIdentifier())
+                        properties[property.Name] = property.Value.Clone();
         }
         var serialized = JsonSerializer.SerializeToElement(request, ResponseJson.Default);
         if (serialized.TryGetProperty("tool_choice", out var choice) && choice.ValueKind == JsonValueKind.Object

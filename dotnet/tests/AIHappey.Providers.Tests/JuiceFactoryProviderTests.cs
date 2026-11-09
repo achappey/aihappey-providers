@@ -166,31 +166,52 @@ public sealed class JuiceFactoryProviderTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Responses_maps_named_tool_choice_and_preserves_native_override(bool nativeOverride)
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Responses_maps_named_tool_choice_and_preserves_native_override(bool nativeOverride, bool streaming)
     {
         using var client = Client(async (http, ct) =>
         {
             Assert.Equal("/v1/chat/completions", http.RequestUri!.AbsolutePath);
             var body = Element(await http.Content!.ReadAsStringAsync(ct));
             AssertNative(body);
+            Assert.Equal(streaming, body.GetProperty("stream").GetBoolean());
+            Assert.True(body.GetProperty("top_level_unknown").GetBoolean());
+            Assert.Equal("lookup", body.GetProperty("tools")[0].GetProperty("function").GetProperty("name").GetString());
             var choice = body.GetProperty("tool_choice");
             if (nativeOverride)
-                Assert.Equal("future-choice", choice.GetProperty("type").GetString());
+                Assert.True(JsonElement.DeepEquals(Element("""{"type":"future-choice","options":[true,null,{},9007199254740993]}"""), choice));
             else
                 Assert.Equal("lookup", choice.GetProperty("function").GetProperty("name").GetString());
-            return Json(Reply);
+            return streaming ? new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""
+                    data: {"id":"chat_1","object":"chat.completion.chunk","created":1,"model":"qwen3.8-27b","choices":[{"index":0,"delta":{"content":"Hello"},"finish_reason":null}]}
+
+                    data: {"id":"chat_1","object":"chat.completion.chunk","created":1,"model":"qwen3.8-27b","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+                    data: [DONE]
+
+                    """, Encoding.UTF8, "text/event-stream")
+            } : Json(Reply);
         });
         var request = JsonSerializer.Deserialize<ResponseRequest>("""
             {"model":"qwen3.8-27b","input":"Hi","tool_choice":{"type":"function","name":"lookup"},
              "tools":[{"type":"function","name":"lookup","description":"Look up a value","parameters":{"type":"object","properties":{}}}]}
             """)!;
         var properties = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Native)!;
-        if (nativeOverride) properties["tool_choice"] = Element("""{"type":"future-choice"}""");
-        request.AdditionalProperties = new() { ["juicefactory"] = JsonSerializer.SerializeToElement(properties) };
+        if (nativeOverride) properties["tool_choice"] = Element("""{"type":"future-choice","options":[true,null,{},9007199254740993]}""");
+        request.AdditionalProperties = new()
+        {
+            ["juicefactory"] = JsonSerializer.SerializeToElement(properties),
+            ["top_level_unknown"] = Element("true"),
+            ["reasoning_effort"] = Element("\"source-effort\"")
+        };
         var before = JsonSerializer.Serialize(request);
-        await Provider(client).ResponsesAsync(request);
+        if (streaming) Assert.NotEmpty(await Collect(Provider(client).ResponsesStreamingAsync(request)));
+        else await Provider(client).ResponsesAsync(request);
         Assert.Equal(before, JsonSerializer.Serialize(request));
     }
 
@@ -300,7 +321,7 @@ public sealed class JuiceFactoryProviderTests
     {
         foreach (var property in Element(Native).EnumerateObject())
             Assert.True(JsonElement.DeepEquals(property.Value, body.GetProperty(property.Name)), property.Name);
-        Assert.False(body.TryGetProperty("juicefactory", out _));
+        Assert.False(body.TryGetProperty("juicefactory", out _), body.GetRawText());
     }
 
     private static async Task<List<T>> Collect<T>(IAsyncEnumerable<T> stream)

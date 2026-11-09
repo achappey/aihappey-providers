@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AIHappey.Core.AI;
 using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.Prism;
@@ -30,11 +31,13 @@ public sealed class PrismProviderTests
         """;
 
     [Theory]
-    [InlineData("responses", false)]
-    [InlineData("responses", true)]
-    [InlineData("messages", false)]
-    [InlineData("messages", true)]
-    public async Task Native_requests_preserve_payloads_headers_and_events(string endpoint, bool streaming)
+    [InlineData("responses", false, false)]
+    [InlineData("responses", true, false)]
+    [InlineData("responses", false, true)]
+    [InlineData("responses", true, true)]
+    [InlineData("messages", false, false)]
+    [InlineData("messages", true, false)]
+    public async Task Native_requests_preserve_payloads_headers_and_events(string endpoint, bool streaming, bool explicitMessageType)
     {
         var body = endpoint == "responses"
             ? """
@@ -55,6 +58,16 @@ public sealed class PrismProviderTests
                "metadata":{"user_id":"user-1"},"future_option":{"nested":[true,null,{}]}}
               """;
         var original = JsonSerializer.Deserialize<JsonElement>(body);
+        if (explicitMessageType)
+        {
+            var document = JsonNode.Parse(body)!;
+            document["input"]![0]!["type"] = "message";
+            original = JsonSerializer.SerializeToElement(document);
+        }
+        // Compare the typed contract's wire representation: omitted message types default to "message".
+        var expected = endpoint == "responses"
+            ? JsonSerializer.SerializeToElement(original.Deserialize<ResponseRequest>(ResponseJson.Default), ResponseJson.Default)
+            : original;
         var calls = 0;
         using var client = Client(async request =>
         {
@@ -74,7 +87,14 @@ public sealed class PrismProviderTests
             var payload = JsonSerializer.Deserialize<JsonElement>(await request.Content!.ReadAsStringAsync());
             Assert.Equal(streaming, payload.GetProperty("stream").GetBoolean());
             foreach (var property in original.EnumerateObject())
-                Assert.True(JsonElement.DeepEquals(property.Value, payload.GetProperty(property.Name)), property.Name);
+                Assert.True(JsonElement.DeepEquals(expected.GetProperty(property.Name), payload.GetProperty(property.Name)),
+                    $"{property.Name}: expected {expected.GetProperty(property.Name)}; actual {payload.GetProperty(property.Name)}");
+            if (endpoint == "responses")
+            {
+                Assert.Equal("message", payload.GetProperty("input")[0].GetProperty("type").GetString());
+                Assert.True(JsonElement.DeepEquals(original.GetProperty("input")[0].GetProperty("content"),
+                    payload.GetProperty("input")[0].GetProperty("content")));
+            }
             return Reply(endpoint, streaming);
         });
         var provider = Provider(client);

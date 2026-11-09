@@ -120,13 +120,31 @@ public sealed class HatzAIProvider(
         if (choice is null)
             return null;
         var value = JsonSerializer.SerializeToElement(choice);
-        if (value.ValueKind == JsonValueKind.Object
-            && value.TryGetProperty("type", out var type) && type.ValueKind == JsonValueKind.String
-            && type.GetString() == "function"
-            && value.TryGetProperty("function", out var function) && function.ValueKind == JsonValueKind.Object
-            && function.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
-            return JsonSerializer.SerializeToElement(new { type = "function", name = name.GetString() });
-        return choice;
+        if (value.ValueKind != JsonValueKind.Object
+            || !value.TryGetProperty("type", out var type) || type.ValueKind != JsonValueKind.String
+            || type.GetString() != "function")
+            return choice;
+
+        var hasFunction = value.TryGetProperty("function", out var function) && function.ValueKind == JsonValueKind.Object;
+        JsonElement name;
+        if (!(hasFunction && function.TryGetProperty("name", out name) && name.ValueKind == JsonValueKind.String)
+            && !(value.TryGetProperty("name", out name) && name.ValueKind == JsonValueKind.String))
+            return choice;
+
+        var fields = value.EnumerateObject().ToDictionary(property => property.Name, property => property.Value.Clone());
+        fields["name"] = name.Clone();
+        if (hasFunction)
+        {
+            // Typed chat contracts synthesize a function object even for an already-flat choice.
+            // Remove the mapped name/default wrapper, but retain any native function extensions.
+            var extensions = function.EnumerateObject().Where(property => property.Name != "name")
+                .ToDictionary(property => property.Name, property => property.Value.Clone());
+            if (extensions.Count == 0)
+                fields.Remove("function");
+            else
+                fields["function"] = JsonSerializer.SerializeToElement(extensions);
+        }
+        return JsonSerializer.SerializeToElement(fields);
     }
 
     public Task<ResponseResult> ResponsesAsync(ResponseRequest options, CancellationToken cancellationToken = default)

@@ -144,9 +144,27 @@ public sealed class HatzAIProviderTests
     [InlineData(false, """{"type":"function","function":{"name":"lookup"}}""", """{"type":"function","name":"lookup"}""")]
     [InlineData(true, """{"type":"function","function":{"name":"lookup"}}""", """{"type":"function","name":"lookup"}""")]
     [InlineData(false, "\"auto\"", "\"auto\"")]
+    [InlineData(true, "\"auto\"", "\"auto\"")]
     [InlineData(false, "\"none\"", "\"none\"")]
+    [InlineData(true, "\"none\"", "\"none\"")]
     [InlineData(false, "\"required\"", "\"required\"")]
+    [InlineData(true, "\"required\"", "\"required\"")]
     [InlineData(false, """{"type":"function","name":"lookup"}""", """{"type":"function","name":"lookup"}""")]
+    [InlineData(true, """{"type":"function","name":"lookup"}""", """{"type":"function","name":"lookup"}""")]
+    [InlineData(false, """{"type":"function","function":{"name":"lookup"},"future_option":{"value":9007199254740993,"empty":{},"null":null}}""",
+        """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""")]
+    [InlineData(true, """{"type":"function","function":{"name":"lookup"},"future_option":{"value":9007199254740993,"empty":{},"null":null}}""",
+        """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""")]
+    [InlineData(false, """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""",
+        """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""")]
+    [InlineData(true, """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""",
+        """{"type":"function","name":"lookup","future_option":{"value":9007199254740993,"empty":{},"null":null}}""")]
+    [InlineData(false, """{"type":"function","function":{"name":"lookup","future_option":{"enabled":true}}}""",
+        """{"type":"function","name":"lookup","function":{"future_option":{"enabled":true}}}""")]
+    [InlineData(true, """{"type":"function","function":{"name":"lookup","future_option":{"enabled":true}}}""",
+        """{"type":"function","name":"lookup","function":{"future_option":{"enabled":true}}}""")]
+    [InlineData(false, """{"type":"future_choice","options":[true,null,{}]}""", """{"type":"future_choice","options":[true,null,{}]}""")]
+    [InlineData(true, """{"type":"future_choice","options":[true,null,{}]}""", """{"type":"future_choice","options":[true,null,{}]}""")]
     public async Task Chat_named_function_tool_choice_is_flattened_without_changing_other_choices(
         bool streaming, string toolChoice, string expected)
     {
@@ -154,7 +172,8 @@ public sealed class HatzAIProviderTests
         {
             Assert.Equal("/v1/openai/responses", request.RequestUri!.AbsolutePath);
             var payload = Parse(await request.Content!.ReadAsStringAsync());
-            Assert.True(JsonElement.DeepEquals(Parse(expected), payload.GetProperty("tool_choice")));
+            var actual = payload.GetProperty("tool_choice");
+            Assert.True(JsonElement.DeepEquals(Parse(expected), actual), $"Expected {expected}; actual {actual.GetRawText()}");
             return ChatCompatibilityReply(streaming);
         });
         var fields = Body().EnumerateObject().ToDictionary(property => property.Name, property => property.Value.Clone());
@@ -273,15 +292,24 @@ public sealed class HatzAIProviderTests
     [InlineData("messages", true)]
     public async Task Errors_and_cancellation_propagate(string endpoint, bool streaming)
     {
-        using var client = Client(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+        var calls = 0;
+        using var client = Client(_ =>
         {
-            Content = new StringContent("""{"error":{"message":"invalid key"}}""")
-        }));
-        await Assert.ThrowsAsync<HttpRequestException>(() => Invoke(Provider(client), endpoint, streaming, Body()));
+            calls++;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                Content = new StringContent("""{"error":{"message":"invalid key"}}""")
+            });
+        });
+        var provider = Provider(client);
+        var error = await Assert.ThrowsAsync<HttpRequestException>(() => Invoke(provider, endpoint, streaming, Body()));
+        Assert.Equal(HttpStatusCode.Unauthorized, error.StatusCode);
+        Assert.Equal(1, calls);
         using var cancelled = new CancellationTokenSource();
         cancelled.Cancel();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-            Invoke(Provider(client), endpoint, streaming, Body(), cancelled.Token));
+            Invoke(provider, endpoint, streaming, Body(), cancelled.Token));
+        Assert.Equal(1, calls);
     }
 
     [Theory]
