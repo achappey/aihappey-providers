@@ -1,5 +1,9 @@
 [
   {
+    "id": "particle",
+    "file": "particle.json"
+  },
+  {
     "id": "upivia",
     "file": "upivia.json"
   },
