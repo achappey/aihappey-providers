@@ -1040,6 +1040,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, BrainiallProvider>();      
         services.AddScoped<IModelProvider, AIRouterProvider>();
         services.AddScoped<IModelProvider, AgenticsProvider>();
+        services.AddScoped<IModelProvider, AIHappey.Core.Providers.JouleCloud.JouleCloudProvider>();
         services.AddScoped<IModelProvider, AinventedProvider>();
         services.AddScoped<IModelProvider, PloriProvider>();
         services.AddScoped<IModelProvider, AgencyOSXProvider>();
