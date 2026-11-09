@@ -90,7 +90,7 @@ public static class ModelProviderResponsesUnifiedExtensions
         responseRequest.Store ??= false;
 
         var response = await modelProvider.ResponsesAsync(responseRequest, cancellationToken);
-        var unified = response.ToUnifiedResponse(modelProvider.GetIdentifier());
+        var unified = response.ToUnifiedResponse(modelProvider.GetIdentifier(), responseRequest.HasLocalShell());
 
         return unified;
     }
@@ -122,7 +122,7 @@ public static class ModelProviderResponsesUnifiedExtensions
             var hostedToolSearchCalls = new Queue<string>();
             var registeredHostedToolSearchCalls = new HashSet<string>(StringComparer.Ordinal);
             var hostedToolSearchOutputIds = new Dictionary<string, string>(StringComparer.Ordinal);
-            var responseMappingState = new ResponsesUnifiedMapper.ResponseStreamMappingState();
+            var responseMappingState = new ResponsesUnifiedMapper.ResponseStreamMappingState { LocalShell = responseRequest.HasLocalShell() };
 
             await foreach (var update in modelProvider.ResponsesStreamingAsync(responseRequest, cancellationToken))
             {
