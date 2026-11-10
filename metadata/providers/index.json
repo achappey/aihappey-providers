@@ -1,5 +1,9 @@
 [
   {
+    "id": "frontiereai",
+    "file": "frontiereai.json"
+  },
+  {
     "id": "joulecloud",
     "file": "joulecloud.json"
      },
