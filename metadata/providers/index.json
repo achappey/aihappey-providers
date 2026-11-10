@@ -2826,5 +2826,9 @@
   {
     "id": "opinference",
     "file": "opinference.json"
+  },
+  {
+    "id": "inferenceclub",
+    "file": "opinference.json"
   }
 ]
