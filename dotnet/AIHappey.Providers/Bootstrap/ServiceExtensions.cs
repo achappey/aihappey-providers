@@ -706,6 +706,7 @@ using AIHappey.Core.Providers.Ampersand;
 using AIHappey.Core.Providers.SippulseAI;
 using AIHappey.Core.Providers.Conway;
 using AIHappey.Core.Providers.Guidai;
+using AIHappey.Core.Providers.OPInference;
 
 namespace AIHappey.Core.AI;
 
@@ -1429,6 +1430,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, CanRouterProvider>();
         services.AddScoped<IModelProvider, HushProvider>();
         services.AddScoped<IModelProvider, OpenferenceProvider>();
+        services.AddScoped<IModelProvider, OPInferenceProvider>();
         services.AddScoped<IModelProvider, SandBaseProvider>();
         services.AddScoped<IModelProvider, HCompanyProvider>();
         services.AddScoped<IModelProvider, MangoBoostProvider>();
