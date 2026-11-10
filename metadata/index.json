@@ -2311,11 +2311,15 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "27d7c544c7b3e85a6de330bd9b15e2186a0034b570606f9cb8041b6b6a5ba8c2"
+      "sha256": "fe1a6c2475f4cc6c2a59449df9ee7bfb44e5038196f948b2bab37976eb9bb979"
     },
     {
       "file": "providers/infercom.json",
       "sha256": "6aba5d7498072b881b37695ec601e2d10c154e461622a90fb6d9dcf145383a9e"
+    },
+    {
+      "file": "providers/inferel.json",
+      "sha256": "880b3a68abdb99cb2a7e30b27f24214ee681da2b697472544449c8d7277048b8"
     },
     {
       "file": "providers/inferenceclub.json",
