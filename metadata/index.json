@@ -2318,6 +2318,10 @@
       "sha256": "6aba5d7498072b881b37695ec601e2d10c154e461622a90fb6d9dcf145383a9e"
     },
     {
+      "file": "providers/inferenceclub.json",
+      "sha256": "a5718b461f79a80d4ac27abcd52e3db4edd4e89099d38d2fb78e9b9daffbe6eb"
+    },
+    {
       "file": "providers/inferencenet.json",
       "sha256": "2ca8bac60f4008327feaba88670f7f265fd8d9f881de0102f68e7a5410dc5e85"
     },
