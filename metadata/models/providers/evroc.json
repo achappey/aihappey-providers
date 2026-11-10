@@ -1,0 +1,26 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "evroc/zai-org/GLM-5.2",
+      "object": "model",
+      "owned_by": "zai-org",
+      "name": "zai-org/GLM-5.2",
+      "type": "language"
+    },
+    {
+      "id": "evroc/intfloat/multilingual-e5-large-instruct",
+      "object": "model",
+      "owned_by": "intfloat",
+      "name": "intfloat/multilingual-e5-large-instruct",
+      "type": "embedding"
+    },
+    {
+      "id": "evroc/openai/whisper-large-v3",
+      "object": "model",
+      "owned_by": "openai",
+      "name": "openai/whisper-large-v3",
+      "type": "transcription"
+    }
+  ]
+}

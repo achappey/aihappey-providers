@@ -33,6 +33,7 @@ using AIHappey.Core.Providers.Inferencenet;
 using AIHappey.Core.Providers.InferenceClub;
 using AIHappey.Core.Providers.Inworld;
 using AIHappey.Core.Providers.ElevenLabs;
+using AIHappey.Core.Providers.Evroc;
 using AIHappey.Core.Providers.Jina;
 using AIHappey.Core.Providers.Mistral;
 using AIHappey.Core.Providers.MindsHub;
@@ -845,6 +846,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, OpperAIProvider>();
         services.AddScoped<IModelProvider, CortecsProvider>();
         services.AddScoped<IModelProvider, EUrouterProvider>();
+        services.AddScoped<IModelProvider, EvrocProvider>();
         services.AddScoped<IModelProvider, RequestyProvider>();
         services.AddScoped<IModelProvider, PortkeyProvider>();
         services.AddScoped<IModelProvider, DeepLProvider>();
