@@ -12,6 +12,7 @@ using AIHappey.Unified.Models;
 using AIHappey.Vercel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using ModelContextProtocol.Protocol;
 
 namespace AIHappey.Tests;
 
@@ -417,9 +418,40 @@ public sealed class JouleCloudProviderTests
             ? Element("""{"output_format":"jpeg"}""")
             : Element("""{"response_format":"wav"}""");
         var expectedMimeType = type == "image" ? "image/jpeg" : "audio/wav";
-        Assert.Contains(expectedMimeType, JsonSerializer.Serialize(await provider.ExecuteUnifiedAsync(request)));
-        Assert.Contains(expectedMimeType, JsonSerializer.Serialize(await Collect(provider.StreamUnifiedAsync(request))));
+        var before = JsonSerializer.Serialize(request);
+        var response = await provider.ExecuteUnifiedAsync(request);
+        var tool = Assert.IsType<AIToolCallContentPart>(Assert.Single(Assert.Single(response.Output!.Items!).Content!));
+        Assert.True(tool.ProviderExecuted);
+        AssertMediaResult(tool.Output);
+
+        var events = await Collect(provider.StreamUnifiedAsync(request));
+        Assert.Equal(["tool-input-available", "tool-output-available", "finish"], events.Select(evt => evt.Event.Type));
+        var output = Assert.IsType<AIToolOutputAvailableEventData>(events[1].Event.Data);
+        Assert.True(output.ProviderExecuted);
+        Assert.False(output.Preliminary);
+        AssertMediaResult(output.Output);
         Assert.Equal(2, calls);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+
+        void AssertMediaResult(object? value)
+        {
+            var result = Assert.IsType<CallToolResult>(value);
+            Assert.False(result.IsError);
+            if (type == "image")
+            {
+                var image = Assert.IsType<ImageContentBlock>(Assert.Single(result.Content));
+                Assert.Equal(expectedMimeType, image.MimeType);
+                Assert.Equal(Encoding.UTF8.GetBytes("image"), image.Data.ToArray());
+            }
+            else
+            {
+                var block = Assert.IsType<EmbeddedResourceBlock>(Assert.Single(result.Content));
+                var audio = Assert.IsType<BlobResourceContents>(block.Resource);
+                Assert.Equal(expectedMimeType, audio.MimeType);
+                Assert.Equal(Encoding.UTF8.GetBytes("audio"),
+                    Convert.FromBase64String(Encoding.UTF8.GetString(audio.Blob.ToArray())));
+            }
+        }
     }
 
     [Fact]

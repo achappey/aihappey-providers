@@ -149,6 +149,54 @@ public sealed class ConwayProviderTests
     }
 
     [Theory]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Responses_preserve_canonical_and_raw_options_without_mutating_request(bool streaming, bool native)
+    {
+        var calls = 0;
+        using var client = Client(async (http, ct) =>
+        {
+            calls++;
+            Assert.Equal("/v1/chat/completions", http.RequestUri!.AbsolutePath);
+            var body = Element(await http.Content!.ReadAsStringAsync(ct));
+            Assert.Equal("gpt-5.2", body.GetProperty("model").GetString());
+            Assert.Equal(streaming, body.GetProperty("stream").GetBoolean());
+            Assert.Contains(body.GetProperty("messages").EnumerateArray(), message =>
+                message.GetProperty("role").GetString() == "user" && message.GetProperty("content").GetString() == "Hi");
+            Assert.False(body.TryGetProperty("input", out _));
+            Assert.False(body.TryGetProperty("max_output_tokens", out _));
+            Assert.False(body.TryGetProperty("conway", out _));
+            Assert.Equal(9007199254740993L, body.GetProperty("root_option").GetProperty("large").GetInt64());
+            Assert.Equal(JsonValueKind.Null, body.GetProperty("root_option").GetProperty("null").ValueKind);
+            Assert.Equal("UPPER", body.GetProperty("root_CASE").GetString());
+            Assert.Equal("lower", body.GetProperty("root_case").GetString());
+            if (native)
+                AssertNative(body);
+            else
+            {
+                Assert.Equal(1, body.GetProperty("temperature").GetDouble());
+                Assert.Equal(0.8, body.GetProperty("top_p").GetDouble());
+                Assert.Equal(64, body.GetProperty("max_tokens").GetInt32());
+            }
+            return streaming ? Response(Events, true) : Response(Reply);
+        });
+        var request = JsonSerializer.Deserialize<ResponseRequest>("""
+            {"model":"conway/gpt-5.2","input":"Hi","temperature":1,"top_p":0.8,"max_output_tokens":64,
+             "root_option":{"large":9007199254740993,"null":null},"root_CASE":"UPPER","root_case":"lower"
+            """ + (native ? ",\"conway\":" + Native : "") + "}")!;
+        var before = JsonSerializer.Serialize(request);
+        var provider = Provider(client);
+        if (streaming)
+            Assert.NotEmpty(await Collect(provider.ResponsesStreamingAsync(request)));
+        else
+            Assert.NotNull(await provider.ResponsesAsync(request));
+        Assert.Equal(1, calls);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
     [InlineData("auto", false)]
     [InlineData("auto", true)]
     [InlineData("none", false)]

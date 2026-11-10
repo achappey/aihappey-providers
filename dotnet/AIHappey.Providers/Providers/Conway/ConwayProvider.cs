@@ -26,13 +26,35 @@ public sealed partial class ConwayProvider(IApiKeyResolver keys, AsyncCacheHelpe
     public string GetIdentifier() => "conway";
 
     public async Task<Responses.ResponseResult> ResponsesAsync(Responses.ResponseRequest options, CancellationToken cancellationToken = default)
-        => (await ExecuteUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)).ToResponseResult();
+        => (await ExecuteUnifiedAsync(ResponsesRequest(options), cancellationToken)).ToResponseResult();
 
     public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(Responses.ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedAsync(options.ToUnifiedRequest(GetIdentifier()), cancellationToken)
+        await foreach (var part in StreamUnifiedAsync(ResponsesRequest(options), cancellationToken)
             .ToResponseStreamParts(cancellationToken)) yield return part;
+    }
+
+    private AIRequest ResponsesRequest(Responses.ResponseRequest request)
+    {
+        var unified = request.ToUnifiedRequest(GetIdentifier());
+        var properties = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
+        if (unified.Metadata!.TryGetValue(GetIdentifier(), out var captured))
+        {
+            var existing = JsonSerializer.SerializeToElement(captured);
+            if (existing.ValueKind == JsonValueKind.Object)
+                foreach (var property in existing.EnumerateObject())
+                    if (property.Name != GetIdentifier())
+                        properties[property.Name] = property.Value.Clone();
+        }
+        // The Responses capture contains the provider envelope. Flatten its raw
+        // contents last so explicit native options override canonical values.
+        if (request.AdditionalProperties?.TryGetValue(GetIdentifier(), out var native) == true
+            && native.ValueKind == JsonValueKind.Object)
+            foreach (var property in native.EnumerateObject())
+                properties[property.Name] = property.Value.Clone();
+        unified.Metadata[GetIdentifier()] = JsonSerializer.SerializeToElement(properties);
+        return unified;
     }
 
     public async Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
