@@ -441,7 +441,7 @@ public sealed class JouleCloudProviderTests
             {
                 var image = Assert.IsType<ImageContentBlock>(Assert.Single(result.Content));
                 Assert.Equal(expectedMimeType, image.MimeType);
-                Assert.Equal(Encoding.UTF8.GetBytes("image"), image.Data.ToArray());
+                Assert.Equal(Encoding.UTF8.GetBytes("image"), image.DecodedData.ToArray());
             }
             else
             {

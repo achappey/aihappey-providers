@@ -13,6 +13,7 @@ using AIHappey.Vercel.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using ModelContextProtocol.Protocol;
 
 namespace AIHappey.Tests;
 
@@ -664,10 +665,28 @@ public sealed class FrontiereAIProviderTests
         };
         var before = JsonSerializer.Serialize(request);
         var provider = Provider(client);
-        var serialized = streaming
-            ? JsonSerializer.Serialize(await Collect(provider.StreamUnifiedAsync(request)))
-            : JsonSerializer.Serialize(await provider.ExecuteUnifiedAsync(request));
-        Assert.Contains("image/" + format, serialized);
+        object? value;
+        if (streaming)
+        {
+            var events = await Collect(provider.StreamUnifiedAsync(request));
+            var output = Assert.Single(events.Select(evt => evt.Event.Data)
+                .OfType<AIToolOutputAvailableEventData>(), output => output.Preliminary != true);
+            Assert.True(output.ProviderExecuted);
+            Assert.False(output.Preliminary);
+            value = output.Output;
+        }
+        else
+        {
+            var response = await provider.ExecuteUnifiedAsync(request);
+            var tool = Assert.IsType<AIToolCallContentPart>(Assert.Single(Assert.Single(response.Output!.Items!).Content!));
+            Assert.True(tool.ProviderExecuted);
+            value = tool.Output;
+        }
+        var result = Assert.IsType<CallToolResult>(value);
+        Assert.False(result.IsError);
+        var image = Assert.IsType<ImageContentBlock>(Assert.Single(result.Content));
+        Assert.Equal("image/" + format, image.MimeType);
+        Assert.Equal(Encoding.UTF8.GetBytes("image"), image.DecodedData.ToArray());
         Assert.Equal(before, JsonSerializer.Serialize(request));
     }
 
