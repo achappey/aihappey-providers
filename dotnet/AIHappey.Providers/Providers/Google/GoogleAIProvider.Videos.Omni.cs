@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -45,9 +46,6 @@ public partial class GoogleAIProvider
 
         if (!string.IsNullOrWhiteSpace(request.Resolution))
             warnings.Add(new { type = "unsupported", feature = "resolution" });
-
-        if (request.Duration is not null)
-            warnings.Add(new { type = "unsupported", feature = "duration" });
 
         var payload = BuildOmniVideoPayload(request, warnings);
 
@@ -294,7 +292,7 @@ public partial class GoogleAIProvider
             : [];
 
         payload["model"] = NormalizeGoogleModelOrAgentId(request.Model);
-        payload["input"] = BuildOmniVideoInput(request, metadataElement, warnings);
+        payload["input"] = BuildOmniVideoInput(request, metadataElement, warnings, out var isInterpolation);
         payload["stream"] = false;
         payload["background"] = true;
         payload["store"] = true;
@@ -332,14 +330,15 @@ public partial class GoogleAIProvider
         else
             payload.Remove("previous_interaction_id");
 
-        var responseFormat = ResolveOmniVideoResponseFormat(request, metadataElement, metadata);
+        var responseFormat = ResolveOmniVideoResponseFormat(request, metadataElement, metadata, isInterpolation);
         payload["response_format"] = responseFormat;
         payload.Remove("responseFormat");
 
         return payload;
     }
 
-    private static JsonNode BuildOmniVideoInput(VideoRequest request, JsonElement metadata, ICollection<object> warnings)
+    private static JsonNode BuildOmniVideoInput(
+        VideoRequest request, JsonElement metadata, ICollection<object> warnings, out bool isInterpolation)
     {
         var content = new JsonArray();
         var hasMedia = false;
@@ -353,6 +352,7 @@ public partial class GoogleAIProvider
 
         var frameImages = request.FrameImages?.ToList() ?? [];
         VideoFile? firstFrame = null;
+        VideoFile? lastFrame = null;
         var referenceFiles = new List<VideoFile>();
 
         foreach (var frameImage in frameImages)
@@ -368,12 +368,9 @@ public partial class GoogleAIProvider
             }
             else if (IsLastFrame(frameImage.FrameType))
             {
-                warnings.Add(new
-                {
-                    type = "unsupported",
-                    feature = "frameImages.last_frame",
-                    details = "Gemini Omni Flash limitations state that video interpolation / last-frame generation is not supported; the last_frame input was ignored."
-                });
+                if (lastFrame is not null)
+                    throw new InvalidOperationException("Google Omni video generation supports only one last_frame image.");
+                lastFrame = frameImage.Image;
             }
             else
             {
@@ -381,17 +378,29 @@ public partial class GoogleAIProvider
             }
         }
 
+        isInterpolation = lastFrame is not null;
+        if (isInterpolation && firstFrame is null && request.Image is null)
+            throw new InvalidOperationException("Google Omni video interpolation requires a first_frame image or top-level image together with last_frame.");
+
         if (firstFrame is not null)
         {
             content.Add(ToGoogleOmniImageContent(firstFrame));
             hasMedia = true;
-            if (!prompt.Contains("<FIRST_FRAME>", StringComparison.OrdinalIgnoreCase))
-                prompt = $"<FIRST_FRAME> {prompt} Use the image as the starting frame.";
         }
         else if (request.Image is not null)
         {
             content.Add(ToGoogleOmniImageContent(request.Image));
             hasMedia = true;
+        }
+
+        if (lastFrame is not null)
+        {
+            content.Add(ToGoogleOmniImageContent(lastFrame));
+            prompt += " Use the first image as the starting frame and the second image as the ending frame, with a smooth transition between them.";
+        }
+        else if (firstFrame is not null)
+        {
+            prompt += " Use the first image as the starting frame.";
         }
 
         if (firstFrame is not null && request.Image is not null)
@@ -488,7 +497,8 @@ public partial class GoogleAIProvider
     private static JsonObject ResolveOmniVideoResponseFormat(
         VideoRequest request,
         JsonElement metadataElement,
-        GoogleOmniVideoProviderMetadata? metadata)
+        GoogleOmniVideoProviderMetadata? metadata,
+        bool isInterpolation)
     {
         var raw = metadata?.ResponseFormat ?? metadata?.ResponseFormatCamel;
         var responseFormat = raw is { ValueKind: JsonValueKind.Object }
@@ -503,6 +513,28 @@ public partial class GoogleAIProvider
 
         if (!string.IsNullOrWhiteSpace(request.AspectRatio) && !HasJsonProperty(responseFormat, "aspect_ratio"))
             responseFormat["aspect_ratio"] = request.AspectRatio;
+
+        if (request.Duration is { } duration && !HasJsonProperty(responseFormat, "duration"))
+        {
+            if (!double.IsFinite(duration) || duration != Math.Truncate(duration) || duration < 3 || duration > 15)
+                throw new InvalidOperationException("Google Omni video duration must be a whole number of seconds from 3 to 15.");
+
+            responseFormat["duration"] = duration.ToString("0", CultureInfo.InvariantCulture) + "s";
+        }
+
+        var effectiveDuration = GetJsonObjectString(responseFormat, "duration");
+        if (effectiveDuration is not null)
+        {
+            if (!effectiveDuration.EndsWith('s')
+                || !int.TryParse(effectiveDuration.AsSpan(0, effectiveDuration.Length - 1), NumberStyles.None, CultureInfo.InvariantCulture, out var seconds)
+                || seconds < 3 || seconds > 15)
+            {
+                throw new InvalidOperationException("Google Omni response_format.duration must be a whole-second duration from '3s' to '15s'.");
+            }
+
+            if (isInterpolation && seconds > 10)
+                throw new InvalidOperationException("Google Omni first and last frame interpolation supports durations from 3 to 10 seconds.");
+        }
 
         var delivery = metadata?.Delivery ?? TryGetGoogleOmniString(metadataElement, "delivery");
         if (string.IsNullOrWhiteSpace(GetJsonObjectString(responseFormat, "delivery")))
