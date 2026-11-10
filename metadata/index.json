@@ -2311,11 +2311,15 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "1a465fd1076837bb64231b8176c5908ba0f36116a75575eee376ce239919fc83"
+      "sha256": "27d7c544c7b3e85a6de330bd9b15e2186a0034b570606f9cb8041b6b6a5ba8c2"
     },
     {
       "file": "providers/infercom.json",
       "sha256": "6aba5d7498072b881b37695ec601e2d10c154e461622a90fb6d9dcf145383a9e"
+    },
+    {
+      "file": "providers/inferenceclub.json",
+      "sha256": "a5718b461f79a80d4ac27abcd52e3db4edd4e89099d38d2fb78e9b9daffbe6eb"
     },
     {
       "file": "providers/inferencenet.json",
@@ -3060,6 +3064,10 @@
     {
       "file": "providers/openrouter.json",
       "sha256": "fce7c3f6cadb5c600093eabed83f016e46ad90f4aeaabc096b971384b352c59d"
+    },
+    {
+      "file": "providers/opinference.json",
+      "sha256": "b0cb00e6c8a5be5d296ccd59952f9e39a691004aead72388abe35b1d8a1b4c4a"
     },
     {
       "file": "providers/opperai.json",

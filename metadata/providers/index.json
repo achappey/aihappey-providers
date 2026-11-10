@@ -2822,5 +2822,9 @@
   {
     "id": "creeksidecompute",
     "file": "creeksidecompute.json"
+  },
+  {
+    "id": "opinference",
+    "file": "opinference.json"
   }
 ]

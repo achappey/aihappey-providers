@@ -30,6 +30,7 @@ using AIHappey.Core.Providers.Google;
 using AIHappey.Core.Providers.Groq;
 using AIHappey.Core.Providers.Hyperbolic;
 using AIHappey.Core.Providers.Inferencenet;
+using AIHappey.Core.Providers.InferenceClub;
 using AIHappey.Core.Providers.Inworld;
 using AIHappey.Core.Providers.ElevenLabs;
 using AIHappey.Core.Providers.Jina;
@@ -705,6 +706,7 @@ using AIHappey.Core.Providers.Ampersand;
 using AIHappey.Core.Providers.SippulseAI;
 using AIHappey.Core.Providers.Conway;
 using AIHappey.Core.Providers.Guidai;
+using AIHappey.Core.Providers.OPInference;
 
 namespace AIHappey.Core.AI;
 
@@ -745,6 +747,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, NvidiaProvider>();
         services.AddScoped<IModelProvider, CanopyWaveProvider>();
         services.AddScoped<IModelProvider, InferencenetProvider>();
+        services.AddScoped<IModelProvider, InferenceClubProvider>();
         services.AddScoped<IModelProvider, InfermaticProvider>();
         services.AddScoped<IModelProvider, InferexAIProvider>();
         services.AddHttpClient("inferexai").AddHttpMessageHandler(() => new InferexAIErrorHandler());
@@ -1427,6 +1430,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, CanRouterProvider>();
         services.AddScoped<IModelProvider, HushProvider>();
         services.AddScoped<IModelProvider, OpenferenceProvider>();
+        services.AddScoped<IModelProvider, OPInferenceProvider>();
         services.AddScoped<IModelProvider, SandBaseProvider>();
         services.AddScoped<IModelProvider, HCompanyProvider>();
         services.AddScoped<IModelProvider, MangoBoostProvider>();
