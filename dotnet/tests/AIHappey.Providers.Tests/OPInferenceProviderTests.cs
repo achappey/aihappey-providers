@@ -207,12 +207,19 @@ public sealed class OPInferenceProviderTests
     [Fact]
     public async Task ErrorsAndCancellationAreNotConvertedIntoSuccessfulEmptyReplies()
     {
-        using var denied = Client((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+        var deniedCalls = 0;
+        using var denied = Client((_, _) =>
         {
-            Content = new StringContent("""{"error":{"message":"invalid key"}}""")
-        }));
-        await Assert.ThrowsAsync<HttpRequestException>(() => Provider(denied).CompleteChatAsync(new() { Model = "model" }));
-        await Assert.ThrowsAsync<HttpRequestException>(() => Provider(denied).ListModels());
+            deniedCalls++;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            {
+                Content = new StringContent("""{"error":{"message":"invalid key"}}""")
+            });
+        });
+        var deniedProvider = Provider(denied);
+        await Assert.ThrowsAsync<HttpRequestException>(() => deniedProvider.CompleteChatAsync(new() { Model = "model" }));
+        await Assert.ThrowsAsync<HttpRequestException>(() => deniedProvider.ListModels());
+        Assert.Equal(2, deniedCalls);
 
         using var failedStream = Client((_, _) => Task.FromResult(Json(
             StreamReply.Replace("data: [DONE]", """data: {"error":{"message":"endpoint failed"}}"""), true)));
