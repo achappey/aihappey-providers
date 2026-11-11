@@ -1,0 +1,13 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "pyrois/qwen3-coder-30b-a3b-instruct",
+      "object": "model",
+      "owned_by": "Qwen",
+      "name": "Qwen3-Coder 30B A3B",
+      "type": "language",
+      "context_window": 65536
+    }
+  ]
+}

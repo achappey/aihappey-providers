@@ -6,4 +6,5 @@ public sealed record ProviderRequestOptions
     public string? DustWorkspaceId { get; init; }
     public string? YandexFolderId { get; init; }
     public string? SunoCallbackUrl { get; init; }
+    public string? PyroisEndpointUrl { get; init; }
 }

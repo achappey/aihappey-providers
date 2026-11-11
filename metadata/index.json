@@ -602,6 +602,10 @@
       "sha256": "f0f577377a856ccb84fd14bc8e0fefaf2cbbd88416c01be7bd8e0de051a4f7d4"
     },
     {
+      "file": "models/providers/pyrois.json",
+      "sha256": "19a1c4ef6a7ac7d72a539e71985e906cc00b89322bbf6548509a77fb3f787fae"
+    },
+    {
       "file": "models/providers/radient.json",
       "sha256": "e0b0899d01657c2bb5ad16d079fa30b80e1a4020d2108a999c0b630d4d12f121"
     },
@@ -1247,7 +1251,7 @@
     },
     {
       "file": "providers/agencyosx.json",
-      "sha256": "8c303c161dd71321b2a506b8807b81173701cc9f83dce7683e549f86cfb75f18"
+      "sha256": "68c1082ef5b55fd3b2d4faebff92bf6f220949e6f7bd24a480a34d7afbe2cb9b"
     },
     {
       "file": "providers/agent37.json",
@@ -1375,7 +1379,7 @@
     },
     {
       "file": "providers/alibaba.json",
-      "sha256": "8357972ab1df9ac59758d439eee20da56017b6ed571471336510f041918bc5d7"
+      "sha256": "c484b2ad1ede403491b5a5175d404b4aad3ab247845135b39428135bd28939f3"
     },
     {
       "file": "providers/allternit.json",
@@ -1475,7 +1479,7 @@
     },
     {
       "file": "providers/arwriter.json",
-      "sha256": "abac72ae6b77f0daac341bb3588e7df4de8c217e8b7200c60d6d7d7fda0cbc34"
+      "sha256": "ca94841d71ccfb9181e6ce52883670b94899aa085c1a24a42e40d10a53c5df6e"
     },
     {
       "file": "providers/asione.json",
@@ -1499,7 +1503,7 @@
     },
     {
       "file": "providers/astica.json",
-      "sha256": "f6ad54c0b2ef6d445ecf44fdf165c3321e9782338e666a2cda10622ba7543495"
+      "sha256": "6675604757ad2b1117b235cdb32555e7675d28b45ec3e2e433e369e49553cc73"
     },
     {
       "file": "providers/astria.json",
@@ -1627,7 +1631,7 @@
     },
     {
       "file": "providers/buildprint.json",
-      "sha256": "7db5b23002544fbf8bed4b072a1c29709f2d7d58dfa25809db235215adc0e78b"
+      "sha256": "a7c784aff1e068f32ce08a355588241bfb4297302a6b7db6528bfbf7a3bef6bc"
     },
     {
       "file": "providers/byteplus.json",
@@ -1855,7 +1859,7 @@
     },
     {
       "file": "providers/darkbloom.json",
-      "sha256": "f224b4a97c6f1429f64b783ca1c166d35c0136cb45650f915f96660c9598f190"
+      "sha256": "9318b55af183486b3e1cf0ab9851faab0de16483717625a455294d78a706c166"
     },
     {
       "file": "providers/databricks.json",
@@ -2207,7 +2211,7 @@
     },
     {
       "file": "providers/hatzai.json",
-      "sha256": "97e6dfa5de9cd3f26c40b2408697361b8b90f34cbe75b84237994fcb4c3b4e1c"
+      "sha256": "cd9c8b094ee358f3165e83975b1818dfe2da9f6292c3741604e4c36e32aac2a1"
     },
     {
       "file": "providers/hcompany.json",
@@ -2259,7 +2263,7 @@
     },
     {
       "file": "providers/hostyourai.json",
-      "sha256": "01c7ec7a962f4a419e89c60c1e87b588ae6717ba97221aae7828f523bbff90c0"
+      "sha256": "fa1dead97fac8adafb82cda5cf9322b72200b3385bfc8cbc97b4d34b776bbd51"
     },
     {
       "file": "providers/huggingface.json",
@@ -2327,7 +2331,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "ece6c2628f860ac2346bc6574245c49ed68d739bcaab2acd7870dc4651c37cd0"
+      "sha256": "63fb6306f4f8b06ad924cf6269d28530c72d86607fbbf5aa31afbd02a54c67d5"
     },
     {
       "file": "providers/infer.json",
@@ -2435,7 +2439,7 @@
     },
     {
       "file": "providers/juicefactory.json",
-      "sha256": "49362cf6486b6d37e03d8b23b5d7c03ceb723f9b6e0c9eea339eb8dda51da041"
+      "sha256": "83e2acbbc9fb5b27293ad186c251aecd919ea28bf82db63787b580a396566e16"
     },
     {
       "file": "providers/kalpalabs.json",
@@ -2459,7 +2463,7 @@
     },
     {
       "file": "providers/kiosapi.json",
-      "sha256": "541602433a89d71f3da1865654443ed3d7daa206ae65a504c689f4ceb8b4dd4d"
+      "sha256": "a17e883b751e6093bad118152e70fde94dc8427d49cb4e12ffefd7c1aac8ec8e"
     },
     {
       "file": "providers/kirha.json",
@@ -2983,7 +2987,7 @@
     },
     {
       "file": "providers/novai.json",
-      "sha256": "e1edac0ff9dc3bd1670a32ba68ffdd7939505ad81a5131fcde1ff15d18b23b47"
+      "sha256": "40838d23786bcf4824cffb2bf0cca98a6730131c351c497a3ba64c0f53d9d60d"
     },
     {
       "file": "providers/novita.json",
@@ -3111,7 +3115,7 @@
     },
     {
       "file": "providers/orbigpu.json",
-      "sha256": "d38027f658028d953dd37cbc8e06efedf0429eb11ae1c76f70975ee0d8de4fde"
+      "sha256": "0bc4b1d5e4316e6421c5bd0ce09597ab8d4e139baf631184e3a447a6fb678615"
     },
     {
       "file": "providers/orcarouter.json",
@@ -3131,7 +3135,7 @@
     },
     {
       "file": "providers/ourtoken.json",
-      "sha256": "74aa3a15413d54d928e32c010ad00b75399bf6d03fc33cbfb9f1485935e099ba"
+      "sha256": "acf2a72779425d66f50228e56d5e1f3db5a61537f6b3774ee95de76acdb2751d"
     },
     {
       "file": "providers/ovhcloud.json",
@@ -3139,7 +3143,7 @@
     },
     {
       "file": "providers/paperinstruments.json",
-      "sha256": "2fdac087699467d5c57823f51dcdda32dbbcba440ce32da9cbb38fc6eeb357fd"
+      "sha256": "1c849cb94ceea090f07643dc6642a462c4a85cb127d946cc758bb334dd482bde"
     },
     {
       "file": "providers/parallel.json",
@@ -3260,6 +3264,10 @@
     {
       "file": "providers/puter.json",
       "sha256": "0523e645897050cc9849d6aa486c338ab734ef078a2c02fd33f812a748a81b90"
+    },
+    {
+      "file": "providers/pyrois.json",
+      "sha256": "eb887c355493493035f3d0f5ddfb37a97eff7bfe69de597bb46489ca9d68e838"
     },
     {
       "file": "providers/qiniu.json",
@@ -3439,7 +3447,7 @@
     },
     {
       "file": "providers/runway.json",
-      "sha256": "347b7ed7f01c101eca73e83ccabc70bb9d49066b9fae3a090eb262b665827cbf"
+      "sha256": "aa677ffe36dd72f0060258f2595d6e2fc10f893e029035e0de96089828a4957b"
     },
     {
       "file": "providers/sailresearch.json",
@@ -3679,7 +3687,7 @@
     },
     {
       "file": "providers/supa.json",
-      "sha256": "d0c6e7cac1b0c115d18b4194ff55a71d9acaa5df4cdd610e00ed38a1644e2b61"
+      "sha256": "706333ee6d4d031d45ab99064f57ec51619f59e80ab9652131cbedf34812534a"
     },
     {
       "file": "providers/surfercloud.json",
@@ -3731,7 +3739,7 @@
     },
     {
       "file": "providers/tencenthunyuan.json",
-      "sha256": "c2fc91be843d4aae31536aba69be687d10b6d44542fedecf617363ca573ffd72"
+      "sha256": "26404659d99daed321c2e5d8caccbd5096f3a553fe9b6b4cb306eab3dae469f8"
     },
     {
       "file": "providers/tensorblock.json",
@@ -3831,7 +3839,7 @@
     },
     {
       "file": "providers/ttsreader.json",
-      "sha256": "b225268063b601084452964fe0a155e33d65becb41bee239cb0ed2884e3817ba"
+      "sha256": "3f34f22521c6404278eed6f4a7083baf1bdbfbcfc532fd71f0ea449180d06bbd"
     },
     {
       "file": "providers/twelvelabs.json",
@@ -3915,7 +3923,7 @@
     },
     {
       "file": "providers/vidu.json",
-      "sha256": "1e627ac31dd6212c5910fca1337ed55ea9d72671c01d9eabcbf7c55a7b6a05ee"
+      "sha256": "f1b887af987d0bdfecbde152f9e02b8198e9ca99cdadc11f9dc6168d363ed1bd"
     },
     {
       "file": "providers/vikasit.json",
@@ -3923,7 +3931,7 @@
     },
     {
       "file": "providers/viktor.json",
-      "sha256": "5b7ce13332292863a478e44068712cd86ba764ad29c6f1487f714899b51c35db"
+      "sha256": "53e447dd4ccf0361610e08ef16b96bd842660582fb7e89d83c36fc27d3e966da"
     },
     {
       "file": "providers/vivgrid.json",
@@ -4003,7 +4011,7 @@
     },
     {
       "file": "providers/xalen.json",
-      "sha256": "644cebbce041ea01f002d36fa8c477ab22134f9b39d74a2a5668ad2e594d853d"
+      "sha256": "2ce80457288fd4b88362888ef2f51792f171e90fc472f16e01a76d65fcc0152b"
     },
     {
       "file": "providers/xiaomimimo.json",
