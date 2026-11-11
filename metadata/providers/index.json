@@ -10,7 +10,7 @@
   {
     "id": "joulecloud",
     "file": "joulecloud.json"
-     },
+  },
   {
     "id": "raven",
     "file": "raven.json"
@@ -23,9 +23,9 @@
     "id": "paperinstruments",
     "file": "paperinstruments.json"
   },
-   {
+  {
     "id": "coralbricks",
-    "file": "coralbricks.json"  
+    "file": "coralbricks.json"
   },
   {
     "id": "particle",
@@ -2814,6 +2814,10 @@
   {
     "id": "kiosapi",
     "file": "kiosapi.json"
+  },
+  {
+    "id": "evroc",
+    "file": "evroc.json"
   },
   {
     "id": "gigachat",
