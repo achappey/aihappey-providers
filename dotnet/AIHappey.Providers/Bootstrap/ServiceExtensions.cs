@@ -1,4 +1,5 @@
 using AIHappey.Core.Providers.AIML;
+using AIHappey.Core.Providers.Pyrois;
 using AIHappey.Core.Providers.Buildprint;
 using AIHappey.Core.Providers.Spawnlabs;
 using AIHappey.Core.Providers.Nolgia;
@@ -1114,6 +1115,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AKIProvider>();
         services.AddScoped<IModelProvider, GetGoAPIProvider>();
         services.AddScoped<IModelProvider, BlockRunProvider>();
+        services.AddScoped<IModelProvider, PyroisProvider>();
         services.AddScoped<IModelProvider, NeuralwattProvider>();
         services.AddScoped<IModelProvider, ToAPIsProvider>();
         services.AddScoped<IModelProvider, OneKeyProvider>();
