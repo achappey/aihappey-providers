@@ -76,7 +76,6 @@ public static class ModelProviderSpeechExtensions
         {
             Content = CreateSpeechContent(options, streamFormat: "sse")
         };
-
         request.Headers.Accept.Add(
             new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
@@ -180,4 +179,5 @@ public static class ModelProviderSpeechExtensions
             _ => "application/octet-stream"
         };
     }
+
 }
