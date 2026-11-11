@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.Models;
 using AIHappey.Vercel.Models;
+using AIHappey.Core.AI;
 
 namespace AIHappey.Core.Providers.Blade;
 
@@ -183,7 +184,6 @@ public partial class BladeProvider
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Model);
-        ArgumentException.ThrowIfNullOrWhiteSpace(request.Audio);
 
         var (audioBytes, mimeType) = DecodeAudio(request.Audio, request.MediaType);
         if (audioBytes.Length > 25 * 1024 * 1024)
@@ -205,7 +205,7 @@ public partial class BladeProvider
             {
                 JsonElement { ValueKind: JsonValueKind.String } element => element.GetString() ?? string.Empty,
                 JsonElement element => element.GetRawText(),
-                string text => text,
+                string textItem => textItem,
                 _ => JsonSerializer.Serialize(value, BladeJsonOptions)
             };
             multipart.Add(new StringContent(rawValue), name);
@@ -285,7 +285,7 @@ public partial class BladeProvider
         {
             Operation = EncodeVideoOperation(jobId, request.Model),
             ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(root),
-            Response = new ResponseData
+            Response = new ()
             {
                 Timestamp = DateTime.UtcNow,
                 ModelId = request.Model.ToModelId(GetIdentifier())
@@ -405,27 +405,30 @@ public partial class BladeProvider
             payload[property.Name] = property.Value.Clone();
     }
 
-    private static (byte[] Bytes, string MimeType) DecodeAudio(string audio, string? mediaType)
-    {
-        var value = audio.Trim();
-        var resolvedMimeType = mediaType;
-        var marker = value.IndexOf(";base64,", StringComparison.OrdinalIgnoreCase);
-        if (value.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && marker >= 0)
-        {
-            resolvedMimeType = value[5..marker];
-            value = value[(marker + ";base64,".Length)..];
-        }
+   private static (byte[] Bytes, string MimeType) DecodeAudio(object audio, string? mediaType)
+{
+    if (audio is not string value)
+        throw new ArgumentException("Blade transcription audio must be a base64-encoded string.", nameof(audio));
 
-        try
-        {
-            return (Convert.FromBase64String(value), ResolveTranscriptionMimeType(resolvedMimeType));
-        }
-        catch (FormatException exception)
-        {
-            throw new ArgumentException("Blade transcription audio must be base64-encoded.", nameof(audio), exception);
-        }
+    value = value.Trim();
+    var resolvedMimeType = mediaType;
+    var marker = value.IndexOf(";base64,", StringComparison.OrdinalIgnoreCase);
+
+    if (value.StartsWith("data:", StringComparison.OrdinalIgnoreCase) && marker >= 0)
+    {
+        resolvedMimeType = value[5..marker];
+        value = value[(marker + ";base64,".Length)..];
     }
 
+    try
+    {
+        return (Convert.FromBase64String(value), ResolveTranscriptionMimeType(resolvedMimeType));
+    }
+    catch (FormatException exception)
+    {
+        throw new ArgumentException("Blade transcription audio must be base64-encoded.", nameof(audio), exception);
+    }
+}
     private static string ExtensionForMimeType(string mimeType)
         => mimeType.ToLowerInvariant() switch
         {
