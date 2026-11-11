@@ -125,6 +125,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using AIHappey.Core.Providers.EUrouter;
 using AIHappey.Core.Providers.Requesty;
 using AIHappey.Core.Providers.Portkey;
+using AIHappey.Core.Providers.Porten;
 using AIHappey.Core.Providers.DeepL;
 using AIHappey.Core.Providers.CometAPI;
 using AIHappey.Core.Providers.Nextbit;
@@ -1360,6 +1361,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, AddisAIProvider>();
         services.AddScoped<IModelProvider, AkumiProvider>();
         services.AddScoped<IModelProvider, ImpossiblProvider>();
+        services.AddScoped<IModelProvider, PortenProvider>();
         services.AddScoped<IModelProvider, SluisProvider>();
         services.AddScoped<IModelProvider, NeuralRingProvider>();        
         services.AddScoped<IModelProvider, CognitivessAIProvider>();
