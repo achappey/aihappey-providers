@@ -59,16 +59,20 @@ public sealed class NicheProviderMaintenanceTests
     }
 
     [Fact]
-    public async Task Fishaudio_asr_alias_uses_the_current_transcription_model_header()
+    public async Task Fishaudio_asr_alias_uses_current_model_and_request_scoped_authentication()
     {
-        using var client = CreateClient(request =>
+        HttpClient client = null!;
+        using var httpClient = CreateClient(request =>
         {
             Assert.Equal("/v1/asr", request.RequestUri!.AbsolutePath);
             Assert.Equal("transcribe-1-pro", request.Headers.GetValues("model").Single());
+            Assert.Equal("Bearer test-api-key", request.Headers.Authorization?.ToString());
+            Assert.Null(client.DefaultRequestHeaders.Authorization);
             Assert.IsType<MultipartFormDataContent>(request.Content);
             return Task.FromResult(JsonResponse("""{"text":"recognized words"}"""));
         });
-        var provider = new FishAudioProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        client = httpClient;
+        var provider = new FishAudioProvider(new TestKeyResolver(), new TestHttpClientFactory(httpClient));
 
         var response = await provider.TranscriptionRequest(new TranscriptionRequest
         {

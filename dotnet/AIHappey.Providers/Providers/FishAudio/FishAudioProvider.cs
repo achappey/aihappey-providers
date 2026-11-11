@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using AIHappey.ChatCompletions.Models;
 using AIHappey.Common.Model;
 using AIHappey.Vercel.Models;
@@ -28,16 +27,6 @@ public partial class FishAudioProvider : IModelProvider
         _keyResolver = keyResolver;
         _client = httpClientFactory.CreateClient();
         _client.BaseAddress = new Uri("https://api.fish.audio/");
-    }
-
-    private void ApplyAuthHeader()
-    {
-        var key = _keyResolver.Resolve(GetIdentifier());
-
-        if (string.IsNullOrWhiteSpace(key))
-            throw new InvalidOperationException($"No {nameof(FishAudio)} API key.");
-
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", key);
     }
 
     public Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
