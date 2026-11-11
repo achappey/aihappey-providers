@@ -2,6 +2,38 @@
   "object": "list",
   "data": [
     {
+      "id": "blackforestlabs/flux-3-image",
+      "object": "model",
+      "owned_by": "Black Forest Labs",
+      "name": "FLUX 3 Image",
+      "type": "image",
+      "description": "FLUX 3 text-to-image generation and instruction-based image editing, with up to ten references and prompt-based bounding-box layouts."
+    },
+    {
+      "id": "blackforestlabs/flux-3-image-klein",
+      "object": "model",
+      "owned_by": "Black Forest Labs",
+      "name": "FLUX 3 Image Klein",
+      "type": "image",
+      "description": "Fast FLUX 3 image generation and editing with up to ten references, automatic prompt upsampling, and seed, step, and output-format controls."
+    },
+    {
+      "id": "blackforestlabs/flux-tools/video-edit-v1",
+      "object": "model",
+      "owned_by": "Black Forest Labs",
+      "name": "FLUX Video Edit [fast]",
+      "type": "video",
+      "description": "Edit an existing video using a written instruction. Accepts URL or base64 source clips up to 15 seconds; timing, framing, and audio follow the source unless edited."
+    },
+    {
+      "id": "blackforestlabs/flux-tools/video-upscale-v1",
+      "object": "model",
+      "owned_by": "Black Forest Labs",
+      "name": "FLUX Video Upscale",
+      "type": "video",
+      "description": "Upscale video in precise or creative mode by 1.5 to 3 times while retaining source audio. Accepts URL or base64 source clips up to 20 seconds and 2K resolution."
+    },
+    {
       "id": "blackforestlabs/flux-3-video",
       "object": "model",
       "owned_by": "Black Forest Labs",

@@ -28,13 +28,11 @@ public partial class BlackForestLabsProvider
 
     public async Task<ImageResponse> ImageRequest(ImageRequest request, CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
 
-        var model = request.Model.Trim().ToLowerInvariant();
+        var model = NormalizeBflVideoModel(request.Model);
         if (!IsSupportedImageModel(model))
             throw new NotSupportedException($"BlackForestLabs image model '{request.Model}' is not supported.");
 
@@ -51,13 +49,24 @@ public partial class BlackForestLabsProvider
         if (IsFlux2Model(model) && string.IsNullOrWhiteSpace(request.Prompt))
             throw new ArgumentException("Prompt is required.", nameof(request));
 
-        var payload = IsFluxToolModel(model)
-            ? BuildFluxToolPayload(request, model)
-            : BuildPayload(request, model, warnings);
+        var payload = IsFlux3ImageModel(model)
+            ? BuildFlux3ImagePayload(request, model, warnings)
+            : IsFluxToolModel(model)
+                ? BuildFluxToolPayload(request, model)
+                : BuildPayload(request, model, warnings);
         MergeProviderOptions(payload, request);
+        if (IsFlux3ImageModel(model))
+        {
+            if (string.IsNullOrWhiteSpace(TryGetPayloadString(payload, "prompt")))
+                throw new ArgumentException("Prompt is required.", nameof(request));
+            if (payload.TryGetValue("images", out var references)
+                && references is JsonElement { ValueKind: JsonValueKind.Array } array
+                && array.GetArrayLength() > 10)
+                throw new ArgumentException("FLUX 3 Image supports at most 10 reference images.", nameof(request));
+        }
 
         var endpoint = ResolveEndpoint(model);
-        var outputFormat = TryGetOutputFormat(payload) ?? "jpeg";
+        var outputFormat = TryGetPayloadString(payload, "output_format") ?? (IsFlux3ImageModel(model) ? "png" : "jpeg");
         var mime = MapOutputFormatToMimeType(outputFormat);
         var images = new List<string>();
         var results = new List<BflGenerationResult>(imageCount);
@@ -87,9 +96,43 @@ public partial class BlackForestLabsProvider
             Response = new()
             {
                 Timestamp = now,
-                ModelId = request.Model.ToModelId(GetIdentifier())
+                ModelId = model.ToModelId(GetIdentifier())
             }
         };
+    }
+
+    private static Dictionary<string, object?> BuildFlux3ImagePayload(ImageRequest request, string model, List<object> warnings)
+    {
+        var payload = new Dictionary<string, object?> { ["prompt"] = request.Prompt };
+        if (!string.IsNullOrWhiteSpace(request.AspectRatio))
+            payload["aspect_ratio"] = request.AspectRatio;
+
+        // Preserve native defaults (including matching the reference for Klein).
+        // An aspect ratio alone must not turn into inferred pixel dimensions.
+        if (!string.IsNullOrWhiteSpace(request.Size) && !request.Size.Equals("auto", StringComparison.OrdinalIgnoreCase))
+        {
+            var size = request.Size.Replace(":", "x", StringComparison.OrdinalIgnoreCase);
+            var dimensions = new ImageRequest { Size = size };
+            var width = dimensions.GetImageWidth();
+            var height = dimensions.GetImageHeight();
+            if (width is null || height is null)
+                throw new ArgumentException("Size must contain a width and height, or be auto.", nameof(request));
+            payload["width"] = width;
+            payload["height"] = height;
+        }
+
+        if (request.Seed is not null)
+        {
+            if (model == "flux-3-image-klein") payload["seed"] = request.Seed;
+            else warnings.Add(new { type = "unsupported", feature = "seed" });
+        }
+
+        var files = request.Files?.ToList() ?? [];
+        if (files.Count > 10)
+            throw new ArgumentException("FLUX 3 Image supports at most 10 reference images.", nameof(request));
+        if (files.Count > 0)
+            payload["images"] = files.Select(NormalizeImageData).ToArray();
+        return payload;
     }
 
     private static Dictionary<string, object?> BuildPayload(ImageRequest request, string model, List<object> warnings)
@@ -200,10 +243,7 @@ public partial class BlackForestLabsProvider
 
         foreach (var prop in options.EnumerateObject())
         {
-            if (prop.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
-                continue;
-
-            payload[prop.Name] = prop.Value;
+            payload[prop.Name] = prop.Value.Clone();
         }
     }
 
@@ -217,6 +257,7 @@ public partial class BlackForestLabsProvider
         {
             Content = new StringContent(submitJson, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(submitReq);
 
         using var submitResp = await _client.SendAsync(submitReq, cancellationToken);
         var submitRaw = await submitResp.Content.ReadAsStringAsync(cancellationToken);
@@ -272,21 +313,38 @@ public partial class BlackForestLabsProvider
 
     private async Task<BflPollResult> PollResultAsync(string taskId, Uri pollingUri, CancellationToken cancellationToken)
     {
-        using var pollResp = await _client.GetAsync(pollingUri, cancellationToken);
+        using var pollRequest = new HttpRequestMessage(HttpMethod.Get, pollingUri);
+        ApplyAuthHeader(pollRequest);
+        using var pollResp = await _client.SendAsync(pollRequest, cancellationToken);
         var pollRaw = await pollResp.Content.ReadAsStringAsync(cancellationToken);
+        // BFL can return a terminal task failure as HTTP 503 with a normal
+        // polling body. Read its status before treating it as an HTTP failure.
+        JsonElement root = default;
+        try
+        {
+            using var pollDoc = JsonDocument.Parse(pollRaw);
+            root = pollDoc.RootElement.Clone();
+        }
+        catch (JsonException) when (!pollResp.IsSuccessStatusCode)
+        {
+            // Preserve the original HTTP error body for non-JSON failures.
+        }
+
+        var status = root.ValueKind == JsonValueKind.Object ? root.TryGetString("status") : null;
+        if (IsBflVideoErrorStatus(status))
+            return new BflPollResult(status!, root);
+
         if (!pollResp.IsSuccessStatusCode)
             throw new InvalidOperationException(
                 $"BlackForestLabs polling failed ({(int)pollResp.StatusCode}, id={taskId}, pollingUrl={pollingUri}): {pollRaw}");
 
-        using var pollDoc = JsonDocument.Parse(pollRaw);
-        var root = pollDoc.RootElement.Clone();
-        var status = root.TryGetString("status") ?? "unknown";
-
+        if (string.IsNullOrWhiteSpace(status))
+            throw new InvalidOperationException($"BlackForestLabs polling response missing status: {pollRaw}");
         return new BflPollResult(status, root);
     }
 
     private static bool IsTerminalStatus(string? status)
-        => status is not null && (status is "Ready" or "Error" or "Request Moderated" or "Content Moderated" or "Task not found");
+        => string.Equals(status, "Ready", StringComparison.OrdinalIgnoreCase) || IsBflVideoErrorStatus(status);
 
     private async Task<List<string>> ExtractImagesAsync(JsonElement root, string defaultMime, CancellationToken cancellationToken)
     {
@@ -294,7 +352,14 @@ public partial class BlackForestLabsProvider
         var dataUrls = new List<string>();
         var urls = new List<string>();
 
-        Visit(result, null);
+        // Expanded prompts may contain input URLs. Only inspect media fields,
+        // never arbitrary strings in the provider response.
+        if (result.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var field in new[] { "sample", "samples", "images", "image", "url", "b64_json", "base64" })
+                if (result.TryGetProperty(field, out var media)) Visit(media, field);
+        }
+        else Visit(result, "sample");
 
         foreach (var url in urls)
         {
@@ -304,7 +369,7 @@ public partial class BlackForestLabsProvider
                 continue;
             }
 
-            dataUrls.Add(await DownloadAsDataUrlAsync(url, cancellationToken));
+            dataUrls.Add(await DownloadAsDataUrlAsync(url, defaultMime, cancellationToken));
         }
 
         return dataUrls;
@@ -349,14 +414,16 @@ public partial class BlackForestLabsProvider
         }
     }
 
-    private async Task<string> DownloadAsDataUrlAsync(string url, CancellationToken cancellationToken)
+    private async Task<string> DownloadAsDataUrlAsync(string url, string defaultMime, CancellationToken cancellationToken)
     {
         using var resp = await _client.GetAsync(url, cancellationToken);
         var bytes = await resp.Content.ReadAsByteArrayAsync(cancellationToken);
         if (!resp.IsSuccessStatusCode)
             throw new InvalidOperationException($"BlackForestLabs image download failed ({(int)resp.StatusCode}): {Encoding.UTF8.GetString(bytes)}");
 
-        var mime = resp.Content.Headers.ContentType?.MediaType ?? GuessImageMediaType(url) ?? MediaTypeNames.Image.Jpeg;
+        var mime = resp.Content.Headers.ContentType?.MediaType;
+        if (mime?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) != true)
+            mime = GuessImageMediaType(url) ?? defaultMime;
         return Convert.ToBase64String(bytes).ToDataUrl(mime);
     }
 
@@ -385,6 +452,8 @@ public partial class BlackForestLabsProvider
     private static string ResolveEndpoint(string model)
         => model switch
         {
+            "flux-3-image" => "v1/flux-3-image",
+            "flux-3-image-klein" => "v1/flux-3-image-klein",
             "flux-2-max" => "v1/flux-2-max",
             "flux-2-klein-9b" => "v1/flux-2-klein-9b",
             "flux-2-klein-9b-preview" => "v1/flux-2-klein-9b-preview",
@@ -399,7 +468,10 @@ public partial class BlackForestLabsProvider
         };
 
     private static bool IsSupportedImageModel(string model)
-        => IsFlux2Model(model) || IsFluxToolModel(model);
+        => IsFlux3ImageModel(model) || IsFlux2Model(model) || IsFluxToolModel(model);
+
+    private static bool IsFlux3ImageModel(string model)
+        => model is "flux-3-image" or "flux-3-image-klein";
 
     private static bool IsFluxToolModel(string model)
         => model is "flux-tools/outpainting-v1" or "flux-tools/erase-v1" or "flux-tools/deblur-v1";
@@ -432,9 +504,9 @@ public partial class BlackForestLabsProvider
             _ => MediaTypeNames.Image.Jpeg
         };
 
-    private static string? TryGetOutputFormat(Dictionary<string, object?> payload)
+    private static string? TryGetPayloadString(Dictionary<string, object?> payload, string name)
     {
-        if (!payload.TryGetValue("output_format", out var value) || value is null)
+        if (!payload.TryGetValue(name, out var value) || value is null)
             return null;
 
         return value switch
@@ -447,10 +519,14 @@ public partial class BlackForestLabsProvider
 
     private static string NormalizeImageData(ImageFile file)
     {
-        if (string.IsNullOrWhiteSpace(file.Data))
-            throw new ArgumentException("Image input must include inline data.", nameof(file));
+        ArgumentNullException.ThrowIfNull(file);
+        if (string.Equals(file.Type, "file_id", StringComparison.OrdinalIgnoreCase))
+            throw new NotSupportedException("BlackForestLabs requires image data or an HTTP(S) URL, not a file id.");
+        var data = file is ImageFileUrl url ? url.Url : file.Data;
+        if (string.IsNullOrWhiteSpace(data))
+            throw new ArgumentException("Image input must include inline data or an HTTP(S) URL.", nameof(file));
 
-        return file.Data.RemoveDataUrlPrefix();
+        return data.RemoveDataUrlPrefix();
     }
 
     private static string? AspectRatioFromSize(string? size)

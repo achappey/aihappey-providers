@@ -29,16 +29,16 @@ public partial class BlackForestLabsProvider : IModelProvider
         _client.BaseAddress = new Uri("https://api.bfl.ai/");
     }
 
-    private void ApplyAuthHeader()
+    private void ApplyAuthHeader(HttpRequestMessage request)
     {
         var key = _keyResolver.Resolve(GetIdentifier());
 
         if (string.IsNullOrWhiteSpace(key))
             throw new InvalidOperationException($"No {nameof(BlackForestLabs)} API key.");
 
-        _client.DefaultRequestHeaders.Authorization = null;
-        _client.DefaultRequestHeaders.Remove("x-key");
-        _client.DefaultRequestHeaders.Add("x-key", key);
+        // Delivery URLs are signed and must never receive the BFL API key.
+        // Keep authentication on API requests, not on the shared download client.
+        request.Headers.Add("x-key", key);
     }
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)

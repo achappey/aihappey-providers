@@ -13,6 +13,8 @@ public partial class BlackForestLabsProvider
 {
     private const string BflVideoModel = "flux-3-video";
     private const string BflDraftEnhanceVideoModel = "flux-3-video-draft-enhance";
+    private const string BflVideoEditModel = "flux-tools/video-edit-v1";
+    private const string BflVideoUpscaleModel = "flux-tools/video-upscale-v1";
     private const string BflVideoOperationTokenPrefix = "bflv1_";
 
     public async Task<VideoOperationStartResult> StartVideoOperation(
@@ -24,23 +26,24 @@ public partial class BlackForestLabsProvider
             throw new ArgumentException("Model is required.", nameof(request));
 
         var model = NormalizeBflVideoModel(request.Model);
-        if (model is not BflVideoModel and not BflDraftEnhanceVideoModel)
+        if (model is not BflVideoModel and not BflDraftEnhanceVideoModel and not BflVideoEditModel and not BflVideoUpscaleModel)
             throw new NotSupportedException($"BlackForestLabs video model '{request.Model}' is not supported.");
 
-        ApplyAuthHeader();
         var warnings = BuildBflVideoWarnings(request, model);
-        var payload = BuildBflVideoPayload(request, model);
+        var payload = IsBflVideoTool(model) ? BuildBflVideoToolPayload(request, model) : BuildBflVideoPayload(request, model);
         var json = JsonSerializer.Serialize(payload, JsonOptions);
 
-        using var submitRequest = new HttpRequestMessage(HttpMethod.Post, "v1/flux-3-video")
+        var endpoint = IsBflVideoTool(model) ? $"v1/{model}" : "v1/flux-3-video";
+        using var submitRequest = new HttpRequestMessage(HttpMethod.Post, endpoint)
         {
             Content = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(submitRequest);
         using var submitResponse = await _client.SendAsync(submitRequest, cancellationToken);
         var submitRaw = await submitResponse.Content.ReadAsStringAsync(cancellationToken);
         if (!submitResponse.IsSuccessStatusCode)
             throw new InvalidOperationException(
-                $"BlackForestLabs FLUX 3 video submit failed ({(int)submitResponse.StatusCode}): {submitRaw}");
+                $"BlackForestLabs video submit failed ({(int)submitResponse.StatusCode}): {submitRaw}");
 
         using var submitDocument = JsonDocument.Parse(submitRaw);
         var submitRoot = submitDocument.RootElement.Clone();
@@ -50,14 +53,14 @@ public partial class BlackForestLabsProvider
 
         return new VideoOperationStartResult
         {
-            Operation = EncodeBflVideoOperation(taskId, request.Model, pollingUri),
+            Operation = EncodeBflVideoOperation(taskId, model, pollingUri),
             Warnings = warnings,
             ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(submitRoot),
             Response = new HeaderResponseData
             {
                 Timestamp = DateTime.UtcNow,
                 Headers = submitResponse.GetHeaders(),
-                ModelId = request.Model.ToModelId(GetIdentifier())
+                ModelId = model.ToModelId(GetIdentifier())
             }
         };
     }
@@ -67,7 +70,6 @@ public partial class BlackForestLabsProvider
         CancellationToken cancellationToken = default)
     {
         var operationData = DecodeBflVideoOperation(operation);
-        ApplyAuthHeader();
 
         var pollResult = await PollResultAsync(
             operationData.TaskId,
@@ -82,7 +84,7 @@ public partial class BlackForestLabsProvider
         var response = new HeaderResponseData
         {
             Timestamp = DateTime.UtcNow,
-            ModelId = operationData.Model.ToModelId(GetIdentifier())
+            ModelId = NormalizeBflVideoModel(operationData.Model).ToModelId(GetIdentifier())
         };
 
         if (string.Equals(pollResult.Status, "Ready", StringComparison.OrdinalIgnoreCase))
@@ -92,7 +94,7 @@ public partial class BlackForestLabsProvider
             {
                 return new VideoOperationErrorResult
                 {
-                    Error = $"BlackForestLabs FLUX 3 video task '{operationData.TaskId}' completed without result.sample.",
+                    Error = $"BlackForestLabs video task '{operationData.TaskId}' completed without result.sample.",
                     ProviderMetadata = metadata,
                     Response = response
                 };
@@ -112,7 +114,7 @@ public partial class BlackForestLabsProvider
         {
             return new VideoOperationErrorResult
             {
-                Error = $"BlackForestLabs FLUX 3 video task '{operationData.TaskId}' failed with status '{pollResult.Status}'.",
+                Error = $"BlackForestLabs video task '{operationData.TaskId}' failed with status '{pollResult.Status}': {pollResult.Root.GetRawText()}",
                 ProviderMetadata = metadata,
                 Response = response
             };
@@ -124,6 +126,34 @@ public partial class BlackForestLabsProvider
             ProviderMetadata = metadata,
             Response = response
         };
+    }
+
+    private static bool IsBflVideoTool(string model)
+        => model is BflVideoEditModel or BflVideoUpscaleModel;
+
+    private static Dictionary<string, object?> BuildBflVideoToolPayload(VideoRequest request, string model)
+    {
+        var payload = new Dictionary<string, object?>();
+        var sourceField = model == BflVideoEditModel ? "video" : "input_video";
+        var source = request.InputReferences?.FirstOrDefault();
+        if (source is not null)
+            payload[sourceField] = NormalizeBflVideoInput(source, "inputReferences[0]");
+        if (!string.IsNullOrWhiteSpace(request.Prompt))
+            payload["prompt"] = request.Prompt;
+
+        // Tools do not have a mode field, nor generation duration/resolution
+        // controls. Explicit provider options still pass through untouched.
+        MergeBflVideoProviderOptions(payload, request, preserveMode: true);
+        if (string.IsNullOrWhiteSpace(TryGetPayloadString(payload, sourceField)))
+            throw new ArgumentException($"{sourceField} is required via inputReferences[0] or providerOptions.blackforestlabs.{sourceField}.", nameof(request));
+        if (model == BflVideoEditModel)
+        {
+            var prompt = TryGetPayloadString(payload, "prompt");
+            if (string.IsNullOrWhiteSpace(prompt) || prompt.Length > 4096)
+                throw new ArgumentException("Video editing requires a prompt of 1 to 4096 characters.", nameof(request));
+        }
+
+        return payload;
     }
 
     private static Dictionary<string, object?> BuildBflVideoPayload(VideoRequest request, string model)
@@ -197,7 +227,7 @@ public partial class BlackForestLabsProvider
         return ordered.Select((frame, index) => NormalizeBflVideoInput(frame, $"keyframes[{index}]")).ToList();
     }
 
-    private static void MergeBflVideoProviderOptions(Dictionary<string, object?> payload, VideoRequest request)
+    private static void MergeBflVideoProviderOptions(Dictionary<string, object?> payload, VideoRequest request, bool preserveMode = false)
     {
         var options = request.GetProviderMetadata<JsonElement>("blackforestlabs");
         if (options.ValueKind != JsonValueKind.Object)
@@ -205,7 +235,7 @@ public partial class BlackForestLabsProvider
 
         foreach (var property in options.EnumerateObject())
         {
-            if (property.NameEquals("mode") || property.Value.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            if (!preserveMode && property.NameEquals("mode"))
                 continue;
 
             payload[property.Name] = property.Value.Clone();
@@ -219,7 +249,18 @@ public partial class BlackForestLabsProvider
         if (request.N is > 1) warnings.Add(new { type = "unsupported", feature = "n" });
         if (request.Seed is not null) warnings.Add(new { type = "unsupported", feature = "seed" });
 
-        if (model == BflDraftEnhanceVideoModel)
+        if (IsBflVideoTool(model))
+        {
+            if (!string.IsNullOrWhiteSpace(request.AspectRatio)) warnings.Add(new { type = "unsupported", feature = "aspect_ratio" });
+            if (!string.IsNullOrWhiteSpace(request.Resolution)) warnings.Add(new { type = "unsupported", feature = "resolution" });
+            if (request.Duration is not null) warnings.Add(new { type = "unsupported", feature = "duration" });
+            if (request.GenerateAudio is not null) warnings.Add(new { type = "unsupported", feature = "generate_audio" });
+            if (request.Image is not null || request.FrameImages?.Any() == true)
+                warnings.Add(new { type = "unsupported", feature = "image inputs" });
+            if (request.InputReferences?.Skip(1).Any() == true)
+                warnings.Add(new { type = "unsupported", feature = "inputReferences", details = "Only the first video reference is used." });
+        }
+        else if (model == BflDraftEnhanceVideoModel)
         {
             if (!string.IsNullOrWhiteSpace(request.Prompt)) warnings.Add(new { type = "unsupported", feature = "prompt" });
             if (!string.IsNullOrWhiteSpace(request.AspectRatio)) warnings.Add(new { type = "unsupported", feature = "aspect_ratio" });
@@ -238,10 +279,11 @@ public partial class BlackForestLabsProvider
 
     private static string NormalizeBflVideoInput(VideoFile input, string name)
     {
-        if (input is null || string.IsNullOrWhiteSpace(input.Data))
-            throw new ArgumentException($"{name}.data is required.", name);
+        var data = input is VideoFileUrl url ? url.Url : input?.Data;
+        if (string.IsNullOrWhiteSpace(data))
+            throw new ArgumentException($"{name} must include inline data or an HTTP(S) URL.", name);
 
-        var value = input.Data.Trim();
+        var value = data.Trim();
         return value.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
             ? value.RemoveDataUrlPrefix()
             : value;
@@ -270,10 +312,13 @@ public partial class BlackForestLabsProvider
                 throw new InvalidOperationException(
                     $"BlackForestLabs FLUX 3 video download failed ({(int)downloadResponse.StatusCode}): {Encoding.UTF8.GetString(bytes)}");
 
+            var mediaType = downloadResponse.Content.Headers.ContentType?.MediaType;
+            if (mediaType?.StartsWith("video/", StringComparison.OrdinalIgnoreCase) != true)
+                mediaType = GuessBflVideoMediaType(sample);
             return new VideoOperationVideoData
             {
                 Type = "base64",
-                MediaType = downloadResponse.Content.Headers.ContentType?.MediaType ?? GuessBflVideoMediaType(sample),
+                MediaType = mediaType,
                 Data = Convert.ToBase64String(bytes)
             };
         }
@@ -316,6 +361,7 @@ public partial class BlackForestLabsProvider
         => value switch
         {
             string text => !string.IsNullOrWhiteSpace(text),
+            JsonElement { ValueKind: JsonValueKind.Null or JsonValueKind.Undefined } => false,
             JsonElement element when element.ValueKind == JsonValueKind.String => !string.IsNullOrWhiteSpace(element.GetString()),
             _ => value is not null
         };
