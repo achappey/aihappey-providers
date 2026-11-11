@@ -1379,7 +1379,7 @@
     },
     {
       "file": "providers/allternit.json",
-      "sha256": "68bf1a41f19544a86f0d675d490acef36ff45e253edace6b3d49ca633c5ad37e"
+      "sha256": "b0e3a8f9bc64edf7bdddb184f0717b2796c17971681ec37c3c3952c6860095af"
     },
     {
       "file": "providers/alltoken.json",
@@ -1939,7 +1939,7 @@
     },
     {
       "file": "providers/echo.json",
-      "sha256": "f8996b150a63e83f46ed6be6d5cbfb6fff0a6097b36e8eb91f7296a401922230"
+      "sha256": "e7b23ed41c72ac2b080b605a9fd02854ba3e5ca4ed3ed8e6ec2a3d1aca292a6a"
     },
     {
       "file": "providers/ecoia.json",
@@ -2187,7 +2187,7 @@
     },
     {
       "file": "providers/guidai.json",
-      "sha256": "22711942d4b6a441dbe97534edff64d50b8a855fae8f3c6e3ad57e3cc5cae1cd"
+      "sha256": "07bbb7024a8d91ea3d783bacbb620096b17f892660d0f2296dcc757b0ec59dd8"
     },
     {
       "file": "providers/gwdg.json",
@@ -4031,7 +4031,7 @@
     },
     {
       "file": "providers/youcom.json",
-      "sha256": "fa59a2382841da222a4cedbb65d8894ca7954c69651673670ff30adb478fda4a"
+      "sha256": "4d8b167463dba15c41249bfb3f7c72e3e1a3baaf5e4c95f5724ec737a457262b"
     },
     {
       "file": "providers/yourvoic.json",
