@@ -29,6 +29,7 @@ using AIHappey.Core.Providers.GigaChat;
 using AIHappey.Core.Providers.Google;
 using AIHappey.Core.Providers.Groq;
 using AIHappey.Core.Providers.Hyperbolic;
+using AIHappey.Core.Providers.Infer;
 using AIHappey.Core.Providers.Inferencenet;
 using AIHappey.Core.Providers.InferenceClub;
 using AIHappey.Core.Providers.Inworld;
@@ -749,6 +750,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, InworldProvider>();
         services.AddScoped<IModelProvider, NvidiaProvider>();
         services.AddScoped<IModelProvider, CanopyWaveProvider>();
+        services.AddScoped<IModelProvider, InferProvider>();
         services.AddScoped<IModelProvider, InferencenetProvider>();
         services.AddScoped<IModelProvider, InferenceClubProvider>();
         services.AddScoped<IModelProvider, InfermaticProvider>();
