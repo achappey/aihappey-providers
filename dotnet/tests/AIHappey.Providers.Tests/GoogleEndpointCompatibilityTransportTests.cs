@@ -165,6 +165,100 @@ public class GoogleEndpointCompatibilityTransportTests
         Assert.Equal("lookup", sent.GetProperty("tools")[0].GetProperty("name").GetString());
     }
 
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    public async Task ResponsesReferenceAgentBuiltinsRemainNativeAndProviderOwned(bool streaming, bool nativeEvent)
+    {
+        var sent = new List<JsonElement>();
+        using var http = new HttpClient(new CaptureHandler(async request =>
+        {
+            sent.Add(JsonSerializer.Deserialize<JsonElement>(await request.Content!.ReadAsStringAsync()));
+            return HostedCodeReply(streaming, nativeEvent);
+        }));
+        var source = JsonSerializer.Deserialize<ResponseRequest>("""
+            {"model":"gemini-4-carbon","instructions":"You are GoogleAgent.","input":"Run some Python code",
+             "tools":[{"type":"google_maps"},{"type":"url_context"},
+               {"type":"google_search","search_types":["web_search"]},{"type":"code_execution"}],
+             "generation_config":{"thinking_level":"medium","thinking_summaries":"auto"},
+             "response_modalities":["text"]}
+            """, ResponseJson.Default)!;
+        var before = JsonSerializer.Serialize(source, ResponseJson.Default);
+        var provider = Provider(http);
+        var output = streaming
+            ? await Collect(provider.ResponsesStreamingAsync(source))
+            : [JsonSerializer.SerializeToElement(await provider.ResponsesAsync(source), ResponseJson.Default)];
+
+        var wire = Assert.Single(sent);
+        var expectedTools = JsonSerializer.Deserialize<JsonElement>(before).GetProperty("tools");
+        Assert.True(JsonElement.DeepEquals(expectedTools, wire.GetProperty("tools")));
+        Assert.DoesNotContain(wire.GetProperty("tools").EnumerateArray(), tool => tool.GetProperty("type").GetString() == "function");
+        Assert.Equal("medium", wire.GetProperty("generation_config").GetProperty("thinking_level").GetString());
+        Assert.Equal(before, JsonSerializer.Serialize(source, ResponseJson.Default));
+
+        var items = streaming
+            ? output.Where(part => part.GetProperty("type").GetString() == "response.output_item.done")
+                .Select(part => part.GetProperty("item")).ToList()
+            : output[0].GetProperty("output").EnumerateArray().ToList();
+        var hostedItems = items.Where(item => item.GetProperty("type").GetString() == "mcp_call").ToList();
+        Assert.NotEmpty(hostedItems);
+        Assert.All(hostedItems, item =>
+        {
+            Assert.Equal("code_execution", item.GetProperty("name").GetString());
+            Assert.Equal("aihappey", item.GetProperty("server_label").GetString());
+        });
+        var hosted = Assert.Single(hostedItems, item => item.TryGetProperty("output", out var result) && result.ValueKind == JsonValueKind.String);
+        Assert.Equal("code_execution", hosted.GetProperty("name").GetString());
+        Assert.Equal("aihappey", hosted.GetProperty("server_label").GetString());
+        Assert.Contains("hosted-result-42", hosted.GetProperty("output").GetString());
+        // Non-streaming Interactions represents native calls and results as
+        // separate output steps; streaming assembles them into one tool item.
+        var input = Assert.Single(hostedItems, item => JsonSerializer.Deserialize<JsonElement>(
+            item.GetProperty("arguments").GetString()!).TryGetProperty("code", out _));
+        Assert.Equal("print('hosted-result-42')", JsonSerializer.Deserialize<JsonElement>(
+            input.GetProperty("arguments").GetString()!).GetProperty("code").GetString());
+        Assert.DoesNotContain(items, item => item.GetProperty("type").GetString() is "function_call" or "function_call_output");
+        if (streaming)
+            Assert.Contains(output, part => part.GetProperty("type").GetString() == "response.completed");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ResponsesClientFunctionBesideBuiltinsRemainsCallerOwned(bool streaming)
+    {
+        JsonElement sent = default;
+        using var http = new HttpClient(new CaptureHandler(async request =>
+        {
+            sent = JsonSerializer.Deserialize<JsonElement>(await request.Content!.ReadAsStringAsync());
+            return Reply(streaming, toolCall: true);
+        }));
+        var source = JsonSerializer.Deserialize<ResponseRequest>("""
+            {"model":"gemini-4-carbon","input":"Look up id 1","tools":[
+              {"type":"code_execution"},
+              {"type":"function","name":"lookup","description":"Caller function","parameters":{"type":"object"}}]}
+            """, ResponseJson.Default)!;
+        var provider = Provider(http);
+        var output = streaming
+            ? await Collect(provider.ResponsesStreamingAsync(source))
+            : [JsonSerializer.SerializeToElement(await provider.ResponsesAsync(source), ResponseJson.Default)];
+
+        Assert.Equal("code_execution", sent.GetProperty("tools")[0].GetProperty("type").GetString());
+        var declaration = sent.GetProperty("tools")[1];
+        Assert.Equal("function", declaration.GetProperty("type").GetString());
+        Assert.Equal("lookup", declaration.GetProperty("name").GetString());
+        Assert.Equal("object", declaration.GetProperty("parameters").GetProperty("type").GetString());
+        var completed = streaming
+            ? Assert.Single(output, part => part.GetProperty("type").GetString() == "response.completed").GetProperty("response")
+            : output[0];
+        var call = Assert.Single(completed.GetProperty("output").EnumerateArray(), item => item.GetProperty("type").GetString() == "function_call");
+        Assert.Equal("lookup", call.GetProperty("name").GetString());
+        Assert.False(call.GetProperty("provider_executed").GetBoolean());
+        Assert.Equal(1, JsonSerializer.Deserialize<JsonElement>(call.GetProperty("arguments").GetString()!).GetProperty("id").GetInt32());
+    }
+
     [Fact]
     public async Task ApiChatStillPreservesProviderMetadataBuiltinsAndInstructions()
     {
@@ -312,6 +406,38 @@ public class GoogleEndpointCompatibilityTransportTests
         var output = new List<JsonElement>();
         await foreach (var item in stream) output.Add(JsonSerializer.SerializeToElement(item, Json));
         return output;
+    }
+
+    private static HttpResponseMessage HostedCodeReply(bool streaming, bool nativeEvent)
+    {
+        // Function-shaped hosted events must not acquire client ownership just
+        // because a native tool declaration passed through the Responses bridge.
+        var call = nativeEvent
+            ? """{"type":"code_execution_call","id":"hosted-code","arguments":{"code":"print('hosted-result-42')","language":"python"}}"""
+            : """{"type":"function_call","id":"hosted-code","name":"code_execution","arguments":{"code":"print('hosted-result-42')","language":"python"}}""";
+        var result = nativeEvent
+            ? """{"type":"code_execution_result","call_id":"hosted-code","result":"hosted-result-42\n"}"""
+            : """{"type":"function_result","call_id":"hosted-code","name":"code_execution","result":{"stdout":"hosted-result-42\n"}}""";
+        var steps = new[] { call, result }.Select(step => JsonSerializer.Deserialize<InteractionStep>(step, InteractionJson.Default)!).ToList();
+        var interaction = new Interaction { Id = "hosted-interaction", Model = "gemini-4-carbon", Status = "completed", Steps = steps };
+        if (!streaming)
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(JsonSerializer.Serialize(interaction, InteractionJson.Default), Encoding.UTF8, "application/json")
+            };
+
+        var events = new List<InteractionStreamEventPart>
+        {
+            new InteractionCreatedEvent { Interaction = new Interaction { Id = interaction.Id, Model = interaction.Model, Status = "in_progress" } }
+        };
+        for (var index = 0; index < steps.Count; index++)
+        {
+            events.Add(new InteractionStepStartEvent { Index = index, Step = steps[index] });
+            events.Add(new InteractionStepStopEvent { Index = index });
+        }
+        events.Add(new InteractionCompletedEvent { Interaction = interaction });
+        var sse = string.Concat(events.Select(item => $"event: {item.EventType}\ndata: {JsonSerializer.Serialize(item, InteractionJson.Default)}\n\n"));
+        return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(sse, Encoding.UTF8, "text/event-stream") };
     }
 
     private static HttpResponseMessage Reply(bool streaming, bool toolCall, int callCount = 1)
