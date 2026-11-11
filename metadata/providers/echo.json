@@ -13,6 +13,7 @@
   ],
   "category": "app_tools",
   "urls": {
-    "homepage": "https://www.rfc-editor.org/info/rfc862/"
+    "homepage": "https://www.rfc-editor.org/info/rfc862/",
+    "docs": "https://datatracker.ietf.org/doc/rfc862/"
   }
 }
