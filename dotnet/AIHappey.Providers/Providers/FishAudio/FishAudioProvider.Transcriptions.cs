@@ -40,8 +40,6 @@ public partial class FishAudioProvider
         TranscriptionRequest request,
         CancellationToken cancellationToken)
     {
-        ApplyAuthHeader();
-
         ArgumentNullException.ThrowIfNull(request);
 
         if (string.IsNullOrWhiteSpace(request.Model))
