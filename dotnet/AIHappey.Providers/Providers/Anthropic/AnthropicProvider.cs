@@ -58,6 +58,7 @@ public partial class AnthropicProvider : IModelProvider
         _keyResolver = keyResolver;
         _debug = debug ?? NullProviderDebugEmitter.Instance;
         _client = httpClientFactory.CreateClient();
+        // Compatibility fallback only: per-request headers override HttpClient defaults.
         _client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
         _client.BaseAddress = new Uri("https://api.anthropic.com/");
     }
