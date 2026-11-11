@@ -435,6 +435,7 @@ using AIHappey.Core.Providers.SelinaAI;
 using AIHappey.Core.Providers.LMRouter;
 using AIHappey.Core.Providers.NONKYCAI;
 using AIHappey.Core.Providers.SimpleLLM;
+using AIHappey.Core.Providers.Situra;
 using AIHappey.Core.Providers.TensorX;
 using AIHappey.Core.Providers.SchatziAI;
 using AIHappey.Core.Providers.Nodebyt;
@@ -1175,6 +1176,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, LMRouterProvider>();
         services.AddScoped<IModelProvider, NONKYCAIProvider>();
         services.AddScoped<IModelProvider, SimpleLLMProvider>();
+        services.AddScoped<IModelProvider, SituraProvider>();
         services.AddScoped<IModelProvider, TensorXProvider>();
         services.AddScoped<IModelProvider, SchatziAIProvider>();
         services.AddScoped<IModelProvider, NodebytProvider>();

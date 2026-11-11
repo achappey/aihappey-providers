@@ -2850,5 +2850,9 @@
   {
     "id": "inferenceclub",
     "file": "inferenceclub.json"
+  },
+  {
+    "id": "situra",
+    "file": "situra.json"
   }
 ]

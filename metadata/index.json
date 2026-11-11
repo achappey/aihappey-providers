@@ -2199,7 +2199,7 @@
     },
     {
       "file": "providers/hanzo.json",
-      "sha256": "f44de6ebd0fd3110515f7dc6d04e89a6233ce7058ed62313949a3b30dda6f7e9"
+      "sha256": "d8b016fa2675b47d60342f798b9249d6bc6802cdcf6c50bce8da9546cb2bec0c"
     },
     {
       "file": "providers/harnessrouter.json",
@@ -2327,7 +2327,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "e5ff5eaf63fa0153dc97c868a43b2107ddbac293cc226111e9b8b26944304037"
+      "sha256": "ece6c2628f860ac2346bc6574245c49ed68d739bcaab2acd7870dc4651c37cd0"
     },
     {
       "file": "providers/infer.json",
@@ -3019,7 +3019,7 @@
     },
     {
       "file": "providers/ohmygpt.json",
-      "sha256": "4cf77d6b89b9e4ab864ff29d017c45cf221c8dd3fba877e2e53458dffd318a4d"
+      "sha256": "4ab589b55a11583826ae8289a82890f3b588a547ead4b20616da277f0ba50e35"
     },
     {
       "file": "providers/ollama.json",
@@ -3560,6 +3560,10 @@
     {
       "file": "providers/sippulseai.json",
       "sha256": "7005b11facd5c692eead75bd4446fcf17208d91212ab8a67c9893c2ea17bb937"
+    },
+    {
+      "file": "providers/situra.json",
+      "sha256": "a7b9ff4b2ad321e1a756c44aa987e03b0cb34a603948b93cc21aad3e4ed548c6"
     },
     {
       "file": "providers/skypooltoken.json",
