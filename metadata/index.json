@@ -111,7 +111,7 @@
     },
     {
       "file": "models/providers/blackforestlabs.json",
-      "sha256": "dfb9df0b5a354c45eaf7cc8b5cba9e275098655c431a1a1b65a5193239e2de5c"
+      "sha256": "5cecd3d4212a7d0e0bf5b7bfaa93e57d105857cd9d887434fe5c551670cb5487"
     },
     {
       "file": "models/providers/blink.json",
@@ -1591,7 +1591,11 @@
     },
     {
       "file": "providers/blackforestlabs.json",
-      "sha256": "4e5d593d9288c3f98cfd9d1118b77f76cb6f3b409f423db0f045df2661a85bba"
+      "sha256": "0e6862ceb211eeb80b56660b44a0c1e07d72ee59bbba1631b3fa889993e609dd"
+    },
+    {
+      "file": "providers/blade.json",
+      "sha256": "4323c069c74a77d2700a435855cdd80074d2d290d28abcdbde8b487865e4a251"
     },
     {
       "file": "providers/blink.json",
@@ -2323,7 +2327,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "7a0a1526612195705fbf4394f3aaca3fde9a2d8abc5c840192b8161409e4b54c"
+      "sha256": "e5ff5eaf63fa0153dc97c868a43b2107ddbac293cc226111e9b8b26944304037"
     },
     {
       "file": "providers/infer.json",

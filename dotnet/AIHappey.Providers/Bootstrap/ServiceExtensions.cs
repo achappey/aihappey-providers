@@ -10,6 +10,7 @@ using AIHappey.Core.Providers.CreeksideCompute;
 using AIHappey.Core.Providers.Codebase;
 using AIHappey.Core.Providers.AbacusAI;
 using AIHappey.Core.Providers.BespokeLabs;
+using AIHappey.Core.Providers.Blade;
 using AIHappey.Core.Providers.SurplusIntelligence;
 using AIHappey.Core.Providers.Alibaba;
 using AIHappey.Core.Providers.Anthropic;
@@ -738,6 +739,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, GuidaiProvider>();
         services.AddScoped<IModelProvider, MachineFiProvider>();
         services.AddScoped<IModelProvider, BespokeLabsProvider>();
+        services.AddScoped<IModelProvider, BladeProvider>();
         services.AddScoped<ISkillProvider, GrooveDevProvider>();
 
         services.AddScoped<IModelProvider, EchoProvider>();
