@@ -2323,7 +2323,11 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "87e773af2a784c566e3df266ec7697d567ded33197ae4c9b396045070ecffa34"
+      "sha256": "7a0a1526612195705fbf4394f3aaca3fde9a2d8abc5c840192b8161409e4b54c"
+    },
+    {
+      "file": "providers/infer.json",
+      "sha256": "5e719f736903042962a5fb5d85798438f317cce44c92967184ba86ba871b975c"
     },
     {
       "file": "providers/infercom.json",
