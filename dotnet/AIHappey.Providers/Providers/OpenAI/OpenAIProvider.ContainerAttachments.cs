@@ -13,6 +13,10 @@ public partial class OpenAIProvider
         ResponseRequest request,
         CancellationToken cancellationToken)
     {
+        // Saved lifecycle state is not a Responses API root option. Consume it
+        // even when hosted tools were disabled after an earlier conversation turn.
+        var metadataContainerId = ConsumeMetadataContainerId(request);
+
         if (request.Tools is null || request.Tools.Count == 0)
             return OpenAiContainerAttachmentPreparation.None;
 
@@ -45,7 +49,6 @@ public partial class OpenAIProvider
         }
 
         var hasExplicitContainer = explicitContainerIds.Count == 1;
-        var metadataContainerId = ConsumeMetadataContainerId(request.GetNativeProviderOptions(GetIdentifier()), GetIdentifier());
         var containerId = hasExplicitContainer
             ? explicitContainerIds[0]
             : metadataContainerId;
@@ -235,50 +238,22 @@ public partial class OpenAIProvider
         tool.Extra["environment"] = JsonSerializer.SerializeToElement(environment, JsonSerializerOptions.Web);
     }
 
-    private static string? ConsumeMetadataContainerId(
-        Dictionary<string, object?>? metadata,
-        string providerId)
+    private static string? ConsumeMetadataContainerId(ResponseRequest request)
     {
-        if (metadata is null || !metadata.TryGetValue(providerId, out var scopedMetadata) || scopedMetadata is null)
+        // Provider options have already been materialized into the native request.
+        // Mutate its extension data, not a serialized GetNativeProviderOptions copy.
+        // Remove the property even if its value contains no reusable ID.
+        if (request.AdditionalProperties?.Remove("container", out var container) != true)
             return null;
 
-        try
+        var containerId = container.ValueKind switch
         {
-            var scoped = scopedMetadata is JsonElement json
-                ? json
-                : JsonSerializer.SerializeToElement(scopedMetadata, JsonSerializerOptions.Web);
-            if (scoped.ValueKind != JsonValueKind.Object || !scoped.TryGetProperty("container", out var container))
-                return null;
+            JsonValueKind.String => container.GetString(),
+            JsonValueKind.Object => TryGetString(container, "id") ?? TryGetString(container, "container_id"),
+            _ => null
+        };
 
-            var containerId = container.ValueKind switch
-            {
-                JsonValueKind.String => container.GetString(),
-                JsonValueKind.Object => TryGetString(container, "id") ?? TryGetString(container, "container_id"),
-                _ => null
-            };
-
-            if (string.IsNullOrWhiteSpace(containerId))
-                return null;
-
-            // This is unified lifecycle metadata, not an OpenAI Responses root
-            // option. Consume only this property and preserve all other provider
-            // options for the existing raw passthrough behavior.
-            var retainedProviderOptions = scoped.EnumerateObject()
-                .Where(property => !string.Equals(property.Name, "container", StringComparison.Ordinal))
-                .ToDictionary(
-                    property => property.Name,
-                    property => property.Value.Clone(),
-                    StringComparer.Ordinal);
-            metadata[providerId] = JsonSerializer.SerializeToElement(
-                retainedProviderOptions,
-                JsonSerializerOptions.Web);
-
-            return containerId;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
+        return string.IsNullOrWhiteSpace(containerId) ? null : containerId;
     }
 
     private async Task<OpenAiContainerStatus> GetContainerStatusAsync(
