@@ -65,20 +65,24 @@ public partial class EvrocProvider : IModelProvider
         Responses.ResponseRequest options,
         CancellationToken cancellationToken = default)
     {
-        var result = await ExecuteUnifiedViaChatCompletionsAsync(
-            options.ToUnifiedRequest(GetIdentifier()), cancellationToken);
-        return result.ToResponseResult();
+        return (await ExecuteUnifiedAsync(
+            options.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken))
+            .ToResponseResult();
     }
 
-    public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(
-        Responses.ResponseRequest options,
+    public async IAsyncEnumerable<Responses.Streaming.ResponseStreamPart> ResponsesStreamingAsync(Responses.ResponseRequest options,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var request = options.ToUnifiedRequest(GetIdentifier());
-        await foreach (var part in StreamUnifiedViaChatCompletionsAsync(request, cancellationToken: cancellationToken)
-            .ToResponseStreamParts(cancellationToken))
+        var unifiedRequest = options.ToUnifiedRequest(GetIdentifier());
+
+        await foreach (var part in this.StreamUnifiedAsync(
+                           unifiedRequest,
+                           cancellationToken)
+                           .ToResponseStreamParts(cancellationToken))
             yield return part;
     }
+
 
     public async Task<IEnumerable<Model>> ListModels(CancellationToken cancellationToken = default)
     {
@@ -133,19 +137,25 @@ public partial class EvrocProvider : IModelProvider
         return "language";
     }
 
+
+
     public async Task<MessagesResponse> MessagesAsync(MessagesRequest request, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
     {
-        var result = await ExecuteUnifiedViaChatCompletionsAsync(request.ToUnifiedRequest(GetIdentifier()), cancellationToken);
+        var result = await ExecuteUnifiedAsync(request.ToUnifiedRequest(GetIdentifier()),
+            cancellationToken);
+
         return result.ToMessagesResponse();
     }
 
-    public async IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(
-        MessagesRequest request,
+    public async IAsyncEnumerable<MessageStreamPart> MessagesStreamingAsync(MessagesRequest request,
         Dictionary<string, string> headers,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        await foreach (var part in StreamUnifiedViaChatCompletionsAsync(
-            request.ToUnifiedRequest(GetIdentifier()), cancellationToken: cancellationToken)
+        var unifiedRequest = request.ToUnifiedRequest(GetIdentifier());
+
+        await foreach (var part in this.StreamUnifiedAsync(
+            unifiedRequest,
+            cancellationToken)
             .ToMessageStreamParts(request.Model, cancellationToken))
             yield return part;
     }
