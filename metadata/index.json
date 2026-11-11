@@ -214,6 +214,10 @@
       "sha256": "687e0096a00e74d19798f033c485d975723a61fd99e99b027910a3c5d94be285"
     },
     {
+      "file": "models/providers/evroc.json",
+      "sha256": "e7eadb70b1b3786eb0fc8b97c444675e3e6f3af1686ecb48fea870dcca17dbe2"
+    },
+    {
       "file": "models/providers/euqai.json",
       "sha256": "8fe7638a50a9b7551a624fe3c9fbf18b00fe186d3f591fede8571e2827bd7963"
     },
