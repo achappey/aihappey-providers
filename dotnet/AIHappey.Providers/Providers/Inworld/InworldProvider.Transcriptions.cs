@@ -3,6 +3,7 @@ using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.MCP.Media;
 using System.Globalization;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -29,6 +30,7 @@ public partial class InworldProvider
             throw new ArgumentException("Audio is required.", nameof(request));
 
         var providerOptions = request.GetProviderMetadata<JsonElement>(GetIdentifier());
+        var rawAudio = request.Audio as byte[];
         var audioBase64 = ReadInworldTranscriptionAudioBase64(request);
         var transcribeConfig = BuildInworldTranscriptionConfig(request, providerOptions);
         var audioData = BuildInworldTranscriptionAudioData(providerOptions, audioBase64);
@@ -43,7 +45,9 @@ public partial class InworldProvider
 
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, "stt/v1/transcribe")
         {
-            Content = new StringContent(requestJson, Encoding.UTF8, MediaTypeNames.Application.Json)
+            Content = rawAudio is not null && !HasAdditionalInworldAudioDataOptions(providerOptions)
+                ? BuildInworldTranscriptionMultipart(transcribeConfig, rawAudio, request.MediaType)
+                : new StringContent(requestJson, Encoding.UTF8, MediaTypeNames.Application.Json)
         };
 
         ApplyAuthHeader();
@@ -145,6 +149,7 @@ public partial class InworldProvider
     {
         var audioString = request.Audio switch
         {
+            byte[] bytes => Convert.ToBase64String(bytes),
             JsonElement { ValueKind: JsonValueKind.String } el => el.GetString(),
             _ => request.Audio?.ToString()
         };
@@ -166,6 +171,36 @@ public partial class InworldProvider
 
         return audioString;
     }
+
+    private static MultipartFormDataContent BuildInworldTranscriptionMultipart(
+        Dictionary<string, object?> transcribeConfig,
+        byte[] audio,
+        string? mediaType)
+    {
+        if (audio.Length == 0)
+            throw new ArgumentException("Audio is required.", nameof(audio));
+
+        var form = new MultipartFormDataContent();
+        form.Add(
+            new StringContent(
+                JsonSerializer.Serialize(transcribeConfig, InworldTranscriptionJson),
+                Encoding.UTF8,
+                MediaTypeNames.Application.Json),
+            "transcribeConfig");
+
+        var file = new ByteArrayContent(audio);
+        file.Headers.ContentType = MediaTypeHeaderValue.Parse(
+            string.IsNullOrWhiteSpace(mediaType) ? MediaTypeNames.Application.Octet : mediaType);
+        form.Add(file, "file", "audio");
+        return form;
+    }
+
+    private static bool HasAdditionalInworldAudioDataOptions(JsonElement providerOptions)
+        => providerOptions.ValueKind == JsonValueKind.Object
+            && providerOptions.TryGetProperty("audioData", out var audioData)
+            && audioData.ValueKind == JsonValueKind.Object
+            && audioData.EnumerateObject().Any(property =>
+                !string.Equals(property.Name, "content", StringComparison.OrdinalIgnoreCase));
 
     private static string NormalizeInworldTranscriptionModelId(string model)
     {
