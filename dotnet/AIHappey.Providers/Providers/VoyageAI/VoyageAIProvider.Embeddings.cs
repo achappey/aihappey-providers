@@ -17,7 +17,6 @@ public partial class VoyageAIProvider
         OpenAIEmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         ModelProviderEmbeddingCompatibilityExtensions.ValidateOpenAIEmbeddingRequest(request);
         var result = await SendVoyageEmbeddingAsync(request, cancellationToken);
         return ToVoyageOpenAIResponse(result.Root, request.Model);
@@ -27,7 +26,6 @@ public partial class VoyageAIProvider
         EmbeddingRequest request,
         CancellationToken cancellationToken = default)
     {
-        ApplyAuthHeader();
         var openAIRequest = request.ToOpenAIEmbeddingRequest(GetIdentifier());
         var result = await SendVoyageEmbeddingAsync(openAIRequest, cancellationToken);
         var response = ToVoyageOpenAIResponse(result.Root, openAIRequest.Model);
@@ -73,6 +71,7 @@ public partial class VoyageAIProvider
         {
             Content = new StringContent(payload.ToJsonString(VoyageEmbeddingJson), Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(message);
         using var response = await _client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var raw = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)

@@ -15,8 +15,6 @@ public partial class VoyageAIProvider
     {
         var url = "v1/rerank";
 
-        ApplyAuthHeader();
-
         var now = DateTime.UtcNow;
         var metadata = request.GetProviderMetadata<JsonElement>(GetIdentifier());
         var payload = new Dictionary<string, object?>();
@@ -42,7 +40,7 @@ public partial class VoyageAIProvider
             throw new JsonException("VoyageAI provider options must be a JSON object.");
         }
 
-        payload["model"] = request.Model;
+        payload["model"] = request.Model.Split('/').Last();
         payload["query"] = request.Query;
         payload["documents"] = request.Documents.Values;
         if (request.TopN is not null)
@@ -53,6 +51,7 @@ public partial class VoyageAIProvider
             Content = new StringContent(JsonSerializer.Serialize(payload, JsonOpts),
                 Encoding.UTF8, MediaTypeNames.Application.Json)
         };
+        ApplyAuthHeader(req);
 
         using var resp = await _client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         var errText = await resp.Content.ReadAsStringAsync(cancellationToken);
