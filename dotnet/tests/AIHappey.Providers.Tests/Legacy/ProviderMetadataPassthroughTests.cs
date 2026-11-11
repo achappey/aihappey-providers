@@ -305,6 +305,7 @@ public sealed class ProviderMetadataPassthroughTests
         await new VoyageAIProvider(new KeyResolver(), new ClientFactory(client)).RerankingRequest(request);
 
         Assert.True(JsonElement.DeepEquals(originalOptions, request.ProviderOptions["voyageai"]));
+        Assert.Equal("voyageai/rerank-2", request.Model);
         Assert.Equal("false", JsonSerializer.Serialize(payload.GetProperty("return_documents")));
         Assert.True(payload.GetProperty("truncation").GetBoolean());
         foreach (var name in new[]
@@ -315,7 +316,7 @@ public sealed class ProviderMetadataPassthroughTests
             Assert.True(JsonElement.DeepEquals(originalOptions.GetProperty(name), payload.GetProperty(name)), name);
         }
 
-        Assert.Equal(request.Model, payload.GetProperty("model").GetString());
+        Assert.Equal("rerank-2", payload.GetProperty("model").GetString());
         Assert.Equal(request.Query, payload.GetProperty("query").GetString());
         Assert.True(JsonElement.DeepEquals(request.Documents.Values, payload.GetProperty("documents")));
         Assert.Equal(1, payload.GetProperty("top_k").GetInt32());
