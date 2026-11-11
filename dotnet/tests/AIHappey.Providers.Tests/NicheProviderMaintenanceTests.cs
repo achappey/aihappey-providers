@@ -18,6 +18,7 @@ using AIHappey.Core.Providers.Tavily;
 using AIHappey.Core.Providers.Valyu;
 using AIHappey.Core.Providers.ZeroEntropy;
 using AIHappey.Core.Providers.Sutra;
+using AIHappey.Core.Providers.Situra;
 using AIHappey.Core.Models;
 using AIHappey.Responses;
 using AIHappey.Unified.Models;
@@ -28,6 +29,140 @@ namespace AIHappey.Tests;
 
 public sealed class NicheProviderMaintenanceTests
 {
+    [Fact]
+    public async Task Situra_discovers_models_with_request_scoped_authentication()
+    {
+        using var client = CreateClient(request =>
+        {
+            Assert.Equal("https://api.situra.ai/v1/models", request.RequestUri!.ToString());
+            Assert.Equal("Bearer test-api-key", request.Headers.Authorization?.ToString());
+            return Task.FromResult(JsonResponse("""{"data":[{"id":"gemini-2.5-flash","owned_by":"google"}]}"""));
+        });
+        var provider = new SituraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        var model = Assert.Single(await provider.ListModels());
+        Assert.Equal("situra/gemini-2.5-flash", model.Id);
+        Assert.Equal("google", model.OwnedBy);
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Situra_chat_and_embeddings_forward_native_properties()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("api.situra.ai", request.RequestUri!.Host);
+            Assert.Equal("Bearer test-api-key", request.Headers.Authorization?.ToString());
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.True(body.RootElement.GetProperty("future_option").GetProperty("enabled").GetBoolean());
+            Assert.False(body.RootElement.GetProperty("model").GetString()!.StartsWith("situra/"));
+            return request.RequestUri.AbsolutePath switch
+            {
+                "/v1/chat/completions" => JsonResponse("""{"id":"chatcmpl-test","object":"chat.completion","created":1,"model":"gemini-2.5-flash","choices":[{"index":0,"message":{"role":"assistant","content":"Hello"},"finish_reason":"stop"}]}"""),
+                "/v1/embeddings" => JsonResponse("""{"object":"list","data":[{"object":"embedding","index":0,"embedding":[0.1,0.2]}],"model":"embed","usage":{"prompt_tokens":1,"total_tokens":1}}"""),
+                _ => throw new InvalidOperationException("Unexpected endpoint")
+            };
+        });
+        var provider = new SituraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        var future = JsonSerializer.SerializeToElement(new { enabled = true });
+        await provider.CompleteChatAsync(new ChatCompletionOptions
+        {
+            Model = "situra/gemini-2.5-flash",
+            Messages = [new() { Role = "user", Content = "Hello" }],
+            AdditionalProperties = new() { ["future_option"] = future }
+        });
+        await provider.OpenAIEmbeddingRequestAsync(new OpenAIEmbeddingRequest
+        {
+            Model = "situra/embed",
+            Input = JsonSerializer.SerializeToElement(new[] { "Hello" }),
+            AdditionalProperties = new() { ["future_option"] = future }
+        });
+        await provider.EmbeddingRequestAsync(new EmbeddingRequest
+        {
+            Model = "situra/embed",
+            Values = ["Hello"],
+            ProviderOptions = new() { ["situra"] = JsonSerializer.SerializeToElement(new { future_option = new { enabled = true } }) }
+        });
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Fact]
+    public async Task Situra_chat_forwards_flat_provider_metadata()
+    {
+        using var client = CreateClient(async request =>
+        {
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.True(body.RootElement.GetProperty("future_option").GetProperty("enabled").GetBoolean());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    "data: {\"id\":\"c\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"gemini-2.5-flash\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
+                    Encoding.UTF8, "text/event-stream")
+            };
+        });
+        var provider = new SituraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        await foreach (var _ in provider.StreamAsync(new ChatRequest
+        {
+            Model = "situra/gemini-2.5-flash",
+            Messages = [new UIMessage { Id = "u", Role = Role.user, Parts = [new TextUIPart { Text = "Hello" }] }],
+            ProviderMetadata = new() { ["situra"] = JsonSerializer.SerializeToElement(new { future_option = new { enabled = true } }) }
+        })) { }
+    }
+
+    [Fact]
+    public async Task Situra_messages_use_native_endpoint_and_preserve_residency_header()
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal("/v1/messages", request.RequestUri!.AbsolutePath);
+            Assert.Equal("test-api-key", Assert.Single(request.Headers.GetValues("x-api-key")));
+            Assert.Equal("2023-06-01", Assert.Single(request.Headers.GetValues("anthropic-version")));
+            Assert.Equal("eu", Assert.Single(request.Headers.GetValues("x-situra-residency")));
+            Assert.Null(request.Headers.Authorization);
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal("gemini-2.5-flash", body.RootElement.GetProperty("model").GetString());
+            Assert.False(body.RootElement.GetProperty("stream").GetBoolean());
+            return JsonResponse("""{"id":"msg","type":"message","role":"assistant","model":"gemini-2.5-flash","content":[],"usage":{"input_tokens":1,"output_tokens":1}}""");
+        });
+        var provider = new SituraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        await provider.MessagesAsync(new MessagesRequest { Model = "situra/gemini-2.5-flash", MaxTokens = 16, Messages = [], Stream = true },
+            new Dictionary<string, string> { ["x-situra-residency"] = "eu", ["Authorization"] = "Bearer wrong" });
+        Assert.Null(client.DefaultRequestHeaders.Authorization);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Situra_streaming_sets_stream_and_uses_the_native_endpoint(bool messages)
+    {
+        using var client = CreateClient(async request =>
+        {
+            Assert.Equal(messages ? "/v1/messages" : "/v1/chat/completions", request.RequestUri!.AbsolutePath);
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.True(body.RootElement.GetProperty("stream").GetBoolean());
+            Assert.Equal("gemini-2.5-flash", body.RootElement.GetProperty("model").GetString());
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(messages
+                    ? "data: {\"type\":\"message_stop\"}\n\n"
+                    : "data: {\"id\":\"c\",\"object\":\"chat.completion.chunk\",\"created\":1,\"model\":\"gemini-2.5-flash\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
+                    Encoding.UTF8, "text/event-stream")
+            };
+        });
+        var provider = new SituraProvider(new TestKeyResolver(), new TestHttpClientFactory(client));
+        if (messages)
+        {
+            var request = new MessagesRequest { Model = "situra/gemini-2.5-flash", MaxTokens = 16, Messages = [], Stream = false };
+            await foreach (var _ in provider.MessagesStreamingAsync(request, [])) { }
+            Assert.False(request.Stream);
+        }
+        else
+        {
+            var request = new ChatCompletionOptions { Model = "situra/gemini-2.5-flash", Messages = [], Stream = false };
+            await foreach (var _ in provider.CompleteChatStreamingAsync(request)) { }
+            Assert.False(request.Stream);
+        }
+    }
+
     [Fact]
     public async Task Sutra_uses_the_documented_endpoint_and_request_scoped_authentication()
     {
