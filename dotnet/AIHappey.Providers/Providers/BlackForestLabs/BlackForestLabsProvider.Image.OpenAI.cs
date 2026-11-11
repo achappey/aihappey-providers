@@ -83,7 +83,8 @@ public partial class BlackForestLabsProvider
                 || field.Name is "model" or "prompt" or "size" or "n" or "images" or "mask" or "stream" or "response_format")
                 continue;
 
-            if (field.Name == "output_format" && request.Model != "flux-3-image")
+            if ((field.Name == "output_format" && request.Model != "flux-3-image")
+                || (field.Name == "user" && IsFlux3ImageModel(request.Model)))
                 native[field.Name] = field.Value.Clone();
             else
                 warnings.Add(new { type = "unsupported", feature = field.Name });

@@ -87,22 +87,260 @@ public sealed class BlackForestLabsMediaTests
         Assert.Empty(transport.Requests);
     }
 
-    [Fact]
-    public async Task Klein_supports_explicit_small_dimensions_seed_steps_and_output_format()
+    [Theory]
+    [InlineData("jpeg", "image/jpeg")]
+    [InlineData("png", "image/png")]
+    public async Task Klein_supports_explicit_small_dimensions_seed_steps_and_output_format(string format, string mime)
     {
-        using var transport = new Transport(mime: "image/webp");
+        using var transport = new Transport(mime: mime);
         var response = await transport.Provider.ImageRequest(new ImageRequest
         {
             Model = "flux-3-image-klein", Prompt = "An icon.", Size = "64x64", Seed = 42,
-            ProviderOptions = Options("""{"steps":16,"output_format":"webp"}""")
+            ProviderOptions = Options(JsonSerializer.Serialize(new { steps = 16, output_format = format }))
         });
         var body = transport.Requests[0].Body;
         Assert.Equal(64, body.GetProperty("width").GetInt32());
         Assert.Equal(64, body.GetProperty("height").GetInt32());
         Assert.Equal(42, body.GetProperty("seed").GetInt32());
         Assert.Equal(16, body.GetProperty("steps").GetInt32());
-        Assert.Equal("webp", body.GetProperty("output_format").GetString());
-        Assert.Equal("data:image/webp;base64,AQID", Assert.Single(response.Images!));
+        Assert.Equal(format, body.GetProperty("output_format").GetString());
+        Assert.Equal($"data:{mime};base64,AQID", Assert.Single(response.Images!));
+    }
+
+    [Theory]
+    [InlineData(null, null, "image/jpeg")]
+    [InlineData(null, "application/octet-stream", "image/jpeg")]
+    [InlineData("jpeg", null, "image/jpeg")]
+    [InlineData("png", null, "image/png")]
+    [InlineData(null, "image/png", "image/png")]
+    [InlineData("png", "image/jpeg", "image/jpeg")]
+    public async Task Klein_mime_fallback_uses_jpeg_but_download_image_headers_take_precedence(string? format, string? contentType, string expectedMime)
+    {
+        using var transport = new Transport(request =>
+        {
+            if (request.Uri.Host != "delivery.bfl.ai") return null;
+            var response = new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent([1, 2, 3]) };
+            if (contentType is not null) response.Content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            return response;
+        });
+        var result = await transport.Provider.ImageRequest(new ImageRequest
+        {
+            Model = "flux-3-image-klein", Prompt = "A rabbit.",
+            ProviderOptions = format is null ? null : Options(JsonSerializer.Serialize(new { output_format = format }))
+        });
+        Assert.Equal($"data:{expectedMime};base64,AQID", Assert.Single(result.Images!));
+        if (format is null) AssertAbsent(transport.Requests[0].Body, "output_format");
+        AssertAuthentication(transport);
+    }
+
+    [Theory]
+    [InlineData("flux-3-image", false, false)]
+    [InlineData("flux-3-image", false, true)]
+    [InlineData("flux-3-image", true, false)]
+    [InlineData("flux-3-image", true, true)]
+    [InlineData("flux-3-image-klein", false, false)]
+    [InlineData("flux-3-image-klein", false, true)]
+    [InlineData("flux-3-image-klein", true, false)]
+    [InlineData("flux-3-image-klein", true, true)]
+    public async Task Flux3_OpenAI_forwards_supported_user_for_generation_edit_and_streaming(string model, bool edit, bool streaming)
+    {
+        using var transport = new Transport();
+        if (edit)
+        {
+            var request = new OpenAIImageEditRequest
+            {
+                Model = model, Prompt = "Make it winter.", User = "opaque-platform-user",
+                Images = [new() { ImageUrl = "https://images.example/ref.png" }]
+            };
+            var before = JsonSerializer.Serialize(request);
+            if (streaming)
+            {
+                await foreach (var _ in transport.Provider.OpenAIImageEditStreamingAsync(request)) { }
+            }
+            else
+            {
+                var response = await transport.Provider.OpenAIImageEditRequestAsync(request);
+                Assert.False(response.AdditionalProperties?.ContainsKey("warnings") == true);
+            }
+            Assert.Equal(before, JsonSerializer.Serialize(request));
+        }
+        else
+        {
+            var request = new OpenAIImageGenerationRequest { Model = model, Prompt = "A rabbit.", User = "opaque-platform-user" };
+            var before = JsonSerializer.Serialize(request);
+            if (streaming)
+            {
+                await foreach (var _ in transport.Provider.OpenAIImageGenerationStreamingAsync(request)) { }
+            }
+            else
+            {
+                var response = await transport.Provider.OpenAIImageGenerationRequestAsync(request);
+                Assert.False(response.AdditionalProperties?.ContainsKey("warnings") == true);
+            }
+            Assert.Equal(before, JsonSerializer.Serialize(request));
+        }
+        Assert.Equal("opaque-platform-user", transport.Requests[0].Body.GetProperty("user").GetString());
+    }
+
+    [Theory]
+    [InlineData("flux-3-image", "\"native-user\"")]
+    [InlineData("flux-3-image", "null")]
+    [InlineData("flux-3-image-klein", "\"native-user\"")]
+    [InlineData("flux-3-image-klein", "null")]
+    public async Task Flux3_explicit_native_user_overrides_the_standard_user_without_mutation(string model, string nativeUser)
+    {
+        using var transport = new Transport();
+        var request = new OpenAIImageGenerationRequest
+        {
+            Model = model, Prompt = "A rabbit.", User = "standard-user",
+            AdditionalProperties = new() { ["user"] = Element(nativeUser) }
+        };
+        var before = JsonSerializer.Serialize(request);
+        var response = await transport.Provider.OpenAIImageGenerationRequestAsync(request);
+        Assert.True(JsonElement.DeepEquals(Element(nativeUser), transport.Requests[0].Body.GetProperty("user")));
+        Assert.False(response.AdditionalProperties?.ContainsKey("warnings") == true);
+        Assert.Equal(before, JsonSerializer.Serialize(request));
+    }
+
+    [Theory]
+    [InlineData("flux-3-image", "\"https://images.example/ref.png\"")]
+    [InlineData("flux-3-image", "[\"https://images.example/ref.png\",\"AQID\"]")]
+    [InlineData("flux-3-image", "null")]
+    [InlineData("flux-3-image-klein", "\"https://images.example/ref.png\"")]
+    [InlineData("flux-3-image-klein", "[\"https://images.example/ref.png\",\"AQID\"]")]
+    [InlineData("flux-3-image-klein", "null")]
+    public async Task Flux3_native_reference_forms_and_omitted_defaults_are_preserved(string model, string references)
+    {
+        using var transport = new Transport();
+        var native = Native("""{"user":"opaque-user","safety_tolerance":7}""");
+        native["images"] = Element(references);
+        var response = await transport.Provider.ImageRequest(new ImageRequest
+        {
+            Model = model, Prompt = "Use the reference if present.",
+            ProviderOptions = new() { ["blackforestlabs"] = JsonSerializer.SerializeToElement(native) }
+        });
+        var body = transport.Requests[0].Body;
+        foreach (var property in native) Assert.True(JsonElement.DeepEquals(property.Value, body.GetProperty(property.Key)));
+        AssertAbsent(body, "resolution", "aspect_ratio", "width", "height", "seed", "steps", "output_format", "grounding", "version");
+        Assert.Empty(response.Warnings);
+    }
+
+    [Theory]
+    [InlineData(0L, 1, 0)]
+    [InlineData(4294967295L, 16, 7)]
+    public async Task Klein_native_options_preserve_unsigned_seed_range_nullable_resolution_and_step_limits(long seed, int steps, int safety)
+    {
+        using var transport = new Transport();
+        var native = JsonSerializer.Serialize(new
+        {
+            seed, steps, safety_tolerance = safety, resolution = (string?)null, aspect_ratio = "auto", output_format = "jpeg"
+        });
+        await transport.Provider.OpenAIImageGenerationRequestAsync(new OpenAIImageGenerationRequest
+        {
+            Model = "flux-3-image-klein", Prompt = "A rabbit.", AdditionalProperties = Native(native)
+        });
+        var body = transport.Requests[0].Body;
+        foreach (var property in Element(native).EnumerateObject())
+            Assert.True(JsonElement.DeepEquals(property.Value, body.GetProperty(property.Name)));
+        AssertAbsent(body, "width", "height", "grounding", "version");
+    }
+
+    [Theory]
+    [InlineData("768sq")]
+    [InlineData("1k")]
+    [InlineData("1.5k")]
+    [InlineData("2k")]
+    [InlineData("4k")]
+    public async Task Flux3_resolution_tiers_and_full_image_grounding_version_are_native_options(string resolution)
+    {
+        foreach (var model in new[] { "flux-3-image", "flux-3-image-klein" })
+        {
+            using var transport = new Transport();
+            var native = Native(JsonSerializer.Serialize(new { resolution, aspect_ratio = "21:9", safety_tolerance = 7 }));
+            if (model == "flux-3-image")
+            {
+                native["grounding"] = Element("false");
+                native["version"] = Element("\"latest\"");
+            }
+            await transport.Provider.OpenAIImageGenerationRequestAsync(new OpenAIImageGenerationRequest
+            {
+                Model = model, Prompt = "An ultra-wide scene.", AdditionalProperties = native
+            });
+            var body = transport.Requests[0].Body;
+            foreach (var property in native) Assert.True(JsonElement.DeepEquals(property.Value, body.GetProperty(property.Key)));
+            AssertAbsent(body, "width", "height");
+            if (model.EndsWith("klein")) AssertAbsent(body, "grounding", "version");
+            else AssertAbsent(body, "seed", "steps", "output_format");
+        }
+    }
+
+    [Theory]
+    [InlineData("flux-3-image", 256, 256, false)]
+    [InlineData("flux-3-image", 6256, 2688, false)]
+    [InlineData("flux-3-image", 4096, 4107, false)]
+    [InlineData("flux-3-image", 2048, 2048, true)]
+    [InlineData("flux-3-image-klein", 64, 64, true)]
+    [InlineData("flux-3-image-klein", 6256, 2688, true)]
+    [InlineData("flux-3-image-klein", 4096, 4107, true)]
+    public async Task Flux3_exact_dimensions_override_size_without_rewriting_native_tiers(string model, int width, int height, bool edit)
+    {
+        using var transport = new Transport();
+        var request = new ImageRequest
+        {
+            Model = model, Prompt = "An exact-size image.", Size = "1024x1024", AspectRatio = "16:9",
+            Files = edit ? [new ImageFile { Data = "AQID" }] : null,
+            ProviderOptions = Options(JsonSerializer.Serialize(new { width, height, resolution = "4k", aspect_ratio = "1:1" }))
+        };
+        await transport.Provider.ImageRequest(request);
+        var body = transport.Requests[0].Body;
+        Assert.Equal(width, body.GetProperty("width").GetInt32());
+        Assert.Equal(height, body.GetProperty("height").GetInt32());
+        Assert.Equal("4k", body.GetProperty("resolution").GetString());
+        Assert.Equal("1:1", body.GetProperty("aspect_ratio").GetString());
+    }
+
+    [Theory]
+    [InlineData("{\"output_format\":\"webp\"}")]
+    [InlineData("{\"resolution\":\"match_input\"}")]
+    [InlineData("{\"steps\":17}")]
+    public async Task Klein_invalid_native_options_are_not_silently_filtered_and_provider_validation_is_preserved(string native)
+    {
+        using var transport = new Transport(request => request.Method == HttpMethod.Post
+            ? Json("""{"detail":"Unsupported native value"}""", HttpStatusCode.UnprocessableEntity) : null);
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(() => transport.Provider.ImageRequest(new ImageRequest
+        {
+            Model = "flux-3-image-klein", Prompt = "A rabbit.", ProviderOptions = Options(native)
+        }));
+        foreach (var property in Element(native).EnumerateObject())
+            Assert.True(JsonElement.DeepEquals(property.Value, Assert.Single(transport.Requests).Body.GetProperty(property.Name)));
+        Assert.Contains("422", error.Message);
+        Assert.Contains("Unsupported native value", error.Message);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task Flux3_submission_metadata_keeps_native_task_cost_and_megapixels_without_media_urls(int count)
+    {
+        var index = 0;
+        using var transport = new Transport(request => request.Method == HttpMethod.Post
+            ? Json(JsonSerializer.Serialize(new { id = $"task-{++index}", polling_url = PollingUrl, cost = 12.5m, input_mp = 1.25m, output_mp = 2.5m }))
+            : null);
+        var response = await transport.Provider.ImageRequest(new ImageRequest { Model = "flux-3-image-klein", Prompt = "A rabbit.", N = count });
+        var metadata = response.ProviderMetadata!["blackforestlabs"];
+        var results = count == 1 ? new[] { metadata } : metadata.GetProperty("results").EnumerateArray().ToArray();
+        Assert.Equal(count, results.Length);
+        for (var i = 0; i < count; i++)
+        {
+            Assert.Equal($"task-{i + 1}", results[i].GetProperty("id").GetString());
+            Assert.Equal(12.5m, results[i].GetProperty("cost").GetDecimal());
+            Assert.Equal(1.25m, results[i].GetProperty("input_mp").GetDecimal());
+            Assert.Equal(2.5m, results[i].GetProperty("output_mp").GetDecimal());
+            Assert.Equal(PollingUrl, results[i].GetProperty("polling_url").GetString());
+        }
+        Assert.Equal(0.125m * count, response.ProviderMetadata["gateway"].GetProperty("cost").GetDecimal());
+        Assert.DoesNotContain("delivery.bfl.ai", JsonSerializer.Serialize(response));
+        Assert.All(response.Images!, image => Assert.StartsWith("data:image/", image));
     }
 
     [Fact]

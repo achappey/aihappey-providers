@@ -66,7 +66,7 @@ public partial class BlackForestLabsProvider
         }
 
         var endpoint = ResolveEndpoint(model);
-        var outputFormat = TryGetPayloadString(payload, "output_format") ?? (IsFlux3ImageModel(model) ? "png" : "jpeg");
+        var outputFormat = TryGetPayloadString(payload, "output_format") ?? (model == "flux-3-image" ? "png" : "jpeg");
         var mime = MapOutputFormatToMimeType(outputFormat);
         var images = new List<string>();
         var results = new List<BflGenerationResult>(imageCount);
@@ -91,7 +91,9 @@ public partial class BlackForestLabsProvider
             Images = images,
             Warnings = warnings,
             ProviderMetadata = GetIdentifier().CreatePrimitiveProviderMetadata(
-                null,
+                results.Count == 1
+                    ? results[0].Submit
+                    : JsonSerializer.SerializeToElement(new { results = results.Select(result => result.Submit) }, JsonOptions),
                 costs: totalCost),
             Response = new()
             {
