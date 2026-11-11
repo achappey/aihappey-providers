@@ -2236,6 +2236,10 @@
     "file": "inceptionlabs.json"
   },
   {
+    "id": "blade",
+    "file": "blade.json"
+  },
+  {
     "id": "commandcode",
     "file": "commandcode.json"
   },

@@ -33,12 +33,39 @@ public static class ModelProviderTranscriptionCompatibilityExtensions
         return string.Equals(model.Type, "transcription", StringComparison.OrdinalIgnoreCase);
     }
 
-    public static async Task<IOpenAITranscriptionResponse>
+    public static Task<IOpenAITranscriptionResponse>
         OpenAICompatibleTranscriptionRequestAsync(
             this HttpClient httpClient,
             OpenAITranscriptionRequest options,
             string? endpoint = "v1/audio/transcriptions",
             CancellationToken cancellationToken = default)
+        => OpenAICompatibleTranscriptionRequestCore(
+            httpClient,
+            options,
+            endpoint,
+            cancellationToken,
+            requestHeaders: null);
+
+    public static Task<IOpenAITranscriptionResponse>
+        OpenAICompatibleTranscriptionRequestWithHeadersAsync(
+            this HttpClient httpClient,
+            OpenAITranscriptionRequest options,
+            IReadOnlyDictionary<string, string> requestHeaders,
+            string? endpoint = "v1/audio/transcriptions",
+            CancellationToken cancellationToken = default)
+        => OpenAICompatibleTranscriptionRequestCore(
+            httpClient,
+            options,
+            endpoint,
+            cancellationToken,
+            requestHeaders);
+
+    private static async Task<IOpenAITranscriptionResponse> OpenAICompatibleTranscriptionRequestCore(
+        HttpClient httpClient,
+        OpenAITranscriptionRequest options,
+        string? endpoint,
+        CancellationToken cancellationToken,
+        IReadOnlyDictionary<string, string>? requestHeaders)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
@@ -47,6 +74,7 @@ public static class ModelProviderTranscriptionCompatibilityExtensions
         {
             Content = CreateTranscriptionContent(options, forceStream: false)
         };
+        AddRequestHeaders(request, requestHeaders);
 
         using var response = await httpClient.SendAsync(
             request,
@@ -83,7 +111,6 @@ public static class ModelProviderTranscriptionCompatibilityExtensions
         {
             Content = CreateTranscriptionContent(options, forceStream: true)
         };
-
         request.Headers.Accept.Add(
             new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
@@ -825,4 +852,17 @@ public static class ModelProviderTranscriptionCompatibilityExtensions
                   $"({(int)response.StatusCode} {response.ReasonPhrase}): {raw}");
     }
 
+    private static void AddRequestHeaders(
+        HttpRequestMessage request,
+        IReadOnlyDictionary<string, string>? headers)
+    {
+        if (headers is null)
+            return;
+
+        foreach (var (name, value) in headers)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(value))
+                request.Headers.TryAddWithoutValidation(name, value);
+        }
+    }
 }
