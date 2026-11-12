@@ -522,6 +522,10 @@
       "sha256": "04bc4372fd6eca7087f51f8731bf01cadad410ac2c9187a16d3ba18bd2b152b0"
     },
     {
+      "file": "models/providers/niavoice.json",
+      "sha256": "a5881dc3e2bd298b35153ac4e984b35f6efd5e60f06c28fdd5c098ad87896c01"
+    },
+    {
       "file": "models/providers/nimbleway.json",
       "sha256": "e812d9c6620d0a4b40807f0932a1c3a1d08d6438e1bbb97bc93c4bf6e30ed06f"
     },
@@ -2335,7 +2339,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "dc0b4051197d56d8e5440a3474f49d10f23b1d563feb0c4e95ec445ab388e746"
+      "sha256": "6447ac0ddf7ea1ad43d1df71f31e53365331268036959e71b18847d2693d7c15"
     },
     {
       "file": "providers/infer.json",
@@ -2940,6 +2944,10 @@
     {
       "file": "providers/nexusify.json",
       "sha256": "09462dcf4551659d07647e238774f215817b4083411ced4cfdd1e808e06877a4"
+    },
+    {
+      "file": "providers/niavoice.json",
+      "sha256": "b6888bc147449879db1ae58c4929be35815f35c3d43f7cea5895c7bd9a86d320"
     },
     {
       "file": "providers/nimbleway.json",
