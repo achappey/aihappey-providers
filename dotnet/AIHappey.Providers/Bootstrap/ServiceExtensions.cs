@@ -223,6 +223,7 @@ using AIHappey.Core.Providers.OrqAgentRuntime;
 using AIHappey.Core.Providers.OrqRouter;
 using AIHappey.Core.Providers.Typecast;
 using AIHappey.Core.Providers.UnrealSpeech;
+using AIHappey.Core.Providers.KugelAudio;
 using AIHappey.Core.Providers.UVoiceAI;
 using AIHappey.Core.Providers.Astica;
 using AIHappey.Core.Providers.IOnet;
@@ -950,6 +951,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, OrqRouterProvider>();
         services.AddScoped<IModelProvider, TypecastProvider>();
         services.AddScoped<IModelProvider, UnrealSpeechProvider>();
+        services.AddScoped<IModelProvider, KugelAudioProvider>();
         services.AddScoped<IModelProvider, VapiProvider>();
         services.AddScoped<IModelProvider, UVoiceAIProvider>();
         services.AddScoped<IModelProvider, AsticaProvider>();

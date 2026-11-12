@@ -358,6 +358,10 @@
       "sha256": "90b6c107a128cf02bf03a13da6aaa95b3ec849956f114eba0333b2e2fcd7cf29"
     },
     {
+      "file": "models/providers/kugelaudio.json",
+      "sha256": "7f2b0859c6d37fb43704b75dbe723e9d5fd144a0365573606622d426f496b868"
+    },
+    {
       "file": "models/providers/langbaseagent/anthropic.json",
       "sha256": "66a39405c9c739a8aef3fb74ce68e34bdb5c8fec76799ec4abe0e80927579682"
     },
@@ -2347,7 +2351,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "82a87b7473d4a4896dd099827cd0d763917de41379da3122127b357647a915e3"
+      "sha256": "011061ee8091093cf437f7b6c66b8c9a1d65446250158bf38ece3777a095a5f3"
     },
     {
       "file": "providers/infer.json",
@@ -2500,6 +2504,10 @@
     {
       "file": "providers/krutrim.json",
       "sha256": "c11463fa5c7e9ba0320a0b6f70d3f27a45df38ad261559c1e21174e6db2760c0"
+    },
+    {
+      "file": "providers/kugelaudio.json",
+      "sha256": "4d5a8858ce45ce9a6f3d52399001439b06fb410aebe7e9878ffff28fdfa182d8"
     },
     {
       "file": "providers/kumorouter.json",

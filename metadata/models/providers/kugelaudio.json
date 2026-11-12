@@ -1,0 +1,21 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "kugelaudio/kugel-3.5",
+      "object": "model",
+      "owned_by": "KugelAudio",
+      "name": "Kugel 3.5",
+      "type": "speech",
+      "description": "KugelAudio text-to-speech model."
+    },
+    {
+      "id": "kugelaudio/kugel-3",
+      "object": "model",
+      "owned_by": "KugelAudio",
+      "name": "Kugel 3",
+      "type": "speech",
+      "description": "Previous-generation KugelAudio text-to-speech model."
+    }
+  ]
+}
