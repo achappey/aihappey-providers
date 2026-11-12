@@ -1,0 +1,43 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "gnani/gnani-prisma-v2.5",
+      "object": "model",
+      "owned_by": "Gnani",
+      "name": "Prisma v2.5",
+      "type": "transcription",
+      "description": "Speech-to-text for Indian languages with a specified language."
+    },
+    {
+      "id": "gnani/prisma-v3.0",
+      "object": "model",
+      "owned_by": "Gnani",
+      "name": "Prisma v3.0",
+      "type": "transcription",
+      "description": "Multilingual speech-to-text with automatic language detection."
+    },
+    {
+      "id": "gnani/timbre-v2.5",
+      "object": "model",
+      "owned_by": "Gnani",
+      "name": "Timbre v2.5",
+      "type": "speech"
+    },
+    {
+      "id": "gnani/timbre-v3.0",
+      "object": "model",
+      "owned_by": "Gnani",
+      "name": "Timbre v3.0",
+      "type": "speech"
+    },
+    {
+      "id": "gnani/vachana-vc-v1",
+      "object": "model",
+      "owned_by": "Gnani",
+      "name": "Vachana Voice Clone",
+      "type": "speech",
+      "description": "Voice-cloned synthesis using a speaker embedding."
+    }
+  ]
+}

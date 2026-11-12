@@ -29,6 +29,7 @@ using AIHappey.Core.Providers.Deepgram;
 using AIHappey.Core.Providers.Echo;
 using AIHappey.Core.Providers.Fireworks;
 using AIHappey.Core.Providers.GigaChat;
+using AIHappey.Core.Providers.Gnani;
 using AIHappey.Core.Providers.Google;
 using AIHappey.Core.Providers.Groq;
 using AIHappey.Core.Providers.Hyperbolic;
@@ -773,6 +774,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, CohereProvider>();
         services.AddScoped<IModelProvider, CozeProvider>();
         services.AddScoped<IModelProvider, GigaChatProvider>();
+        services.AddScoped<IModelProvider, GnaniProvider>();
         services.AddScoped<IModelProvider, MistralProvider>();
         services.AddScoped<IModelProvider, CopilotProvider>();
         services.AddScoped<IModelProvider, AnthropicProvider>();
