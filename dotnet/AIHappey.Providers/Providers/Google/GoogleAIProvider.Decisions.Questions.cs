@@ -122,8 +122,10 @@ public partial class GoogleAIProvider
                         var optionId = keepIds ? value : "o" + optionIndex.ToString("D3", CultureInfo.InvariantCulture);
                         // Google never sees the original value after remapping; carry its
                         // meaning into the description instead of sending an empty criterion.
+                        var typedDescription = option.Value.Value.ValueKind == JsonValueKind.String
+                            ? "String value " + option.Value.Value.GetRawText() : "Boolean value " + value;
                         var description = keepIds ? option.Description ?? ""
-                            : string.IsNullOrEmpty(option.Description) ? value : value + ": " + option.Description;
+                            : string.IsNullOrEmpty(option.Description) ? typedDescription : typedDescription + ": " + option.Description;
                         criteria.Add(optionId, description);
                         options.Add(new(optionId, option.Value));
                     }

@@ -36,14 +36,15 @@ public partial class GoogleAIProvider
                     : Enumerable.Range(0, question.Labels!.Count).Select(GoogleDecisionIndex).ToArray();
                 var probabilities = ReadGoogleDecisionDistribution(answer.GetProperty("probabilities"), keys);
                 var max = probabilities.Values.Max(item => item.Value);
-                var tolerance = probabilities.Values.Sum(item => item.Error) + GoogleDecisionRoundingError(answer.GetProperty("confidence")) + 1e-9;
+                var largestError = probabilities.Values.Max(item => item.Error);
+                var tolerance = largestError + GoogleDecisionRoundingError(answer.GetProperty("confidence")) + 1e-9;
                 if (Math.Abs(confidence - max) > tolerance)
                     throw new JsonException("Google decision confidence must match the most likely outcome.");
                 if (question.Type == "choice")
                 {
                     var selected = answer.GetProperty("choice").GetString();
                     var option = question.Options!.SingleOrDefault(item => item.Id == selected);
-                    if (option is null || max - probabilities[option.Id].Value > tolerance)
+                    if (option is null || max - probabilities[option.Id].Value > largestError + probabilities[option.Id].Error + 1e-9)
                         throw new JsonException("Google decision choice must be a supplied option with maximal probability.");
                     mapped = new OpenAIDecisionChoiceAnswer
                     {

@@ -11,6 +11,8 @@ namespace AIHappey.Core.Providers.Google;
 public partial class GoogleAIProvider
 {
     private static readonly JsonSerializerOptions GoogleDecisionJsonOptions = new(JsonSerializerDefaults.Web) { MaxDepth = 100 };
+    // The provider key adds one level around an otherwise valid native response.
+    private static readonly JsonSerializerOptions GoogleDecisionMetadataJsonOptions = new(JsonSerializerDefaults.Web) { MaxDepth = 101 };
 
     private sealed record GoogleDecisionOption(string Id, OpenAIDecisionChoiceValue Value);
 
@@ -147,7 +149,7 @@ public partial class GoogleAIProvider
             var mapped = MapGoogleDecisionResponse(root, model, questions);
             mapped.AdditionalProperties = new()
             {
-                ["providerMetadata"] = JsonSerializer.SerializeToElement(new Dictionary<string, JsonElement> { [GetIdentifier()] = root.Clone() }, GoogleDecisionJsonOptions),
+                ["providerMetadata"] = JsonSerializer.SerializeToElement(new Dictionary<string, JsonElement> { [GetIdentifier()] = root.Clone() }, GoogleDecisionMetadataJsonOptions),
                 ["responseHeaders"] = JsonSerializer.SerializeToElement(responseHeaders)
             };
             return new(mapped, responseHeaders, root.Clone());

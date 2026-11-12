@@ -122,8 +122,8 @@ public sealed partial class GoogleDecisionTests
 
         var nativeQuestions = transport.Body.GetProperty("questions");
         Assert.Equal(new[] { "q0000", "q0001", "q0002" }, nativeQuestions.EnumerateObject().Select(item => item.Name));
-        Assert.Equal("true", nativeQuestions.GetProperty("q0001").GetProperty("criteria").GetProperty("o000").GetString());
-        Assert.Equal("true: Boolean true", nativeQuestions.GetProperty("q0001").GetProperty("criteria").GetProperty("o001").GetString());
+        Assert.Equal("String value \"true\"", nativeQuestions.GetProperty("q0001").GetProperty("criteria").GetProperty("o000").GetString());
+        Assert.Equal("Boolean value true: Boolean true", nativeQuestions.GetProperty("q0001").GetProperty("criteria").GetProperty("o001").GetString());
         Assert.Equal("medium: Workaround", nativeQuestions.GetProperty("q0002").GetProperty("criteria")[1].GetString());
         Assert.True(transport.Body.GetProperty("future_native_option").GetProperty("preserve")[1].GetBoolean());
         Assert.Equal("gemini-decision-1", response.Model);
