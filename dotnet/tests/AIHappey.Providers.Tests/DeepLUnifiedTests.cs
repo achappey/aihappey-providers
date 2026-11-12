@@ -364,14 +364,19 @@ public sealed class DeepLUnifiedTests
                 ? """[{"lang":"de","name":"German","usable_as_target":true,"status":"stable","features":{"formality":{"status":"stable"}}},{"lang":"en","name":"English","usable_as_target":false,"features":{}}]"""
                 : resource.EndsWith("translate_document")
                     ? """[{"lang":"de","name":"German","usable_as_target":true,"features":{}},{"lang":"fr","name":"French","usable_as_target":true,"features":{}}]"""
-                    : """[{"lang":"en-US","name":"American English","usable_as_target":true,"features":{}}]"""));
+                    : resource.EndsWith("voice")
+                        ? """[{"lang":"de","name":"German","usable_as_target":true,"features":{}},{"lang":"en-US","name":"American English","usable_as_target":true,"features":{}},{"lang":"de","name":"German","usable_as_target":true,"features":{}},{"lang":"en","name":"English","usable_as_target":false,"features":{}}]"""
+                        : """[{"lang":"en-US","name":"American English","usable_as_target":true,"features":{}}]"""));
         }));
         using var cache = new MemoryCache(new MemoryCacheOptions());
         var provider = new DeepLProvider(new KeyResolver(), new AsyncCacheHelper(cache), new Factory(client));
         var models = (await provider.ListModels(default)).ToList();
         await provider.ListModels(default);
-        Assert.Equal(3, calls);
-        Assert.Equal(4, models.Count);
+        Assert.Equal(4, calls);
+        Assert.Equal(7, models.Count);
+        Assert.Contains(models, m => m.Id == "deepl/voice-realtime" && m.Type == "transcription" && m.Tags!.Contains("real-time"));
+        Assert.Contains(models, m => m.Id == "deepl/voice-realtime/translate-to/en-US" && m.Type == "transcription");
+        Assert.DoesNotContain(models, m => m.Id == "deepl/voice-realtime/translate-to/en");
         var german = Assert.Single(models, m => m.Id == "deepl/translate-to/DE");
         Assert.Contains("translate_document", german.Tags!);
         Assert.Contains("deepl:translate_text:de:formality:stable", german.Tags!);
