@@ -1,5 +1,9 @@
 [
   {
+    "id": "deepdub",
+    "file": "deepdub.json"
+  },
+  {
     "id": "nabrah",
     "file": "nabrah.json"
   },

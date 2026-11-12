@@ -23,6 +23,7 @@ using AIHappey.Core.Providers.CanopyWave;
 using AIHappey.Core.Providers.CloudRift;
 using AIHappey.Core.Providers.CloudflareWorkersAI;
 using AIHappey.Core.Providers.DeepInfra;
+using AIHappey.Core.Providers.Deepdub;
 using AIHappey.Core.Providers.DeepSeek;
 using AIHappey.Core.Providers.Deepgram;
 using AIHappey.Core.Providers.Echo;
@@ -953,6 +954,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, OrqAgentRuntimeProvider>();
         services.AddScoped<IModelProvider, OrqRouterProvider>();
         services.AddScoped<IModelProvider, TypecastProvider>();
+        services.AddScoped<IModelProvider, DeepdubProvider>();
         services.AddScoped<IModelProvider, UnrealSpeechProvider>();
         services.AddScoped<IModelProvider, KugelAudioProvider>();
         services.AddScoped<IModelProvider, NabrahProvider>();
