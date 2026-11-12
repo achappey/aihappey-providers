@@ -3,8 +3,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AIHappey.Common.Extensions;
+using AIHappey.Core.AI;
 using AIHappey.Core.Extensions;
 using AIHappey.Core.MCP.Media;
+using AIHappey.Core.Models;
 using AIHappey.Vercel.Extensions;
 using AIHappey.Vercel.Mapping;
 using AIHappey.Vercel.Models;
@@ -40,7 +42,7 @@ public sealed partial class VocalStackProvider
         if (metadata.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null or JsonValueKind.Object))
             throw new JsonException("VocalStack provider options must be a JSON object.");
 
-        var options = CreateOptions(metadata, request.Language);
+        var options = CreateOptions(metadata, null);
         var requestBody = options?.ToJsonString(VocalStackJson);
         var now = DateTime.UtcNow;
 
