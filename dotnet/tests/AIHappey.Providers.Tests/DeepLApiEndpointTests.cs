@@ -15,19 +15,19 @@ public sealed class DeepLApiEndpointTests
         string apiKey,
         string expectedHost)
     {
-        Uri? requestUri = null;
+        var requestUris = new List<Uri>();
         string? authorization = null;
         var provider = new DeepLProvider(
             new TestKeyResolver(apiKey),
             new AsyncCacheHelper(),
             new TestHttpClientFactory(request =>
             {
-                requestUri = request.RequestUri;
+                requestUris.Add(request.RequestUri!);
                 authorization = request.Headers.Authorization?.ToString();
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new StringContent(
-                        """[{"language":"DE","name":"German"}]""",
+                        """[{"lang":"de","name":"German","usable_as_source":true,"usable_as_target":true,"status":"stable","features":{"formality":{"status":"stable"}}}]""",
                         Encoding.UTF8,
                         "application/json")
                 };
@@ -35,9 +35,10 @@ public sealed class DeepLApiEndpointTests
 
         var models = await provider.ListModels(CancellationToken.None);
 
-        Assert.Equal(expectedHost, requestUri?.Host);
-        Assert.Equal("/v2/languages", requestUri?.AbsolutePath);
-        Assert.Equal("?type=target", requestUri?.Query);
+        Assert.Equal(3, requestUris.Count);
+        Assert.All(requestUris, uri => Assert.Equal(expectedHost, uri.Host));
+        Assert.All(requestUris, uri => Assert.Equal("/v3/languages", uri.AbsolutePath));
+        Assert.Equal(new[] { "?resource=translate_text", "?resource=translate_document", "?resource=write" }, requestUris.Select(uri => uri.Query));
         Assert.Equal($"DeepL-Auth-Key {apiKey}", authorization);
         Assert.Contains(models, model => model.Name == "DeepL Translate to German");
     }
