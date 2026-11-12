@@ -1,0 +1,90 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "niavoice/nia-chat-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Chat",
+      "type": "language"
+    },
+    {
+      "id": "niavoice/nia-translate-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Translate",
+      "type": "language",
+      "tags": ["translation"]
+    },
+    {
+      "id": "niavoice/speech",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Speech",
+      "type": "speech",
+      "description": "Select language, voice or persona_id through native provider options. Voice-specific models are discovered from /v1/voices."
+    },
+    {
+      "id": "niavoice/nia-scribe-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Scribe",
+      "type": "transcription"
+    },
+    {
+      "id": "niavoice/nia-embed-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Embed",
+      "type": "embedding"
+    },
+    {
+      "id": "niavoice/nia-realtime-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Realtime Voice",
+      "type": "audio",
+      "tags": ["real-time", "realtime-token"]
+    },
+    {
+      "id": "niavoice/nia-conversational-en",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Conversational English",
+      "type": "audio",
+      "tags": ["real-time", "realtime-token"]
+    },
+    {
+      "id": "niavoice/nia-realtime-tts-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Realtime Speech",
+      "type": "audio",
+      "tags": ["real-time", "realtime-token"]
+    },
+    {
+      "id": "niavoice/nia-realtime-stt-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Realtime Transcription",
+      "type": "transcription",
+      "tags": ["real-time", "realtime-token"]
+    },
+    {
+      "id": "niavoice/nia-live-stt-auto-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Live Transcription (Auto-detect)",
+      "type": "transcription",
+      "tags": ["real-time", "realtime-token"]
+    },
+    {
+      "id": "niavoice/nia-live-stt-lang-1",
+      "object": "model",
+      "owned_by": "NiaVoice",
+      "name": "Nia Live Transcription (Pinned Language)",
+      "type": "transcription",
+      "tags": ["real-time", "realtime-token"]
+    }
+  ]
+}
