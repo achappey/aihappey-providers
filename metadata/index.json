@@ -938,6 +938,10 @@
       "sha256": "81132d3cef4df9a9a1abe39fa642464583e673d38ee6015e4625c1d1d01bf186"
     },
     {
+      "file": "models/providers/wavenai.json",
+      "sha256": "89aee6c7d4bccc26c690df8d55f68259112c2c2aeee89e7d437704791e85a8cf"
+    },
+    {
       "file": "models/providers/webcrawlerapi.json",
       "sha256": "f92a430da3b7803c30e5778025cc71392402ece436e1110697faebce62d576f9"
     },
@@ -2343,7 +2347,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "d6f754291227e08c8b6b3b226bfb4e24a18374683e571d1b5f2bba24743ea3de"
+      "sha256": "82a87b7473d4a4896dd099827cd0d763917de41379da3122127b357647a915e3"
     },
     {
       "file": "providers/infer.json",
@@ -3996,6 +4000,10 @@
     {
       "file": "providers/waslo.json",
       "sha256": "152fcc855d26a4b268fb52e4001d389df7252631a4dcf0ea67cc78fda5b46f1f"
+    },
+    {
+      "file": "providers/wavenai.json",
+      "sha256": "9f9e274d8aa5c8062c2d379cf80282f68da7e43e421825c1bc5da100f8524302"
     },
     {
       "file": "providers/wavespeed.json",

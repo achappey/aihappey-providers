@@ -2756,6 +2756,10 @@
     "file": "wavespeed.json"
   },
   {
+    "id": "wavenai",
+    "file": "wavenai.json"
+  },
+  {
     "id": "lightcone",
     "file": "lightcone.json"
   },
