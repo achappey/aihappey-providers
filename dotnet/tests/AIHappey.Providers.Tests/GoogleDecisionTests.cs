@@ -139,7 +139,10 @@ public sealed partial class GoogleDecisionTests
         Assert.Equal(0, response.Usage.OutputTokens);
         Assert.Equal(100, response.Usage.TotalTokens);
         Assert.True(response.AdditionalProperties!["providerMetadata"].GetProperty("google").TryGetProperty("answers", out _));
-        Assert.Equal("request-1", response.AdditionalProperties["responseHeaders"].GetProperty("x-request-id").GetString());
+        // HTTP header names are case-insensitive; JSON property lookup is not.
+        var requestId = Assert.Single(response.AdditionalProperties["responseHeaders"].EnumerateObject()
+            .Where(header => header.Name.Equals("x-request-id", StringComparison.OrdinalIgnoreCase)));
+        Assert.Equal("request-1", requestId.Value.GetString());
     }
 
     [Theory]
