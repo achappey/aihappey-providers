@@ -510,6 +510,10 @@
       "sha256": "f66fee7e825266abad5734799d0eb87f9f306f45ff3bf7f16e54424b5996d9f3"
     },
     {
+      "file": "models/providers/nabrah.json",
+      "sha256": "f6b6b4c27c5c8a80ecb3caf96004e8351f01d24a5bdd314bef4aa6d8fba39ad8"
+    },
+    {
       "file": "models/providers/naceai.json",
       "sha256": "de86da9479bab05e02787fa7ab8b080a5429c2facf58a61ba141f9cceef56c7a"
     },
@@ -2351,7 +2355,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "011061ee8091093cf437f7b6c66b8c9a1d65446250158bf38ece3777a095a5f3"
+      "sha256": "6cc2e8d655b2e5dd61ae2579431f60dc5176d0eefe2ae644f1d91c5c864a9de5"
     },
     {
       "file": "providers/infer.json",
@@ -2892,6 +2896,10 @@
     {
       "file": "providers/myrouter.json",
       "sha256": "922ff30d31fd6eba04ac2e396970157d047a8a16d50e4e9a008b88796307982e"
+    },
+    {
+      "file": "providers/nabrah.json",
+      "sha256": "18f4ee2fea65b9f4878fd1533ac2574daa807a764f8dc0203ccadf940544090c"
     },
     {
       "file": "providers/naceai.json",

@@ -1,0 +1,21 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "nabrah/nabrah_tts_v1",
+      "object": "model",
+      "owned_by": "Nabrah",
+      "name": "Nabrah TTS V1",
+      "type": "speech",
+      "description": "Speech synthesis with a project or public voice ID."
+    },
+    {
+      "id": "nabrah/transcription",
+      "object": "model",
+      "owned_by": "Nabrah",
+      "name": "Nabrah Transcription",
+      "type": "transcription",
+      "description": "Asynchronous audio transcription using the server-configured recognition model."
+    }
+  ]
+}
