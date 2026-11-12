@@ -1,0 +1,21 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "deepdub/dd-etts-4.0",
+      "object": "model",
+      "owned_by": "Deepdub",
+      "name": "dd-etts-4.0",
+      "type": "speech",
+      "description": "Deepdub expressive multilingual text-to-speech."
+    },
+    {
+      "id": "deepdub/dd-etts-3.0",
+      "object": "model",
+      "owned_by": "Deepdub",
+      "name": "dd-etts-3.0",
+      "type": "speech",
+      "description": "Deepdub multilingual text-to-speech."
+    }
+  ]
+}

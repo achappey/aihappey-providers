@@ -190,6 +190,10 @@
       "sha256": "589e542635033c185d19353917c105a519482d6c06c91231da340737d065e243"
     },
     {
+      "file": "models/providers/deepdub.json",
+      "sha256": "95413002fbfbc20a269f5dc54d457c008977bc5885292a6d240f1f899c479bb0"
+    },
+    {
       "file": "models/providers/depaza.json",
       "sha256": "725cc68c3a7e1b8d4f3b101a3dd369ed2e74cf81eafb79d2cdc23811c304640b"
     },
@@ -1914,6 +1918,10 @@
       "sha256": "69533f99d963990c6d575bdc62de01d48c256013323f242050e99eca69e0654a"
     },
     {
+      "file": "providers/deepdub.json",
+      "sha256": "1a517cc4f0837602189c09f788c7a740fae8409a7d8fdd7b03739bbb75733cae"
+    },
+    {
       "file": "providers/deepgram.json",
       "sha256": "c05cec6234d3acb06d04713cd031f305cbdb45015189d1a50a4088a85b4c26cf"
     },
@@ -2355,7 +2363,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "2c7934a8183db3992b4a77560ac1222de42dc5485bdd54c43be89096f6032d78"
+      "sha256": "861fad28cc97a7afdb980188b3605ee8d29e4fb747017aea226654eebd073ef0"
     },
     {
       "file": "providers/infer.json",
