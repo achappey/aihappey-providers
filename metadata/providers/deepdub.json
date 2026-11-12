@@ -9,7 +9,7 @@
   "providerCountry": "IL",
   "category": "media_voice",
   "inferenceRegions": [
-    "US",
-    "EU"
+    "Americas",
+    "Europe"
   ]
 }
