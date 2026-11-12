@@ -39,7 +39,8 @@ public partial class GoogleAIProvider
                             OwnedBy = Google,
                             Description = id,
                             Id = id.ToModelId(GetIdentifier()),
-                            Type = id.GuessModelType(),
+                            Type = id.StartsWith("gemini-decision-", StringComparison.OrdinalIgnoreCase)
+                                ? "decision" : id.GuessModelType(),
                             Tags = RealtimeCapabilities.Tags(GetIdentifier(), id,
                                 id.Contains("-live") ? ["real-time"] : null),
                             Created = createdAt != default ? createdAt.ToUnixTimeSeconds() : null
