@@ -5,6 +5,14 @@ const path = require('node:path');
 const { test } = require('node:test');
 const { hash, buildManifest } = require('./catalog.cjs');
 
+test('Speechmatics catalog tags all five STT models for real-time tokens without changing TTS capabilities', () => {
+  const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../models/providers/speechmatics.json'), 'utf8')).data;
+  const models = data.filter(model => model.type === 'transcription');
+  assert.deepEqual(models.map(model => model.id), ['standard', 'enhanced', 'melia-1', 'oak-1', 'linden-1'].map(model => 'speechmatics/' + model));
+  for (const model of models) { assert.ok(model.tags.includes('real-time')); assert.ok(model.tags.includes('realtime-token')); assert.ok(!model.tags.includes('realtime-session')); }
+  for (const model of data.filter(model => model.type === 'speech')) assert.ok(!model.tags?.includes('real-time'));
+});
+
 test('manifest inventories every display, model, and pricing document, including nested variants', () => {
   const expected = JSON.parse(fs.readFileSync(path.join(__dirname, '../index.json'), 'utf8'));
   assert.deepEqual(buildManifest(), expected);
