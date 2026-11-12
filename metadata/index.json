@@ -1223,7 +1223,7 @@
     },
     {
       "file": "providers/302ai.json",
-      "sha256": "2f817de4276b8ce2870f620963f287561e92bdea18f4fc7d84d0e4aec274c1a7"
+      "sha256": "2ca2f371dd2431bdce2536df6592cca16abe90eeb2c94ddbc17e1198e0b19188"
     },
     {
       "file": "providers/abacusai.json",
@@ -2507,7 +2507,7 @@
     },
     {
       "file": "providers/lazu.json",
-      "sha256": "98965df1b15edf23a6b170545137fff6583c35b7bc2f10bd3e923e5a41cea03a"
+      "sha256": "f66933def3fc1949add0bbeb2cbca8a2de3755d7cb2066e38c38d21c251f4805"
     },
     {
       "file": "providers/lectoai.json",
@@ -4059,7 +4059,7 @@
     },
     {
       "file": "providers/zebracat.json",
-      "sha256": "dd63b63081307a420bd4d0ce7a0fad9ea012670edc22ba3047459cdc9aa75dac"
+      "sha256": "bf57b648602bc1dab3a375b1f000e02fd18f5f068315b50a8f36000bb1108d8a"
     },
     {
       "file": "providers/zenlayer.json",
