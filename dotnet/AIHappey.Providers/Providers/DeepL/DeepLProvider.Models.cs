@@ -23,6 +23,7 @@ public partial class DeepLProvider
                 var textLanguages = await GetLanguagesAsync("translate_text", ct);
                 var documentLanguages = await GetLanguagesAsync("translate_document", ct);
                 var writeLanguages = await GetLanguagesAsync("write", ct);
+                var voiceLanguages = await GetLanguagesAsync("voice", ct);
                 var models = textLanguages.Concat(documentLanguages)
                     .Where(IsTargetLanguage)
                     .GroupBy(language => language.GetProperty("lang").GetString()!, StringComparer.OrdinalIgnoreCase)
@@ -55,6 +56,25 @@ public partial class DeepLProvider
                         Description = $"{(operation == "rephrase" ? "Improve fluency and readability" : "Fix spelling and grammar with minimal changes")}. Supported target languages: {string.Join(", ", writeLanguages.Where(IsTargetLanguage).Select(l => l.GetProperty("lang").GetString()))}."
                     });
 
+                models.Add(new Model
+                {
+                    OwnedBy = nameof(DeepL), Type = "transcription", Id = "voice-realtime".ToModelId(GetIdentifier()),
+                    Name = "DeepL Voice · Transcription", Tags = ["real-time"],
+                    Description = "Live source-language transcription without translation or synthesized audio."
+                });
+                foreach (var language in voiceLanguages.Where(IsTargetLanguage)
+                    .DistinctBy(l => l.GetProperty("lang").GetString()!, StringComparer.OrdinalIgnoreCase))
+                {
+                    var code = language.GetProperty("lang").GetString()!;
+                    models.Add(new Model
+                    {
+                        OwnedBy = nameof(DeepL), Type = "transcription",
+                        Id = $"voice-realtime/translate-to/{code}".ToModelId(GetIdentifier()),
+                        Name = $"DeepL Voice · Translate to {language.GetProperty("name").GetString()}",
+                        Tags = ["real-time", "translate", code.NormalizeLanguageCode(), .. LanguageFeatureTags("voice", [language])],
+                        Description = $"Live speech-to-text translation to {code}. Saves the translation as the transcript; no synthesized audio."
+                    });
+                }
                 return models;
             },
             baseTtl: TimeSpan.FromHours(4),

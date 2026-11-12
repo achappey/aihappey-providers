@@ -40,7 +40,7 @@ public partial class DeepLProvider : IModelProvider
             throw new InvalidOperationException($"No {nameof(DeepL)} API key.");
 
         var trimmedKey = key.Trim();
-        var baseAddress = trimmedKey.EndsWith(":fx", StringComparison.OrdinalIgnoreCase)
+        var baseAddress = !path.StartsWith("v3/voice/", StringComparison.Ordinal) && trimmedKey.EndsWith(":fx", StringComparison.OrdinalIgnoreCase)
             ? "https://api-free.deepl.com/"
             : "https://api.deepl.com/";
         var request = new HttpRequestMessage(method, new Uri(new Uri(baseAddress), path));
