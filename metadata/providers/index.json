@@ -2882,5 +2882,9 @@
   {
     "id": "kugelaudio",
     "file": "kugelaudio.json"
+  },
+  {
+    "id": "vocalstack",
+    "file": "vocalstack.json"
   }
 ]

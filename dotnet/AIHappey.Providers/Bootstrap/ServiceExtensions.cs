@@ -69,6 +69,7 @@ using AIHappey.Core.Providers.VoyageAI;
 using AIHappey.Core.Providers.Sarvam;
 using AIHappey.Core.Providers.MiniMax;
 using AIHappey.Core.Providers.AssemblyAI;
+using AIHappey.Core.Providers.VocalStack;
 using AIHappey.Core.Providers.AI21;
 using AIHappey.Core.Providers.ResembleAI;
 using AIHappey.Core.Providers.Respan;
@@ -812,6 +813,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, SarvamProvider>();
         services.AddScoped<IModelProvider, MiniMaxProvider>();
         services.AddScoped<IModelProvider, AssemblyAIProvider>();
+        services.AddScoped<IModelProvider, VocalStackProvider>();
         services.AddScoped<IModelProvider, ResembleAIProvider>();
         services.AddScoped<IModelProvider, SpeechifyProvider>();
         services.AddScoped<IModelProvider, TTSReaderProvider>();
