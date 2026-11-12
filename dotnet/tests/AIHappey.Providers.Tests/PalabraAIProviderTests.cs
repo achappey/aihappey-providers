@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AIHappey.Common.Model;
 using AIHappey.Core.AI;
+using AIHappey.Core.Contracts;
 using AIHappey.Core.Providers.PalabraAI;
 using Microsoft.Extensions.DependencyInjection;
 
