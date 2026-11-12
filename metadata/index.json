@@ -3875,7 +3875,7 @@
     },
     {
       "file": "providers/upivia.json",
-      "sha256": "fbdec2fd6b619ef7d128d0b0e54b96f351e9edcb45aaa6f54fb6567d02c09e64"
+      "sha256": "90de8c39da86ea5cfff88232f4705d5ed7912675dd17a7f761be1804d86c8569"
     },
     {
       "file": "providers/upstage.json",
@@ -4047,7 +4047,7 @@
     },
     {
       "file": "providers/yutori.json",
-      "sha256": "32c5f36001137afb19af69a6e8743f35e6f64b01d5e006eeb59003fbfc2764f9"
+      "sha256": "3c69aa0f53f7ed936ce58187547c24c69898c8921b4564de23ce821e28a8d0a5"
     },
     {
       "file": "providers/zai.json",
