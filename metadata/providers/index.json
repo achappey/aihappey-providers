@@ -2866,5 +2866,9 @@
   {
     "id": "palabraai",
     "file": "palabraai.json"
+  },
+  {
+    "id": "speakai",
+    "file": "speakai.json"
   }
 ]
