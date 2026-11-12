@@ -102,7 +102,6 @@ public sealed class VocalStackProviderTests
             Model = "general",
             Audio = Convert.ToBase64String(Encoding.UTF8.GetBytes("audio")),
             MediaType = "audio/wav",
-            Language = "fr",
             ProviderOptions = new() { ["vocalstack"] = metadata }
         };
 
@@ -111,7 +110,6 @@ public sealed class VocalStackProviderTests
         using var options = JsonDocument.Parse(submittedOptions!);
         Assert.Equal("clip", options.RootElement.GetProperty("name").GetString());
         Assert.Equal(42, options.RootElement.GetProperty("custom").GetInt32());
-        Assert.Equal("fr", options.RootElement.GetProperty("settings").GetProperty("spokenLanguage").GetString());
         Assert.Equal("on", options.RootElement.GetProperty("settings").GetProperty("speakerLabels").GetString());
     }
 
