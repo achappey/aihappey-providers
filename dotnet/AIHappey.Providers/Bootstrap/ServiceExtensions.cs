@@ -214,6 +214,7 @@ using AIHappey.Core.Providers.HeyGen;
 using AIHappey.Core.Providers.Cartesia;
 using AIHappey.Core.Providers.PalabraAI;
 using AIHappey.Core.Providers.NiaVoice;
+using AIHappey.Core.Providers.SpeakAI;
 using AIHappey.Core.Providers.LOVO;
 using AIHappey.Core.Providers.Verbatik;
 using AIHappey.Core.Providers.Vapi;
@@ -939,6 +940,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, CartesiaProvider>();
         services.AddScoped<IModelProvider, PalabraAIProvider>();
         services.AddScoped<IModelProvider, NiaVoiceProvider>();
+        services.AddScoped<IModelProvider, SpeakAIProvider>();
         services.AddScoped<IModelProvider, LOVOProvider>();
         //services.AddScoped<IModelProvider, EverypixeLabsProvider>();
         services.AddScoped<IModelProvider, VerbatikProvider>();

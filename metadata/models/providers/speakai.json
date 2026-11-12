@@ -1,0 +1,30 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "speakai/transcription",
+      "object": "model",
+      "owned_by": "Speak AI",
+      "name": "Speak AI Transcription",
+      "type": "transcription",
+      "description": "Uploads the audio or video, waits for processing and returns the transcript. Pass native upload fields (sourceLanguage, folderId, tags, fields, callbackUrl) through provider options."
+    },
+    {
+      "id": "speakai/ai-chat",
+      "object": "model",
+      "owned_by": "Speak AI",
+      "name": "Speak AI Chat",
+      "type": "language",
+      "description": "Prompts Speak AI over your workspace media. Pass mediaIds, folderIds, assistantType or promptId through provider options."
+    },
+    {
+      "id": "speakai/live-transcription",
+      "object": "model",
+      "owned_by": "Speak AI",
+      "name": "Speak AI Live Transcription",
+      "type": "transcription",
+      "tags": ["real-time"],
+      "description": "Mints a short-lived token for the Socket.IO namespace wss://listen.speakai.co/v1/live."
+    }
+  ]
+}

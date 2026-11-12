@@ -778,6 +778,10 @@
       "sha256": "5777d647cbf2ca7b798dd994e05339fdc663aff1458ae200a308582f1e79b5cb"
     },
     {
+      "file": "models/providers/speakai.json",
+      "sha256": "fb13a1bd1b56051d62315a5894f83f763d7fc815ea2d1c93b7d11029f0eb88d3"
+    },
+    {
       "file": "models/providers/speechmatics.json",
       "sha256": "6b075c5501be9c6dff4b782be777e25464cb44c6af9f3b62a25c7f2717f54a27"
     },
@@ -2339,7 +2343,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "6447ac0ddf7ea1ad43d1df71f31e53365331268036959e71b18847d2693d7c15"
+      "sha256": "d6f754291227e08c8b6b3b226bfb4e24a18374683e571d1b5f2bba24743ea3de"
     },
     {
       "file": "providers/infer.json",
@@ -3636,6 +3640,10 @@
     {
       "file": "providers/spacexai.json",
       "sha256": "2f25dfe2cc88b525914e3f7e95204aff56ec37a27426bab1e36eabb98332163d"
+    },
+    {
+      "file": "providers/speakai.json",
+      "sha256": "e61640dd6cc5e2bbba13e7c59081aeddee6c6f48f3d3f7fb49f892ccd358436f"
     },
     {
       "file": "providers/speechactors.json",
