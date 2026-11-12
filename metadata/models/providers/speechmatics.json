@@ -59,6 +59,7 @@
             "owned_by": "Speechmatics",
             "name": "Speechmatics Standard",
             "type": "transcription",
+            "tags": ["real-time", "realtime-token"],
             "description": "Speech-to-text transcription model"
         },
         {
@@ -67,6 +68,7 @@
             "owned_by": "Speechmatics",
             "name": "Speechmatics Enhanced",
             "type": "transcription",
+            "tags": ["real-time", "realtime-token"],
             "description": "Enhanced speech-to-text transcription model"
         },
         {
@@ -75,7 +77,26 @@
             "owned_by": "Speechmatics",
             "name": "Speechmatics Melia 1",
             "type": "transcription",
+            "tags": ["real-time", "realtime-token"],
             "description": "Melia 1 matches the Enhanced and Standard models for core transcription features, including diarization, word timings, punctuation, notifications, and output locale."
+        },
+        {
+            "id": "speechmatics/oak-1",
+            "object": "model",
+            "owned_by": "Speechmatics",
+            "name": "Speechmatics Oak 1",
+            "type": "transcription",
+            "tags": ["real-time", "realtime-token"],
+            "description": "Multilingual batch and real-time transcription; uses language multi with optional language hints."
+        },
+        {
+            "id": "speechmatics/linden-1",
+            "object": "model",
+            "owned_by": "Speechmatics",
+            "name": "Speechmatics Linden 1 (Agent STT)",
+            "type": "transcription",
+            "tags": ["real-time", "realtime-token"],
+            "description": "Agent STT WebSocket-only transcription with partial/final segments and voice-activity turn detection; not a batch model."
         }
     ]
 }

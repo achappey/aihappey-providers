@@ -19,6 +19,8 @@ public partial class SpeechmaticsProvider
         ArgumentNullException.ThrowIfNull(request);
         if (string.IsNullOrWhiteSpace(request.Model))
             throw new ArgumentException("Model is required.", nameof(request));
+        if (NormalizeTranscriptionModelId(request.Model) == "linden-1")
+            throw new NotSupportedException("Speechmatics Linden 1 supports Agent STT WebSocket transcription only.");
         if (string.IsNullOrWhiteSpace(request.MediaType))
             throw new ArgumentException("MediaType is required.", nameof(request));
 
@@ -89,9 +91,9 @@ public partial class SpeechmaticsProvider
             }
         }
 
-        // Melia 1 is multilingual-only and rejects both a selected language and `auto`.
+        // Melia 1 and Oak 1 are multilingual-only and reject a selected language or `auto`.
         // It must always receive the documented `multi` language value.
-        if (string.Equals(speechmaticsModel, "melia-1", StringComparison.OrdinalIgnoreCase))
+        if (speechmaticsModel is "melia-1" or "oak-1")
             transcriptionConfig["language"] = "multi";
         else if (!string.IsNullOrWhiteSpace(language))
             transcriptionConfig["language"] = language;

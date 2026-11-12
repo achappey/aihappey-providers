@@ -771,7 +771,7 @@
     },
     {
       "file": "models/providers/speechmatics.json",
-      "sha256": "02d02b060ef1415009c6ceaa2967e2726a19608c08b0ab68e88bf0f9da282a4e"
+      "sha256": "6b075c5501be9c6dff4b782be777e25464cb44c6af9f3b62a25c7f2717f54a27"
     },
     {
       "file": "models/providers/stabilityai.json",
@@ -1399,7 +1399,7 @@
     },
     {
       "file": "providers/ambient.json",
-      "sha256": "7348d1492b723233dd93472e6ad93c5244e000f4d94eceafcba86d65d14d9e28"
+      "sha256": "ff5623ae319731b64044b54d1fb72c85b73d5f35983f8b4e98cf55e2d341de6f"
     },
     {
       "file": "providers/amnt.json",
@@ -1647,7 +1647,7 @@
     },
     {
       "file": "providers/cailos.json",
-      "sha256": "2649bbb8cf79a4201eb0d4508eb7031120e9bc04d4c11fbe1f958983245a181a"
+      "sha256": "120994a6999f62e7223e4a16c24f269b688e3f51a17d9ce542c411b6d9fca5f5"
     },
     {
       "file": "providers/callmissed.json",
@@ -1943,7 +1943,7 @@
     },
     {
       "file": "providers/echo.json",
-      "sha256": "e7b23ed41c72ac2b080b605a9fd02854ba3e5ca4ed3ed8e6ec2a3d1aca292a6a"
+      "sha256": "c7abb33a27457647603473226a9cd5c87b5f58fc50c8e4f6e6a25770c0957eed"
     },
     {
       "file": "providers/ecoia.json",
@@ -2067,7 +2067,7 @@
     },
     {
       "file": "providers/fortytwo.json",
-      "sha256": "4f79a794f856371b881a67d0a23229b8b7617be5f6eec4c31b8e8659d06721a6"
+      "sha256": "b485cb6478f2a1acc4e6e1e2ce939f41b36cae10361d0d983d72bd999aca16f5"
     },
     {
       "file": "providers/founden.json",
@@ -2187,11 +2187,11 @@
     },
     {
       "file": "providers/gtranslate.json",
-      "sha256": "b5d6196f7262ab50a5780f6cc7f59c4e2422988604fd6f25965b40d2d5d7c402"
+      "sha256": "92e8465b0c94c49f309d3299c36cc45af13ec82bfaa64003021c055bf3aacc2b"
     },
     {
       "file": "providers/guidai.json",
-      "sha256": "07bbb7024a8d91ea3d783bacbb620096b17f892660d0f2296dcc757b0ec59dd8"
+      "sha256": "b8f6e12d906a74494587bd85a402479e1b73f77b5ac7c9763896d12843fe2f69"
     },
     {
       "file": "providers/gwdg.json",
@@ -2371,7 +2371,7 @@
     },
     {
       "file": "providers/infraxa.json",
-      "sha256": "1acdaaff91168b1c3cfd526a536e497fb7747824a7ee911beb77e8bf9ba571f8"
+      "sha256": "12a090ddc80cd7d57bd90e68b33edbba05ec129ab006c15c689c79e56aa829a8"
     },
     {
       "file": "providers/infron.json",
@@ -2955,7 +2955,7 @@
     },
     {
       "file": "providers/nodion.json",
-      "sha256": "457c825efb312a038839cd5b7ecc5637564c5fe9efcf188a319019dc73d032a5"
+      "sha256": "4f0c8d44cdb4435a44c667606431adbb4939b7c6d4fc45f511dfb731564ad937"
     },
     {
       "file": "providers/noiz.json",
@@ -2987,7 +2987,7 @@
     },
     {
       "file": "providers/novai.json",
-      "sha256": "40838d23786bcf4824cffb2bf0cca98a6730131c351c497a3ba64c0f53d9d60d"
+      "sha256": "80258a7c41bcee2125cede94a536ce93735be009c29bfffd5fc795735c2c3b5b"
     },
     {
       "file": "providers/novita.json",
@@ -3539,7 +3539,7 @@
     },
     {
       "file": "providers/shannonai.json",
-      "sha256": "773b41db5ca5cf097a903f520e2e1ea9d7b2e7ac1b77e2dbf7e018c1de7cfa99"
+      "sha256": "8a98edbb04a3a7bc319c9a8cea570f39c84d11024bfd5e4e9a023a2c4fdfe7ee"
     },
     {
       "file": "providers/shareai.json",
@@ -3551,7 +3551,7 @@
     },
     {
       "file": "providers/shuttleai.json",
-      "sha256": "af33e95e025f49a964d330b5367e098214f23076862030d1816015cb8da4c3a9"
+      "sha256": "c9523c312431425324e1968263a77798a5f7ffe5b810b5b40e51ad7fd1353d0b"
     },
     {
       "file": "providers/siliconflow.json",
@@ -3679,7 +3679,7 @@
     },
     {
       "file": "providers/sundaypyjamas.json",
-      "sha256": "92f5f23ea0f8fddeb2a82635d18b1cc6864655ceff604ecb88280eac49a295ed"
+      "sha256": "886fee8871ccca2f37429282ebf043b06b75dc3fb7a6d6ddd98755580d7ac945"
     },
     {
       "file": "providers/sunoapi.json",
@@ -3803,7 +3803,7 @@
     },
     {
       "file": "providers/toapis.json",
-      "sha256": "0f989c91d99619a8d6dd8fd79411a7ab73a6d74b2f555693f044ff624c1dacf0"
+      "sha256": "4d707ef4cb7cc6056dd687a8775b1fb5b90fc24a4a3a06f7924364d38432fcca"
     },
     {
       "file": "providers/together.json",
@@ -4043,7 +4043,7 @@
     },
     {
       "file": "providers/yourvoic.json",
-      "sha256": "c4ba59f3bb21b7f1879093700f0806da875467493d0d9bc29e0c6d0428387d2a"
+      "sha256": "837afb43391c5d20198f80c711647936dfcaabaffdf27aa8c33e3f3b90aba73a"
     },
     {
       "file": "providers/yutori.json",
