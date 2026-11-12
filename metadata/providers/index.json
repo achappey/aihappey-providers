@@ -2890,5 +2890,9 @@
   {
     "id": "vocalstack",
     "file": "vocalstack.json"
+  },
+  {
+    "id": "gnani",
+    "file": "gnani.json"
   }
 ]

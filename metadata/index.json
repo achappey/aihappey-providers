@@ -286,6 +286,10 @@
       "sha256": "78373ba4bf8a80c1a715b278866bd0afd5276ef5908b89d129acc70810401b02"
     },
     {
+      "file": "models/providers/gnani.json",
+      "sha256": "fb946ef59d209107ac3a45b470c129ab632d04e39820bb560dea6419630101f3"
+    },
+    {
       "file": "models/providers/helyxai.json",
       "sha256": "4a1d6795660e414c299d6d241ee96298049d2d35a4162ec2f78d67effd279574"
     },
@@ -2178,6 +2182,10 @@
       "sha256": "4f31655d01cdc85799512f919195b72f4fba83b97d39e69ef789246e9a31dd55"
     },
     {
+      "file": "providers/gnani.json",
+      "sha256": "c5d105a3207c3330c5e2a92bbf511dbca1e3360e1e2697ce52d0d58af0f7d23e"
+    },
+    {
       "file": "providers/gonkagate.json",
       "sha256": "643a49b50bff858922807ba206af3b5e938c2a780bc6a6334f4e74a17f737620"
     },
@@ -2363,7 +2371,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "861fad28cc97a7afdb980188b3605ee8d29e4fb747017aea226654eebd073ef0"
+      "sha256": "3f56b3dc460dd56cfa284c3a244fdfbd9b28b2229f720cdbfc645ec3fa24a4bf"
     },
     {
       "file": "providers/infer.json",
