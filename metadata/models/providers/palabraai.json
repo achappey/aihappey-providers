@@ -1,0 +1,39 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "palabraai/s2s",
+      "object": "model",
+      "owned_by": "PalabraAI",
+      "name": "Speech-to-Speech Translation",
+      "type": "audio",
+      "tags": [
+        "real-time",
+        "realtime-token",
+        "translation"
+      ]
+    },
+    {
+      "id": "palabraai/stt",
+      "object": "model",
+      "owned_by": "PalabraAI",
+      "name": "Realtime Speech-to-Text",
+      "type": "transcription",
+      "tags": [
+        "real-time",
+        "realtime-token"
+      ]
+    },
+    {
+      "id": "palabraai/tts",
+      "object": "model",
+      "owned_by": "PalabraAI",
+      "name": "Realtime Text-to-Speech",
+      "type": "audio",
+      "tags": [
+        "real-time",
+        "realtime-token"
+      ]
+    }
+  ]
+}
