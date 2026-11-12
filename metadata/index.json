@@ -2247,7 +2247,7 @@
     },
     {
       "file": "providers/hicap.json",
-      "sha256": "7c610c71c5b015e3a3ed2ea26843bf9076c13fc6c542037a80ab13beb0ff5276"
+      "sha256": "8ed3ff2a570e0fdfc31b9789dc0e829b25ce8e4ce28de76e9db99db4aa8dc1cf"
     },
     {
       "file": "providers/hinow.json",
@@ -3055,7 +3055,7 @@
     },
     {
       "file": "providers/opeai.json",
-      "sha256": "545cb848898ee5646611aa67ef00a2d9430071e1109ef4f053c2e639a84f56c7"
+      "sha256": "9200cabe75d0ca0f206e034bf5a4dffbc7e0147387c0a6ae43a70f197f944777"
     },
     {
       "file": "providers/openadapter.json",
