@@ -2355,7 +2355,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "6cc2e8d655b2e5dd61ae2579431f60dc5176d0eefe2ae644f1d91c5c864a9de5"
+      "sha256": "2c7934a8183db3992b4a77560ac1222de42dc5485bdd54c43be89096f6032d78"
     },
     {
       "file": "providers/infer.json",
@@ -3984,6 +3984,10 @@
     {
       "file": "providers/vlmrun.json",
       "sha256": "67310cba61a7f087e43ed18fc3ec7a9e645477f3e2efde791dc6588b32d1cfdd"
+    },
+    {
+      "file": "providers/vocalstack.json",
+      "sha256": "187e0ece35f7c2493b0d2b820163eaf28408a5358cb59de5efbc2a37e3b29201"
     },
     {
       "file": "providers/vogent.json",
