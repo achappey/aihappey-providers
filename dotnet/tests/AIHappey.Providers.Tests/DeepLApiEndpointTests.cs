@@ -35,10 +35,10 @@ public sealed class DeepLApiEndpointTests
 
         var models = await provider.ListModels(CancellationToken.None);
 
-        Assert.Equal(3, requestUris.Count);
+        Assert.Equal(4, requestUris.Count);
         Assert.All(requestUris, uri => Assert.Equal(expectedHost, uri.Host));
         Assert.All(requestUris, uri => Assert.Equal("/v3/languages", uri.AbsolutePath));
-        Assert.Equal(new[] { "?resource=translate_text", "?resource=translate_document", "?resource=write" }, requestUris.Select(uri => uri.Query));
+        Assert.Equal(new[] { "?resource=translate_text", "?resource=translate_document", "?resource=write", "?resource=voice" }, requestUris.Select(uri => uri.Query));
         Assert.Equal($"DeepL-Auth-Key {apiKey}", authorization);
         Assert.Contains(models, model => model.Name == "DeepL Translate to German");
     }
