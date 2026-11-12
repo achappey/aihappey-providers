@@ -1,0 +1,45 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "wavenai/kokoro",
+      "object": "model",
+      "owned_by": "WavenAI",
+      "name": "WavenAI Kokoro",
+      "type": "speech",
+      "description": "Stock-voice speech synthesis with speed control and long-form narration."
+    },
+    {
+      "id": "wavenai/chatterbox",
+      "object": "model",
+      "owned_by": "WavenAI",
+      "name": "WavenAI Chatterbox",
+      "type": "speech",
+      "description": "Multilingual speech synthesis with consent-based reference audio or saved gallery voices."
+    },
+    {
+      "id": "wavenai/auto",
+      "object": "model",
+      "owned_by": "WavenAI",
+      "name": "WavenAI Auto Transcription",
+      "type": "transcription",
+      "description": "Automatic language detection and routing to Parakeet or Voxtral."
+    },
+    {
+      "id": "wavenai/parakeet",
+      "object": "model",
+      "owned_by": "WavenAI",
+      "name": "WavenAI Parakeet",
+      "type": "transcription",
+      "description": "English transcription with segment and optional word timestamps."
+    },
+    {
+      "id": "wavenai/voxtral",
+      "object": "model",
+      "owned_by": "WavenAI",
+      "name": "WavenAI Voxtral",
+      "type": "transcription",
+      "description": "Multilingual transcription. Word alignments and caption formats are unavailable."
+    }
+  ]
+}

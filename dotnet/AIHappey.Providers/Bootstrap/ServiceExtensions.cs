@@ -605,6 +605,7 @@ using AIHappey.Core.Providers.WellSaid;
 using AIHappey.Core.Providers.PredictionGuard;
 using AIHappey.Core.Providers.Sutra;
 using AIHappey.Core.Providers.WaveSpeed;
+using AIHappey.Core.Providers.WavenAI;
 using AIHappey.Core.Providers.BeastLabAI;
 using AIHappey.Core.Providers.LelapaAI;
 using AIHappey.Core.Providers.SailResearch;
@@ -1352,6 +1353,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, PredictionGuardProvider>();
         services.AddScoped<IModelProvider, SutraProvider>();
         services.AddScoped<IModelProvider, WaveSpeedProvider>();
+        services.AddScoped<IModelProvider, WavenAIProvider>();
         services.AddScoped<IModelProvider, BeastLabAIProvider>();
         services.AddScoped<IModelProvider, LelapaAIProvider>();
         services.AddScoped<IModelProvider, SailResearchProvider>();
