@@ -69,6 +69,12 @@
       "output": "0.00002"
     }
   },
+  "google/gemini-4-hydrogen": {
+    "pricing": {
+      "input": "0.0000015",
+      "output": "0.0000075"
+    }
+  },
   "google/gemini-3.5-flash-lite": {
     "pricing": {
       "input": "0.0000003",
