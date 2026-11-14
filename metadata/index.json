@@ -1095,7 +1095,7 @@
     },
     {
       "file": "pricing/providers/google.json",
-      "sha256": "d97361c21af4e58d89720413714123d50f5136d22fdc17ba653d889fdef813be"
+      "sha256": "0c91b9aa65c5dc2ac7c733b6da061f9672ba74236f57a7ecac0612445faf26c3"
     },
     {
       "file": "pricing/providers/google/batch.json",
