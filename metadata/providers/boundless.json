@@ -1,0 +1,10 @@
+{
+  "name": "Boundless",
+  "description": "Open-weight and proprietary model inference with OpenAI-compatible and Anthropic-compatible APIs and System One decision models.",
+  "urls": {
+    "homepage": "https://inference.boundless.network",
+    "docs": "https://inference.boundless.network/docs",
+    "pricing": "https://inference.boundless.network/models"
+  },
+  "category": "inference_compute"
+}

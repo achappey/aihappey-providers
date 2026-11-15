@@ -1646,6 +1646,10 @@
       "sha256": "c10e084122963b2746119542102889657e3dbe6a9d90b36e0ead260cc7925430"
     },
     {
+      "file": "providers/boundless.json",
+      "sha256": "91431493f0c072ac36a5e6a2fccbfaf313f843b0e4354f7d0322973013b3773d"
+    },
+    {
       "file": "providers/brainiall.json",
       "sha256": "eba526009573ef11483e274e1d9016f9ab84e0427767ca1db0c88c84c437c2c2"
     },
@@ -1923,7 +1927,7 @@
     },
     {
       "file": "providers/deepdub.json",
-      "sha256": "1a517cc4f0837602189c09f788c7a740fae8409a7d8fdd7b03739bbb75733cae"
+      "sha256": "60b06341a072fabab0e74e7598d50d0f5e478d46871f9e26dc42eb3b36805bbc"
     },
     {
       "file": "providers/deepgram.json",
@@ -2371,7 +2375,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "3f56b3dc460dd56cfa284c3a244fdfbd9b28b2229f720cdbfc645ec3fa24a4bf"
+      "sha256": "301103f047fd0af8faadfa459ce1967330fa26c0ea07dbb0ca6dfdf6b289dc7d"
     },
     {
       "file": "providers/infer.json",
