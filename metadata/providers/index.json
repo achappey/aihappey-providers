@@ -1880,6 +1880,10 @@
     "file": "gmicloud.json"
   },
   {
+    "id": "byteit",
+    "file": "byteit.json"
+  },
+  {
     "id": "byteplus",
     "file": "byteplus.json"
   },

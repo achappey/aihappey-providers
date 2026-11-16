@@ -134,6 +134,10 @@
       "sha256": "82399ce93e813c5fd0e795a448de4c36ec4c8d29212761a88b97bbfe9d4593fa"
     },
     {
+      "file": "models/providers/byteit.json",
+      "sha256": "2442c8498dd1b77a7893585d551fb9ebd58f5270a32e14ac759a23c860e2061b"
+    },
+    {
       "file": "models/providers/bytez.json",
       "sha256": "eacf51fd1bfb6f516a0966d69f70fb09c85569902ae2289bbb4d4e8b318e6cec"
     },
@@ -1670,6 +1674,10 @@
       "sha256": "a7c784aff1e068f32ce08a355588241bfb4297302a6b7db6528bfbf7a3bef6bc"
     },
     {
+      "file": "providers/byteit.json",
+      "sha256": "c6e9a15cabd1999da01580ff1b170626bcbc26816182b86c804da8cb4dc2b2ab"
+    },
+    {
       "file": "providers/byteplus.json",
       "sha256": "9a524cbde666fcf65e9db234d27acd7e68c74924e5ae26403298181bae5e21e6"
     },
@@ -2375,7 +2383,7 @@
     },
     {
       "file": "providers/index.json",
-      "sha256": "301103f047fd0af8faadfa459ce1967330fa26c0ea07dbb0ca6dfdf6b289dc7d"
+      "sha256": "3f84949a66c692d575b019aab095673f870f3b70a13110363ddc3ec3d5fe1bb6"
     },
     {
       "file": "providers/infer.json",
