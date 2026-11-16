@@ -307,6 +307,7 @@ using AIHappey.Core.Providers.PayPerQ;
 using AIHappey.Core.Providers.Swarms;
 using AIHappey.Core.Providers.DocsRouter;
 using AIHappey.Core.Providers.OCRSkill;
+using AIHappey.Core.Providers.ByteIT;
 using AIHappey.Core.Providers.Zoom;
 using AIHappey.Core.Providers.Nexusify;
 using AIHappey.Core.Providers.LitAI;
@@ -1040,6 +1041,7 @@ public static class ServiceExtensions
         services.AddScoped<IModelProvider, SwarmsProvider>();
         services.AddScoped<IModelProvider, DocsRouterProvider>();
         services.AddScoped<IModelProvider, OCRSkillProvider>();
+        services.AddScoped<IModelProvider, ByteITProvider>();
         services.AddScoped<IModelProvider, ZoomProvider>();
         services.AddScoped<IModelProvider, SerenityEdgeProvider>();
         services.AddScoped<IModelProvider, AgentSkyProvider>();

@@ -1,0 +1,13 @@
+{
+  "name": "ByteIT",
+  "description": "AI-powered document OCR, parsing, schema-based data extraction, classification and custom document processing.",
+  "urls": {
+    "homepage": "https://byteit.ai",
+    "docs": "https://github.com/byteit-ai/byteit-sdk"
+  },
+  "category": "app_tools",
+  "providerCountry": "DE",
+  "inferenceRegions": [
+    "Europe"
+  ]
+}

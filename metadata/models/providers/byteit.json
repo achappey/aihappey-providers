@@ -1,0 +1,37 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "byteit/parse",
+      "object": "model",
+      "owned_by": "ByteIT",
+      "name": "ByteIT Parse",
+      "type": "language",
+      "description": "Document OCR and parsing to Markdown, text, HTML, JSON or Excel ZIP. A JSON schema enables structured extraction."
+    },
+    {
+      "id": "byteit/extract",
+      "object": "model",
+      "owned_by": "ByteIT",
+      "name": "ByteIT Extract",
+      "type": "language",
+      "description": "Schema-based extraction from uploaded documents or an existing parse_job_id."
+    },
+    {
+      "id": "byteit/classification",
+      "object": "model",
+      "owned_by": "ByteIT",
+      "name": "ByteIT Classification",
+      "type": "language",
+      "description": "Classify and split documents using native classes or system defaults."
+    },
+    {
+      "id": "byteit/custom",
+      "object": "model",
+      "owned_by": "ByteIT",
+      "name": "ByteIT Custom",
+      "type": "language",
+      "description": "Account-enabled custom processing of up to 25 documents with an optional schema and user prompt."
+    }
+  ]
+}
